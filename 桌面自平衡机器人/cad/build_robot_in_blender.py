@@ -5,14 +5,14 @@ blender_script = """
 import bpy
 import math
 
-# 1. 清空场景中旧物体
+# 1. 清空旧物体
 bpy.ops.object.select_all(action='DESELECT')
 for obj in list(bpy.data.objects):
     if obj.type == 'MESH':
         bpy.data.objects.remove(obj, do_unlink=True)
 
-# 2. 高级材质库 (太空宇航白 + 赛博黑钛 + 发光青蓝 + 哑光橡胶)
-def get_mat(name, color, roughness=0.3, metallic=0.0, emission=False, emit_strength=5.0):
+# 2. 材质库定义 (包含半透明透视外壳 + 真实电子器件颜色)
+def get_mat(name, color, roughness=0.3, metallic=0.0, emission=False, alpha=1.0, emit_strength=5.0):
     mat = bpy.data.materials.get(name)
     if not mat:
         mat = bpy.data.materials.new(name=name)
@@ -23,122 +23,47 @@ def get_mat(name, color, roughness=0.3, metallic=0.0, emission=False, emit_stren
             bsdf.inputs['Base Color'].default_value = color
             bsdf.inputs['Roughness'].default_value = roughness
             bsdf.inputs['Metallic'].default_value = metallic
+            if 'Alpha' in bsdf.inputs:
+                bsdf.inputs['Alpha'].default_value = alpha
             if emission:
                 if 'Emission Color' in bsdf.inputs:
                     bsdf.inputs['Emission Color'].default_value = color
                     bsdf.inputs['Emission Strength'].default_value = emit_strength
                 elif 'Emission' in bsdf.inputs:
                     bsdf.inputs['Emission'].default_value = color
+        if alpha < 1.0:
+            mat.blend_method = 'BLEND'
     return mat
 
-mat_shell_white = get_mat("Armor_White", (0.92, 0.93, 0.95, 1.0), roughness=0.2, metallic=0.05)
-mat_shell_dark  = get_mat("Armor_DarkTitanium", (0.12, 0.13, 0.15, 1.0), roughness=0.35, metallic=0.2)
-mat_visor_glass = get_mat("Visor_Glass", (0.02, 0.03, 0.05, 1.0), roughness=0.05, metallic=0.1)
-mat_glow_cyan   = get_mat("Cyber_Cyan_Glow", (0.0, 0.85, 1.0, 1.0), emission=True, emit_strength=10.0)
-mat_glow_orange = get_mat("Cyber_Orange_Glow", (1.0, 0.45, 0.05, 1.0), emission=True, emit_strength=6.0)
-mat_rubber      = get_mat("Tire_Rubber", (0.04, 0.04, 0.04, 1.0), roughness=0.85)
-mat_rim_metal   = get_mat("Wheel_Rim_Metal", (0.85, 0.85, 0.88, 1.0), roughness=0.2, metallic=0.8)
+# 外壳材质 (半透明太空银白，方便 X-Ray 透视内部空间)
+mat_xray_shell = get_mat("XRay_Shell_White", (0.92, 0.94, 0.98, 0.35), roughness=0.1, alpha=0.35)
+mat_xray_visor = get_mat("XRay_Visor", (0.05, 0.1, 0.2, 0.4), roughness=0.05, alpha=0.4)
+mat_rubber     = get_mat("Tire_Rubber", (0.04, 0.04, 0.04, 1.0), roughness=0.85)
+mat_rim_metal  = get_mat("Wheel_Rim_Metal", (0.85, 0.85, 0.88, 1.0), roughness=0.2, metallic=0.8)
 
-# 基础机械参数
-wheel_r = 0.0215  # 43mm 轮径
-wheel_w = 0.014   # 14mm 轮宽
-body_w  = 0.052   # 车身宽 52mm
-body_l  = 0.058   # 车身长 58mm
-body_h  = 0.065   # 车身高 65mm
+# 内部真实电子元器件材质
+mat_bat_blue   = get_mat("18650_LiIon", (0.1, 0.45, 0.95, 1.0), roughness=0.2)
+mat_n20_brass  = get_mat("N20_Gearbox", (0.85, 0.68, 0.22, 1.0), metallic=0.85, roughness=0.2)
+mat_n20_silver = get_mat("N20_Motor_Body", (0.8, 0.8, 0.82, 1.0), metallic=0.9, roughness=0.2)
+mat_pcb_stm32  = get_mat("PCB_STM32_Green", (0.05, 0.45, 0.15, 1.0), roughness=0.3)
+mat_pcb_esp32  = get_mat("PCB_ESP32_Black", (0.08, 0.08, 0.09, 1.0), roughness=0.3)
+mat_driver_red = get_mat("TB6612_Driver_Red", (0.85, 0.1, 0.1, 1.0), roughness=0.3)
+mat_ic_black   = get_mat("IC_Chip_Black", (0.02, 0.02, 0.02, 1.0), roughness=0.4)
+mat_oled_glow  = get_mat("OLED_Screen_Cyan", (0.0, 0.85, 1.0, 1.0), emission=True, emit_strength=8.0)
 
-# 3. 头部宇航盔 (圆润胶囊科技感头部)
-z_head = wheel_r + 0.052
-bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.002, 0, z_head))
-head = bpy.context.active_object
-head.name = "Robot_Helmet_Head"
-head.scale = (0.046, 0.052, 0.036)
-head.data.materials.append(mat_shell_white)
+# ==============================================================
+# 真实工业级空间尺寸 (针对 65mm 长 18650 电池优化机身空间)
+# ==============================================================
+wheel_r   = 0.0215  # 43mm 轮径 (半径 21.5mm)
+wheel_w   = 0.014   # 14mm 轮宽
+chassis_w = 0.052   # 机身外宽 52mm (内部净宽 46mm)
+chassis_l = 0.074   # 机身外长 74mm (内部净长 68mm，完美容纳 65mm 长的 18650 电池！)
+chassis_h = 0.088   # 机身总高 88mm
 
-# 头部倒角细分 (让头盔圆润拟人化)
-sub = head.modifiers.new(name="Bevel", type='BEVEL')
-sub.width = 0.18
-sub.segments = 5
-
-# 4. 前置一体化弧形深黑面罩 (Visor)
-bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.024, 0, z_head))
-visor = bpy.context.active_object
-visor.name = "Face_Visor"
-visor.scale = (0.004, 0.044, 0.024)
-visor.data.materials.append(mat_visor_glass)
-sub_v = visor.modifiers.new(name="Bevel", type='BEVEL')
-sub_v.width = 0.15
-sub_v.segments = 4
-
-# 面罩上的发光科技眼睛 (OLED Pixel Eyes)
-for eye_side in [-1, 1]:
-    bpy.ops.mesh.primitive_cube_add(
-        size=1.0, location=(0.0265, eye_side * 0.012, z_head + 0.002)
-    )
-    eye = bpy.context.active_object
-    eye.name = f"Eye_{'L' if eye_side>0 else 'R'}"
-    eye.scale = (0.002, 0.006, 0.008)
-    eye.data.materials.append(mat_glow_cyan)
-
-# 5. 侧边机甲耳机 / 科技小耳朵 (Cyberpunk Ears)
-for ear_side in [-1, 1]:
-    bpy.ops.mesh.primitive_cylinder_add(
-        radius=0.008, depth=0.006,
-        location=(0.002, ear_side * (0.028 + 0.003), z_head), rotation=(math.pi/2, 0, 0)
-    )
-    ear = bpy.context.active_object
-    ear.name = f"Ear_Antenna_{'L' if ear_side>0 else 'R'}"
-    ear.data.materials.append(mat_shell_dark)
-    
-    # 耳机发光光环
-    bpy.ops.mesh.primitive_cylinder_add(
-        radius=0.005, depth=0.007,
-        location=(0.002, ear_side * (0.028 + 0.0035), z_head), rotation=(math.pi/2, 0, 0)
-    )
-    ear_glow = bpy.context.active_object
-    ear_glow.name = f"Ear_Glow_{'L' if ear_side>0 else 'R'}"
-    ear_glow.data.materials.append(mat_glow_cyan)
-
-# 6. 中段机甲躯干外壳 (Torso Armor - 把电池和主控完美包裹)
-z_torso = wheel_r + 0.024
-bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, z_torso))
-torso = bpy.context.active_object
-torso.name = "Torso_Armor"
-torso.scale = (body_l, body_w, 0.038)
-torso.data.materials.append(mat_shell_white)
-sub_t = torso.modifiers.new(name="Bevel", type='BEVEL')
-sub_t.width = 0.12
-sub_t.segments = 4
-
-# 胸口科技装饰条与状态指示灯
-bpy.ops.mesh.primitive_cube_add(size=1.0, location=(body_l/2.0 + 0.001, 0, z_torso))
-chest_stripe = bpy.context.active_object
-chest_stripe.name = "Chest_LED_Stripe"
-chest_stripe.scale = (0.002, 0.032, 0.006)
-chest_stripe.data.materials.append(mat_shell_dark)
-
-bpy.ops.mesh.primitive_cube_add(size=1.0, location=(body_l/2.0 + 0.002, 0, z_torso))
-chest_led = bpy.context.active_object
-chest_led.name = "Chest_Core_LED"
-chest_led.scale = (0.0015, 0.016, 0.003)
-chest_led.data.materials.append(mat_glow_orange)
-
-# 7. 后背背包仓 (Backpack Power Unit - 放置 Type-C 与电源开关)
-bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-body_l/2.0 - 0.004, 0, z_torso + 0.004))
-backpack = bpy.context.active_object
-backpack.name = "Backpack_Battery_Module"
-backpack.scale = (0.012, 0.036, 0.032)
-backpack.data.materials.append(mat_shell_dark)
-sub_b = backpack.modifiers.new(name="Bevel", type='BEVEL')
-sub_b.width = 0.15
-sub_b.segments = 3
-
-# 8. 左右车轮总成 (赛博轮毂 + 宽胎 + 发光轮圈)
-wheel_y = (body_w / 2.0) + 0.004 + (wheel_w / 2.0) # 37mm
-
+# 3. 左右车轮
+wheel_y = (chassis_w / 2.0) + 0.004 + (wheel_w / 2.0)
 for side in [-1, 1]:
     y_pos = side * wheel_y
-    
-    # 橡胶花纹轮胎
     bpy.ops.mesh.primitive_cylinder_add(
         radius=wheel_r, depth=wheel_w,
         location=(0, y_pos, wheel_r), rotation=(math.pi/2, 0, 0)
@@ -147,7 +72,6 @@ for side in [-1, 1]:
     tire.name = f"Tire_{'L' if side>0 else 'R'}"
     tire.data.materials.append(mat_rubber)
     
-    # 金属三幅轮毂
     bpy.ops.mesh.primitive_cylinder_add(
         radius=wheel_r * 0.76, depth=wheel_w * 1.05,
         location=(0, y_pos, wheel_r), rotation=(math.pi/2, 0, 0)
@@ -155,20 +79,124 @@ for side in [-1, 1]:
     rim = bpy.context.active_object
     rim.name = f"Rim_{'L' if side>0 else 'R'}"
     rim.data.materials.append(mat_rim_metal)
-    
-    # 轮毂发光核心
-    bpy.ops.mesh.primitive_cylinder_add(
-        radius=wheel_r * 0.35, depth=wheel_w * 1.12,
-        location=(0, y_pos, wheel_r), rotation=(math.pi/2, 0, 0)
-    )
-    hub_glow = bpy.context.active_object
-    hub_glow.name = f"Hub_Glow_{'L' if side>0 else 'R'}"
-    hub_glow.data.materials.append(mat_glow_cyan)
 
-print("✅ High-Quality Cyberpunk Companion Robot 3D Shell Built Successfully!")
+# ==============================================================
+# 4. 内部核心器件精准排布 (从底到顶严丝合缝)
+# ==============================================================
+
+# ① 底层：2颗 N20 减速电机 (宽12mm x 高10mm x 长24mm)
+for side in [-1, 1]:
+    # 减速箱
+    bpy.ops.mesh.primitive_cube_add(
+        size=1.0, location=(0, side * 0.018, wheel_r)
+    )
+    gb = bpy.context.active_object
+    gb.name = f"N20_Gearbox_{'L' if side>0 else 'R'}"
+    gb.scale = (0.012, 0.009, 0.010)
+    gb.data.materials.append(mat_n20_brass)
+    
+    # 电机马达体
+    bpy.ops.mesh.primitive_cylinder_add(
+        radius=0.006, depth=0.015,
+        location=(0, side * 0.006, wheel_r), rotation=(math.pi/2, 0, 0)
+    )
+    m_body = bpy.context.active_object
+    m_body.name = f"N20_Motor_{'L' if side>0 else 'R'}"
+    m_body.data.materials.append(mat_n20_silver)
+
+# ② 底层电机上方：TB6612 电机驱动小板 (红色，18x18mm)
+z_driver = wheel_r + 0.009
+bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.015, 0, z_driver))
+driver = bpy.context.active_object
+driver.name = "TB6612_Driver_Board"
+driver.scale = (0.018, 0.018, 0.002)
+driver.data.materials.append(mat_driver_red)
+
+# ③ 中层：2节 18650 动力锂电池 (长65mm x 直径18.2mm，沿 X 轴前后并排)
+z_bat = z_driver + 0.014
+for b_idx in [-1, 1]:
+    bpy.ops.mesh.primitive_cylinder_add(
+        radius=0.0091, depth=0.065, # 直径18.2mm, 长度65mm 真实规格
+        location=(0, b_idx * 0.0105, z_bat), rotation=(0, math.pi/2, 0)
+    )
+    bat = bpy.context.active_object
+    bat.name = f"18650_Battery_Cell_{b_idx}"
+    bat.data.materials.append(mat_bat_blue)
+
+# ④ 顶层：你的 STM32F401 主控板 (绿色 PCB 36x36mm x 1.6mm)
+z_stm32 = z_bat + 0.018
+bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.005, 0, z_stm32))
+stm32_pcb = bpy.context.active_object
+stm32_pcb.name = "STM32F401_Mainboard_PCB"
+stm32_pcb.scale = (0.036, 0.036, 0.0016)
+stm32_pcb.data.materials.append(mat_pcb_stm32)
+
+# 主控芯片 STM32 + IMU
+bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.005, 0, z_stm32 + 0.0015))
+mcu_chip = bpy.context.active_object
+mcu_chip.name = "STM32F401_MCU_Chip"
+mcu_chip.scale = (0.007, 0.007, 0.001)
+mcu_chip.data.materials.append(mat_ic_black)
+
+# ⑤ 头部前方：ESP32 智能上位机模块 (黑色微型核心板 22x18mm)
+z_esp32 = z_stm32 + 0.018
+bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.012, 0, z_esp32))
+esp32_pcb = bpy.context.active_object
+esp32_pcb.name = "ESP32_AI_Module_PCB"
+esp32_pcb.scale = (0.022, 0.018, 0.0016)
+esp32_pcb.data.materials.append(mat_pcb_esp32)
+
+# ⑥ 头部面罩正后方：0.96寸 OLED 发光表情屏 (27x27mm)
+z_oled = z_esp32 + 0.006
+bpy.ops.mesh.primitive_cube_add(
+    size=1.0, location=(0.028, 0, z_oled), rotation=(0, -math.radians(10), 0)
+)
+oled = bpy.context.active_object
+oled.name = "OLED_0.96_Display"
+oled.scale = (0.003, 0.027, 0.027)
+oled.data.materials.append(mat_oled_glow)
+
+# ==============================================================
+# 5. 半透明机甲外壳 (X-Ray 透视观察内部余量)
+# ==============================================================
+
+# 躯干外壳 (长74mm x 宽52mm x 高48mm)
+z_torso = z_bat + 0.004
+bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, z_torso))
+torso_shell = bpy.context.active_object
+torso_shell.name = "Torso_XRay_Armor"
+torso_shell.scale = (chassis_l, chassis_w, 0.048)
+torso_shell.data.materials.append(mat_xray_shell)
+sub_t = torso_shell.modifiers.new(name="Bevel", type='BEVEL')
+sub_t.width = 0.12
+sub_t.segments = 4
+
+# 头部头盔外壳
+z_head = z_oled + 0.002
+bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.005, 0, z_head))
+head_shell = bpy.context.active_object
+head_shell.name = "Head_XRay_Helmet"
+head_shell.scale = (0.056, 0.052, 0.038)
+head_shell.data.materials.append(mat_xray_shell)
+sub_h = head_shell.modifiers.new(name="Bevel", type='BEVEL')
+sub_h.width = 0.18
+sub_h.segments = 5
+
+# 头部面罩
+bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.032, 0, z_head))
+visor_shell = bpy.context.active_object
+visor_shell.name = "Visor_XRay_Glass"
+visor_shell.scale = (0.004, 0.044, 0.026)
+visor_shell.data.materials.append(mat_xray_visor)
+
+for obj in bpy.data.objects:
+    if obj.type == "MESH":
+        for poly in obj.data.polygons:
+            poly.use_smooth = True
+
+print("✅ X-Ray Internal Space Verification Model Built Successfully!")
 """
 
-# 连接并发送至 Blender 执行
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect(("127.0.0.1", 9876))
 cmd = {"type": "execute_code", "params": {"code": blender_script}}
