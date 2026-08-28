@@ -1,0 +1,34 @@
+CompileFlags:
+  CompilationDatabase: "."
+  Remove:
+    - "-mlongcalls"
+    - "-fstrict-volatile-bitfields"
+    - "-fno-jump-tables"
+    - "-fno-tree-switch-conversion"
+    - "-fno-shrink-wrap"
+    - "-fmacro-prefix-map=*"
+    - "-Wunused-but-set-variable=*"
+    - "-mfix-esp32-psram-cache-issue"
+    - "-fzero-init-padding-bits=all"
+    - "-specs=*"
+    - "-mdisable-hardware-atomics"
+    - "-fno-builtin-memcpy"
+    - "-fno-builtin-memset"
+    - "-fno-builtin-bzero"
+    - "-fno-malloc-dce"
+    - "-Werror"
+  Add:
+    - -nostdinc++
+    - -isystem/Users/mjt/.cache/esp32_idf_headers/esp-idf-tools/tools/xtensa-esp-elf/esp-16.1.0_20260609/xtensa-esp-elf/xtensa-esp-elf/include/c++/16.1.0
+    - -isystem/Users/mjt/.cache/esp32_idf_headers/esp-idf-tools/tools/xtensa-esp-elf/esp-16.1.0_20260609/xtensa-esp-elf/xtensa-esp-elf/include/c++/16.1.0/xtensa-esp-elf
+    - -isystem/Users/mjt/.cache/esp32_idf_headers/esp-idf-tools/tools/xtensa-esp-elf/esp-16.1.0_20260609/xtensa-esp-elf/xtensa-esp-elf/include
+    - -isystem/Users/mjt/.cache/esp32_idf_headers/esp-idf-tools/tools/xtensa-esp-elf/esp-16.1.0_20260609/xtensa-esp-elf/lib/gcc/xtensa-esp-elf/16.1.0/include
+    - -U__APPLE__
+    - -U__MACH__
+    - -D__XTENSA__=1
+    - -DESP_PLATFORM
+    - -DIDF_VER="v6.2.0"
+    - -w
+Diagnostics:
+  Suppress: ["*"]
+  UnusedIncludes: None

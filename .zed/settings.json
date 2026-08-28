@@ -23,5 +23,17 @@
       "format_on_save": "off",
       "remove_trailing_whitespace_on_save": false
     }
+  },
+  "lsp": {
+    "clangd": {
+      "binary": {
+        "arguments": [
+          "--background-index",
+          "--compile-commands-dir=.",
+          "--header-insertion=never",
+          "--completion-style=detailed"
+        ]
+      }
+    }
   }
 }

@@ -9,6 +9,7 @@ out/
 *.o
 *.obj
 *.d
+.cache
 
 # ESP-IDF
 sdkconfig
