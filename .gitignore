@@ -1,3 +1,37 @@
+# Build outputs
+build/
+bin/
+out/
+*.elf
+*.bin
+*.hex
+*.map
+*.o
+*.obj
+*.d
+
+# ESP-IDF
+sdkconfig
+sdkconfig.old
+dependencies.lock
+managed_components/
+
+# STM32 / IDEs
+.project
+.cproject
+.mxproject
+MDK-ARM/
+EWARM/
+
+# Editor / OS
+.DS_Store
+*.swp
+*~
+.vscode/
+.idea/
+.zed/local.json
+
+# Blender / Temp
 docs/计划/*.blend
 docs/计划/*.blend1
 docs/计划/*.blend2
