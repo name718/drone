@@ -37,6 +37,7 @@ CompileFlags:
     - -Wno-unused-command-line-argument
     - -Wno-unknown-attributes
 Diagnostics:
+  UnusedIncludes: None
   Suppress:
     - "drv_unknown_argument"
     - "unknown-warning-option"
@@ -47,3 +48,4 @@ Diagnostics:
     - "asm-operand-widths"
     - "unknown_typename"
     - "typecheck_convert_incompatible"
+    - "unused-includes"

@@ -23,14 +23,10 @@ fi
 # 2. 自动检测串口
 PORT="$1"
 if [ -z "$PORT" ]; then
-    # 自动搜索常见 USB 串口
     PORTS=($(ls /dev/cu.usbserial* /dev/cu.wchusbserial* /dev/cu.usbmodem* 2>/dev/null || true))
     if [ ${#PORTS[@]} -eq 0 ]; then
         echo "❌ 未检测到 ESP32-S3 USB 串口设备！"
-        echo "💡 请检查："
-        echo "   1. Type-C 数据线是否连接稳固；"
-        echo "   2. 数据线是否支持数据传输（非仅充电线）；"
-        echo "   3. 是否插在标有 COM / UART 的 Type-C 口。"
+        echo "💡 请检查数据线连接。"
         exit 1
     elif [ ${#PORTS[@]} -eq 1 ]; then
         PORT="${PORTS[0]}"
@@ -46,14 +42,14 @@ fi
 # 3. 执行高速烧录
 echo "⚡ 开始烧录 (波特率: 460800)..."
 esptool --chip esp32s3 -p "$PORT" -b 460800 \
-    --before default_reset --after hard_reset \
-    write_flash \
-    --flash_mode dio --flash_size 16MB --flash_freq 80m \
+    --before default-reset --after hard-reset \
+    write-flash \
+    --flash-mode dio --flash-size 16MB --flash-freq 80m \
     0x0 "$BOOTLOADER" \
     0x8000 "$PARTITION" \
     0x10000 "$APP_BIN"
 
 echo "================================================="
 echo "✅ 固件烧录成功！"
-echo "💡 提示: 现在可以打开 VOFA+ 连接串口 [$PORT] (波特率 115200) 查看实时日志！"
+echo "💡 提示: 现在可以打开 VOFA+ 连接串口 [$PORT] 查看实时日志！"
 echo "================================================="
