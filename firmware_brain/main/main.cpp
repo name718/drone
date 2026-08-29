@@ -9,9 +9,12 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-// 引入我们自己编写的 OLED 屏幕驱动类
+// 引入自己编写的 OLED 屏幕驱动类
 #include "./display/face_engine.hpp"
 #include "./display/oled_driver.hpp"
+
+// 引入 I2S 数字音频播放器驱动
+#include "./audio/audio_player.hpp"
 
 // 引入与下位机 STM32 共享的纯 C 语言通信协议
 extern "C" {
@@ -21,11 +24,14 @@ extern "C" {
 // 定义当前文件的日志 TAG
 static const char *TAG = "ROBOT_BRAIN";
 
-// 实例化全局 OLED 屏幕对象 (SDA: GPIO 8, SCL: GPIO 9, I2C从机地址: 0x3C)
+// 1. 实例化全局 OLED 屏幕对象 (SDA: GPIO 8, SCL: GPIO 9, I2C从机地址: 0x3C)
 static OledDriver s_oled(8, 9, 0x3C);
 
 // 2. 实例化顶层拟人表情引擎，并绑定屏幕驱动
 static FaceEngine s_face(s_oled);
+
+// 3. 实例化 MAX98357A 音频播放器 (BCLK: GPIO 16, LRC: GPIO 17, DIN: GPIO 15,采样率: 16000Hz)
+static AudioPlayer s_audioPlayer(16, 17, 15, 16000);
 
 /**
  * @brief OLED 眼睛与表情渲染后台任务 (运行在 CPU Core 1)
@@ -105,7 +111,14 @@ extern "C" void app_main(void) {
     vTaskDelay(pdMS_TO_TICKS(500));
     // 1. 打印系统启动诊断信息
     printSystemDiagnostics();
-    // 2. 创建独立 OLED 表情渲染任务 (栈大小 4096 字节，优先级 5，绑定在 Core 1)
+
+    // 2. 初始化 I2S 音频播放器硬件
+    if (s_audioPlayer.init() == ESP_OK) {
+        // 播放开机科技上升和弦音
+        s_audioPlayer.playBootSound();
+    }
+
+    // 3. 创建独立 OLED 表情渲染任务 (栈大小 4096 字节，优先级 5，绑定在 Core 1)
     xTaskCreatePinnedToCore(oledRenderTask, "oled_task", 4096, nullptr, 5, nullptr, 1);
 
     // 3. 演示表情动态切换 (主线程每隔几秒切换一次表情)
