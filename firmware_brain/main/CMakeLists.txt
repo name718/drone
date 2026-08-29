@@ -1,22 +1,26 @@
 idf_component_register(
-    SRCS
+    SRCS 
         "main.cpp"
         "display/oled_driver.cpp"
         "display/face_engine.cpp"
         "audio/audio_player.cpp"
         "audio/audio_recorder.cpp"
-    INCLUDE_DIRS
-        "."
-        "display"
+        "comm/uart_comm.cpp"
+        "comm/protocol_parser.cpp"
+    INCLUDE_DIRS 
+        "." 
+        "display" 
         "audio"
-    REQUIRES
-        driver
-        esp_driver_i2c
-        esp_driver_i2s
-        esp_timer
-        freertos
-        log
-        esp_psram
-        esp_system
+        "comm"
+    REQUIRES 
+        driver 
+        esp_driver_i2c 
+        esp_driver_i2s 
+        esp_driver_uart
+        esp_timer 
+        freertos 
+        log 
+        esp_psram 
+        esp_system 
         spi_flash
 )

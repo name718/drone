@@ -125,8 +125,23 @@ void FaceEngine::drawHappyEyes() {
     m_oled.fillRect(RIGHT_EYE_X - 2, 32, EYE_WIDTH + 4, 25, false);
 }
 
+// void FaceEngine::drawListeningEyes() {
+//     // 倾听状态: 眼睛微微放大变圆，显出灵动好奇的神态
+//     m_oled.fillRoundRect(LEFT_EYE_X - 2, EYE_CENTER_Y - 18, EYE_WIDTH + 4, 36, 10, true);
+//     m_oled.fillRoundRect(RIGHT_EYE_X - 2, EYE_CENTER_Y - 18, EYE_WIDTH + 4, 36, 10, true);
+// }
+
 void FaceEngine::drawListeningEyes() {
-    // 倾听状态: 眼睛微微放大变圆，显出灵动好奇的神态
-    m_oled.fillRoundRect(LEFT_EYE_X - 2, EYE_CENTER_Y - 18, EYE_WIDTH + 4, 36, 10, true);
-    m_oled.fillRoundRect(RIGHT_EYE_X - 2, EYE_CENTER_Y - 18, EYE_WIDTH + 4, 36, 10, true);
+    // 1. 绘制大幅放大的灵动大眼 (宽 36, 高 44, 圆角 12)
+    m_oled.fillRoundRect(LEFT_EYE_X - 4, EYE_CENTER_Y - 22, EYE_WIDTH + 8, 44, 12, true);
+    m_oled.fillRoundRect(RIGHT_EYE_X - 4, EYE_CENTER_Y - 22, EYE_WIDTH + 8, 44, 12, true);
+
+    // 2. 雕刻灵动高光反光瞳孔 (在右上角挖出两个黑色小圆点，形成水汪汪注视感)
+    // 左眼高光
+    m_oled.fillRect(LEFT_EYE_X + 16, EYE_CENTER_Y - 14, 6, 6, false);
+    m_oled.fillRect(LEFT_EYE_X + 8, EYE_CENTER_Y + 4, 4, 4, false);
+
+    // 右眼高光
+    m_oled.fillRect(RIGHT_EYE_X + 16, EYE_CENTER_Y - 14, 6, 6, false);
+    m_oled.fillRect(RIGHT_EYE_X + 8, EYE_CENTER_Y + 4, 4, 4, false);
 }

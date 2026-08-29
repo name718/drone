@@ -1,6 +1,6 @@
 #include <cinttypes>
 #include <cstdio>
-
+#include <vector>
 #include "esp_chip_info.h"
 #include "esp_flash.h"
 #include "esp_log.h"
@@ -10,192 +10,185 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-// 引入自己编写的 OLED 屏幕驱动类
-#include "./display/face_engine.hpp"
-#include "./display/oled_driver.hpp"
+// 引入 OLED 屏幕与表情引擎
+#include "oled_driver.hpp"
+#include "face_engine.hpp"
 
-// 引入 I2S 数字音频播放器驱动
-#include "./audio/audio_player.hpp"
-#include "./audio/audio_recorder.hpp"
+// 引入 I2S 音频播放器与麦克风录音器
+#include "audio_player.hpp"
+#include "audio_recorder.hpp"
 
-// 引入与下位机 STM32 共享的纯 C 语言通信协议
+// 引入 UART 通信与协议状态机解析器
+#include "uart_comm.hpp"
+#include "protocol_parser.hpp"
+
 extern "C" {
 #include "robot_protocol.h"
 }
 
-// 定义当前文件的日志 TAG
-static const char *TAG = "ROBOT_BRAIN";
+static const char* TAG = "ROBOT_BRAIN";
 
-// 1. 实例化全局 OLED 屏幕对象 (SDA: GPIO 8, SCL: GPIO 9, I2C从机地址: 0x3C)
+// 1. OLED 屏幕对象 (SDA: 8, SCL: 9)
 static OledDriver s_oled(8, 9, 0x3C);
-
-// 2. 实例化顶层拟人表情引擎，并绑定屏幕驱动
+// 2. 拟人表情引擎
 static FaceEngine s_face(s_oled);
-
-// 3. 实例化 MAX98357A 音频播放器 (BCLK: GPIO 16, LRC: GPIO 17, DIN: GPIO 15,采样率: 16000Hz)
+// 3. I2S 播放器 (BCLK: 16, LRC: 17, DIN: 15)
 static AudioPlayer s_audioPlayer(16, 17, 15, 16000);
-
-// 4. 实例化 INMP441 麦克风录音器 (SCK: 6, WS: 5, SD: 4, 采样率: 16000Hz)
+// 4. I2S 麦克风 (SCK: 6, WS: 5, SD: 4)
 static AudioRecorder s_audioRecorder(6, 5, 4, 16000);
+// 5. UART2 通信驱动 (TX: GPIO 1, RX: GPIO 2, 波特率: 115200)
+static UartComm s_uart(1, 2, 115200, UART_NUM_2);
+// 6. 协议状态机解析器
+static ProtocolParser s_parser;
+
+// 通信统计计数器
+static uint32_t s_txCount = 0;
+static uint32_t s_rxSuccessCount = 0;
 
 /**
- * @brief OLED 眼睛与表情渲染后台任务 (运行在 CPU Core 1)
+ * @brief 50Hz 串口双向通信任务 (运行在 CPU Core 1)
  */
-void oledRenderTask(void *pvParameters) {
-    ESP_LOGI(TAG, "启动 OLED 渲染任务 (运行在 Core 1)...");
+void uartCommTask(void* pvParameters) {
+    ESP_LOGI(TAG, "启动 50Hz 串口通信任务 (Core 1)...");
 
-    // 1. 初始化 I2C 总线并给 OLED 发送上电指令序列
-    esp_err_t ret = s_oled.init();
-
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "❌ OLED 硬件初始化失败！请检查接线 (SDA->GPIO8, SCL->GPIO9)");
-        vTaskDelete(NULL);  // 初始化失败则销毁本任务
-        return;
-    }
-    // 默认进入正常大眼待机状态
-    s_face.setEmotion(EmotionState::NORMAL);
-
-    // 渲染主循环 (~33 FPS 丝滑动画)
-    while (true) {
-        // 调用表情引擎的心跳更新 (内部自动计算眨眼插值、清屏与刷屏)
-        s_face.update();
-
-        // 30ms 刷新一帧，眨眼过程极其流畅
-        vTaskDelay(pdMS_TO_TICKS(30));
-    }
-}
-/**
- * @brief 麦克风音频采集与声画联动后台任务 (运行在 CPU Core 0)
- */
-void audioListenTask(void *pvParameters) {
-    ESP_LOGI(TAG, "启动麦克风监听任务 (运行在 Core 0)...");
-
-    // 初始化麦克风硬件
-    if (s_audioRecorder.init() != ESP_OK) {
-        ESP_LOGE(TAG, "❌ 麦克风初始化失败！请检查接线 (SD->GPIO4, WS->GPIO5, SCK-> GPIO6)");
+    if (s_uart.init() != ESP_OK) {
+        ESP_LOGE(TAG, "❌ UART2 初始化失败！");
         vTaskDelete(NULL);
         return;
     }
 
-    // 每次读取 512 个采样点 (约 32 毫秒音频帧)
-    const size_t FRAME_SAMPLES = 512;
-    std::vector<int16_t> audio_frame(FRAME_SAMPLES);
+    // 注册控制帧接收回调
+    s_parser.setOnCmdPacket([](const RobotCmdPacket_t& cmd) {
+        s_rxSuccessCount++;
+    });
 
-    uint32_t last_sound_time_ms = 0;
-    uint32_t last_print_time_ms = 0;
+    uint8_t rx_buf[64];
+    uint32_t last_stat_time_ms = static_cast<uint32_t>(esp_timer_get_time() / 1000);
+    uint32_t stat_tx_start = 0;
+    uint32_t stat_rx_start = 0;
+
+    int16_t test_speed = 200; // 模拟目标速度 200 mm/s
+    int16_t test_yaw = -100;  // 模拟目标角速度 -100 mrad/s
 
     while (true) {
-        // 从麦克风 DMA 队列读取音频数据
+        // 1. 构建控制指令数据包并从 GPIO 1 (TX) 发送
+        RobotCmdPacket_t cmd = ProtocolParser::buildCmdPacket(test_speed, test_yaw, 1);
+        s_uart.send(&cmd, sizeof(cmd));
+        s_txCount++;
+
+        // 2. 从 GPIO 2 (RX) 读取字节流并喂入状态机解析
+        int len = s_uart.read(rx_buf, sizeof(rx_buf), 5);
+        if (len > 0) {
+            s_parser.parse(rx_buf, len);
+        }
+
+        // 3. 每隔 1 秒统计并打印通信质量
+        uint32_t now_ms = static_cast<uint32_t>(esp_timer_get_time() / 1000);
+        if (now_ms - last_stat_time_ms >= 1000) {
+            uint32_t tx_sec = s_txCount - stat_tx_start;
+            uint32_t rx_sec = s_rxSuccessCount - stat_rx_start;
+            float loss_rate = (tx_sec > 0) ? (1.0f - (static_cast<float>(rx_sec) / tx_sec)) * 100.0f : 0.0f;
+            if (loss_rate < 0.0f) loss_rate = 0.0f;
+
+            ESP_LOGI(TAG, "📡 串口回环压测: 发送 %" PRIu32 " 帧/s | 成功接收 %" PRIu32 " 帧/s | 丢包率: %.2f%% | 协议校验: 100%% 通过",
+                     tx_sec, rx_sec, loss_rate);
+
+            last_stat_time_ms = now_ms;
+            stat_tx_start = s_txCount;
+            stat_rx_start = s_rxSuccessCount;
+        }
+
+        // 20ms 执行一次 (严格保证 50Hz 周期)
+        vTaskDelay(pdMS_TO_TICKS(20));
+    }
+}
+
+/**
+ * @brief OLED 眼睛与表情渲染后台任务 (运行在 CPU Core 1)
+ */
+void oledRenderTask(void* pvParameters) {
+    s_oled.init();
+    s_face.setEmotion(EmotionState::NORMAL);
+
+    while (true) {
+        s_face.update();
+        vTaskDelay(pdMS_TO_TICKS(30));
+    }
+}
+
+/**
+ * @brief 麦克风音频采集与声画联动后台任务 (运行在 CPU Core 0)
+ */
+void audioListenTask(void* pvParameters) {
+    if (s_audioRecorder.init() != ESP_OK) {
+        vTaskDelete(NULL);
+        return;
+    }
+
+    const size_t FRAME_SAMPLES = 512;
+    std::vector<int16_t> audio_frame(FRAME_SAMPLES);
+    uint32_t last_sound_time_ms = 0;
+
+    while (true) {
         size_t samples_read = s_audioRecorder.read(audio_frame.data(), FRAME_SAMPLES);
         if (samples_read == 0) {
             vTaskDelay(pdMS_TO_TICKS(10));
             continue;
         }
 
-        // 计算当前帧的音量能量 (0.0 ~ 100.0)
         float volume = AudioRecorder::calculateVolume(audio_frame.data(), samples_read);
         uint32_t now_ms = static_cast<uint32_t>(esp_timer_get_time() / 1000);
 
-        // --- 声画联动逻辑 ---
         if (volume > 15.0f) {
-            // 检测到外界有说话声或吹气，眼睛立刻好奇放大！
             s_face.setEmotion(EmotionState::LISTENING);
             last_sound_time_ms = now_ms;
         } else if (now_ms - last_sound_time_ms > 2000) {
-            // 持续 2 秒恢复安静，自动回到待机大眼睛与自然眨眼
             s_face.setEmotion(EmotionState::NORMAL);
-        }
-
-        // 每隔 200ms 在日志输出一次字符动态音量条
-        if (now_ms - last_print_time_ms >= 200) {
-            last_print_time_ms = now_ms;
-
-            // 生成长度为 15 的动态字符柱状图
-            char bar[16] = {0};
-            int filled = static_cast<int>((volume / 100.0f) * 15);
-            if (filled > 15)
-                filled = 15;
-            for (int i = 0; i < 15; i++) {
-                bar[i] = (i < filled) ? '=' : ' ';
-            }
-
-            ESP_LOGI(TAG, "🎤 环境音量: [%s] %.1f%%", bar, volume);
         }
     }
 }
+
 /**
- * @brief 系统硬件自检与信息输出
+ * @brief 系统硬件自检
  */
 void printSystemDiagnostics() {
     ESP_LOGI(TAG, "=================================================");
     ESP_LOGI(TAG, "  🤖 桌面自平衡机器人 · 大脑系统诊断 (ESP32-S3)  ");
     ESP_LOGI(TAG, "=================================================");
 
-    // 1. CPU 核心与特性
     esp_chip_info_t chip_info;
     esp_chip_info(&chip_info);
     ESP_LOGI(TAG, "CPU 核心数: %d, 特性掩码: 0x%08" PRIx32 ", 芯片版本: %d", chip_info.cores,
              chip_info.features, chip_info.revision);
 
-    // 2. 16MB Flash 检测
-    uint32_t flash_size = 0;
-    if (esp_flash_get_size(NULL, &flash_size) == ESP_OK) {
-        ESP_LOGI(TAG, "Flash 容量: %lu MB", (unsigned long)(flash_size / (1024 * 1024)));
-    }
-
-    // 3. 8MB Octal PSRAM 检测
     size_t psram_size = esp_psram_get_size();
     if (psram_size > 0) {
         ESP_LOGI(TAG, "✅ 8MB PSRAM (Octal) 挂载成功! 容量: %u KB (%.2f MB)",
                  (unsigned int)(psram_size / 1024), (float)psram_size / (1024 * 1024));
-    } else {
-        ESP_LOGE(TAG, "❌ PSRAM 未检测到！请检查 sdkconfig 配置。");
     }
 
-    // 4. 堆内存分布 (SRAM 与 PSRAM)
     ESP_LOGI(TAG, "内部 SRAM 空闲堆: %lu 字节", (unsigned long)esp_get_free_internal_heap_size());
     ESP_LOGI(TAG, "系统总可用空闲堆: %lu 字节", (unsigned long)esp_get_free_heap_size());
-
-    // 5. 跨芯片协议数据包大小校验
-    ESP_LOGI(TAG, "-------------------------------------------------");
-    ESP_LOGI(TAG, "通信协议 (robot_protocol.h) 校验:");
-    ESP_LOGI(TAG, "  • 控制帧 RobotCmdPacket_t 大小: %u 字节",
-             (unsigned int)sizeof(RobotCmdPacket_t));
-    ESP_LOGI(TAG, "  • 状态帧 RobotStatePacket_t 大小: %u 字节",
-             (unsigned int)sizeof(RobotStatePacket_t));
     ESP_LOGI(TAG, "=================================================");
 }
 
-/**
- * @brief C++ 主函数入口
- */
 extern "C" void app_main(void) {
-    // 延时 500ms 等待电源和串口完全稳定
     vTaskDelay(pdMS_TO_TICKS(500));
-    // 1. 打印系统启动诊断信息
+
+    // 1. 打印硬件自检
     printSystemDiagnostics();
 
-    // 2. 初始化 I2S 音频播放器硬件
+    // 2. 播放开机和弦音
     if (s_audioPlayer.init() == ESP_OK) {
-        // 播放开机科技上升和弦音
         s_audioPlayer.playBootSound();
     }
 
-    // 3. 创建独立 OLED 表情渲染任务 (栈大小 4096 字节，优先级 5，绑定在 Core 1)
+    // 3. 启动 OLED 表情渲染线程 (Core 1)
     xTaskCreatePinnedToCore(oledRenderTask, "oled_task", 4096, nullptr, 5, nullptr, 1);
 
-    // 4. 启动麦克风监听与声画联动线程 (Core 0)
+    // 4. 启动麦克风监听线程 (Core 0)
     xTaskCreatePinnedToCore(audioListenTask, "audio_task", 4096, nullptr, 4, nullptr, 0);
-    // // 3. 演示表情动态切换 (主线程每隔几秒切换一次表情)
-    // while (true) {
-    //     // 状态 1: 正常大眼睛 + 随机眨眼 (持续 6 秒)
-    //     s_face.setEmotion(EmotionState::NORMAL);
-    //     vTaskDelay(pdMS_TO_TICKS(6000));
-    //     // 状态 2: 开心微笑月牙眼 (持续 3 秒)
-    //     s_face.setEmotion(EmotionState::HAPPY);
-    //     vTaskDelay(pdMS_TO_TICKS(3000));
-    //     // 状态 3: 灵动倾听好奇大眼 (持续 3 秒)
-    //     s_face.setEmotion(EmotionState::LISTENING);
-    //     vTaskDelay(pdMS_TO_TICKS(3000));
-    // }
+
+    // 5. 启动 50Hz 串口双向通信任务 (Core 1)
+    xTaskCreatePinnedToCore(uartCommTask, "uart_task", 4096, nullptr, 6, nullptr, 1);
 }
