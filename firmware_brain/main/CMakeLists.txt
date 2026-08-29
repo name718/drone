@@ -1,19 +1,22 @@
 idf_component_register(
     SRCS 
         "main.cpp"
+        "core/robot_brain.cpp"
         "display/oled_driver.cpp"
         "display/face_engine.cpp"
+        "display/display_service.cpp"
         "audio/audio_player.cpp"
         "audio/audio_recorder.cpp"
+        "audio/audio_service.cpp"
         "comm/uart_comm.cpp"
         "comm/protocol_parser.cpp"
-        "voice/speech_engine.cpp"
+        "comm/motion_service.cpp"
     INCLUDE_DIRS 
         "." 
+        "core"
         "display" 
         "audio" 
         "comm"
-        "voice"
     REQUIRES 
         driver 
         esp_driver_i2c 
