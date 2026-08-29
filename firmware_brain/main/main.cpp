@@ -1,6 +1,7 @@
 #include <cinttypes>
 #include <cstdio>
 #include <vector>
+
 #include "esp_chip_info.h"
 #include "esp_flash.h"
 #include "esp_log.h"
@@ -10,103 +11,101 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-// 引入 OLED 屏幕与表情引擎
-#include "oled_driver.hpp"
-#include "face_engine.hpp"
-
-// 引入 I2S 音频播放器与麦克风录音器
+// 引入 视觉、音频、通信 与 语音 核心子系统
 #include "audio_player.hpp"
 #include "audio_recorder.hpp"
-
-// 引入 UART 通信与协议状态机解析器
-#include "uart_comm.hpp"
+#include "face_engine.hpp"
+#include "oled_driver.hpp"
 #include "protocol_parser.hpp"
+#include "speech_engine.hpp"
+#include "uart_comm.hpp"
 
 extern "C" {
 #include "robot_protocol.h"
 }
 
-static const char* TAG = "ROBOT_BRAIN";
+static const char *TAG = "ROBOT_BRAIN";
 
-// 1. OLED 屏幕对象 (SDA: 8, SCL: 9)
+// 1. OLED 屏幕 (SDA: 8, SCL: 9)
 static OledDriver s_oled(8, 9, 0x3C);
 // 2. 拟人表情引擎
 static FaceEngine s_face(s_oled);
-// 3. I2S 播放器 (BCLK: 16, LRC: 17, DIN: 15)
+// 3. I2S 扬声器 (BCLK: 16, LRC: 17, DIN: 15)
 static AudioPlayer s_audioPlayer(16, 17, 15, 16000);
 // 4. I2S 麦克风 (SCK: 6, WS: 5, SD: 4)
 static AudioRecorder s_audioRecorder(6, 5, 4, 16000);
-// 5. UART2 通信驱动 (TX: GPIO 1, RX: GPIO 2, 波特率: 115200)
+// 5. UART2 通信驱动 (TX: GPIO 1, RX: GPIO 2)
 static UartComm s_uart(1, 2, 115200, UART_NUM_2);
 // 6. 协议状态机解析器
 static ProtocolParser s_parser;
+// 7. 端侧语音识别引擎
+static SpeechEngine s_speechEngine(16000);
+
+// 全局动态控制目标参数
+static int16_t s_targetSpeed = 0;  // 目标线速度 (mm/s)
+static int16_t s_targetYaw = 0;    // 目标角速度 (mrad/s)
+static uint32_t s_stopMotionTimeMs = 0;
 
 // 通信统计计数器
 static uint32_t s_txCount = 0;
 static uint32_t s_rxSuccessCount = 0;
 
 /**
- * @brief 50Hz 串口双向通信任务 (运行在 CPU Core 1)
+ * @brief 50Hz 串口双向控制下发任务 (Core 1)
  */
-void uartCommTask(void* pvParameters) {
-    ESP_LOGI(TAG, "启动 50Hz 串口通信任务 (Core 1)...");
+void uartCommTask(void *pvParameters) {
+    ESP_LOGI(TAG, "启动 50Hz 串口控制下发任务 (Core 1)...");
 
-    if (s_uart.init() != ESP_OK) {
-        ESP_LOGE(TAG, "❌ UART2 初始化失败！");
-        vTaskDelete(NULL);
-        return;
-    }
+    s_uart.init();
 
-    // 注册控制帧接收回调
-    s_parser.setOnCmdPacket([](const RobotCmdPacket_t& cmd) {
-        s_rxSuccessCount++;
-    });
+    s_parser.setOnCmdPacket([](const RobotCmdPacket_t &cmd) { s_rxSuccessCount++; });
 
     uint8_t rx_buf[64];
     uint32_t last_stat_time_ms = static_cast<uint32_t>(esp_timer_get_time() / 1000);
     uint32_t stat_tx_start = 0;
     uint32_t stat_rx_start = 0;
 
-    int16_t test_speed = 200; // 模拟目标速度 200 mm/s
-    int16_t test_yaw = -100;  // 模拟目标角速度 -100 mrad/s
-
     while (true) {
-        // 1. 构建控制指令数据包并从 GPIO 1 (TX) 发送
-        RobotCmdPacket_t cmd = ProtocolParser::buildCmdPacket(test_speed, test_yaw, 1);
+        uint32_t now_ms = static_cast<uint32_t>(esp_timer_get_time() / 1000);
+
+        // 运动超时保护：语音触发前进 3 秒后自动减速刹车
+        if (s_targetSpeed > 0 && now_ms > s_stopMotionTimeMs) {
+            s_targetSpeed = 0;
+            s_face.setEmotion(EmotionState::NORMAL);
+            ESP_LOGI(TAG, "🛑 语音运动完成，小车平稳减速刹车。");
+        }
+
+        // 1. 构建控制包并由 GPIO 1 (TX) 下发
+        RobotCmdPacket_t cmd = ProtocolParser::buildCmdPacket(s_targetSpeed, s_targetYaw, 1);
         s_uart.send(&cmd, sizeof(cmd));
         s_txCount++;
 
-        // 2. 从 GPIO 2 (RX) 读取字节流并喂入状态机解析 (非阻塞极速读取)
+        // 2. 非阻塞读取 GPIO 2 (RX) 接收队列
         int len = s_uart.read(rx_buf, sizeof(rx_buf), 0);
         if (len > 0) {
             s_parser.parse(rx_buf, len);
         }
 
-        // 3. 每隔 1 秒统计并打印通信质量
-        uint32_t now_ms = static_cast<uint32_t>(esp_timer_get_time() / 1000);
+        // 3. 统计输出
         if (now_ms - last_stat_time_ms >= 1000) {
             uint32_t tx_sec = s_txCount - stat_tx_start;
             uint32_t rx_sec = s_rxSuccessCount - stat_rx_start;
-            float loss_rate = (tx_sec > 0) ? (1.0f - (static_cast<float>(rx_sec) / tx_sec)) * 100.0f : 0.0f;
-            if (loss_rate < 0.0f) loss_rate = 0.0f;
-
-            ESP_LOGI(TAG, "📡 串口回环压测: 发送 %" PRIu32 " 帧/s | 成功接收 %" PRIu32 " 帧/s | 丢包率: %.2f%% | 协议校验: 100%% 通过",
-                     tx_sec, rx_sec, loss_rate);
+            ESP_LOGI(TAG, "📡 串口状态: 发送 %" PRIu32 " 帧/s | 目标速度: %d mm/s", tx_sec,
+                     s_targetSpeed);
 
             last_stat_time_ms = now_ms;
             stat_tx_start = s_txCount;
             stat_rx_start = s_rxSuccessCount;
         }
 
-        // 20ms 执行一次 (严格保证 50Hz 周期)
-        vTaskDelay(pdMS_TO_TICKS(20));
+        vTaskDelay(pdMS_TO_TICKS(20));  // 严格 50Hz 周期
     }
 }
 
 /**
- * @brief OLED 眼睛与表情渲染后台任务 (运行在 CPU Core 1)
+ * @brief OLED 眼睛与表情渲染后台任务 (Core 1)
  */
-void oledRenderTask(void* pvParameters) {
+void oledRenderTask(void *pvParameters) {
     s_oled.init();
     s_face.setEmotion(EmotionState::NORMAL);
 
@@ -117,17 +116,48 @@ void oledRenderTask(void* pvParameters) {
 }
 
 /**
- * @brief 麦克风音频采集与声画联动后台任务 (运行在 CPU Core 0)
+ * @brief 麦克风音频采集与语音指令识别线程 (Core 0)
  */
-void audioListenTask(void* pvParameters) {
+void audioListenTask(void *pvParameters) {
+    ESP_LOGI(TAG, "启动语音监听与识别引擎 (Core 0)...");
+
     if (s_audioRecorder.init() != ESP_OK) {
         vTaskDelete(NULL);
         return;
     }
 
+    // 注册语音指令回调事件
+    s_speechEngine.setOnCommand([](VoiceCommand cmd) {
+        uint32_t now_ms = static_cast<uint32_t>(esp_timer_get_time() / 1000);
+
+        switch (cmd) {
+            case VoiceCommand::WAKEUP:
+                ESP_LOGI(TAG, "🤖 [语音事件] 机器人被唤醒！");
+                s_face.setEmotion(EmotionState::LISTENING);  // 水汪汪大眼
+                s_audioPlayer.playTone(784.0f, 80, 0.35f);   // G5 轻快提示音
+                break;
+
+            case VoiceCommand::COMMAND_HAPPY:
+                ESP_LOGI(TAG, "✨ [语音事件] 指令：开心微笑！");
+                s_face.setEmotion(EmotionState::HAPPY);      // 月牙微笑眼
+                s_audioPlayer.playTone(659.25f, 80, 0.35f);  // 欢快和弦
+                s_audioPlayer.playTone(783.99f, 120, 0.40f);
+                break;
+
+            case VoiceCommand::COMMAND_FORWARD:
+                ESP_LOGI(TAG, "🚀 [语音事件] 指令：向前走！");
+                s_targetSpeed = 300;                           // 设定目标速度 300 mm/s
+                s_stopMotionTimeMs = now_ms + 3000;            // 持续运动 3 秒
+                s_audioPlayer.playTone(1046.50f, 150, 0.40f);  // 高音提示
+                break;
+
+            default:
+                break;
+        }
+    });
+
     const size_t FRAME_SAMPLES = 512;
     std::vector<int16_t> audio_frame(FRAME_SAMPLES);
-    uint32_t last_sound_time_ms = 0;
 
     while (true) {
         size_t samples_read = s_audioRecorder.read(audio_frame.data(), FRAME_SAMPLES);
@@ -136,15 +166,8 @@ void audioListenTask(void* pvParameters) {
             continue;
         }
 
-        float volume = AudioRecorder::calculateVolume(audio_frame.data(), samples_read);
-        uint32_t now_ms = static_cast<uint32_t>(esp_timer_get_time() / 1000);
-
-        if (volume > 15.0f) {
-            s_face.setEmotion(EmotionState::LISTENING);
-            last_sound_time_ms = now_ms;
-        } else if (now_ms - last_sound_time_ms > 2000) {
-            s_face.setEmotion(EmotionState::NORMAL);
-        }
+        // 喂入语音识别引擎进行端点与节奏分析
+        s_speechEngine.feedAudio(audio_frame.data(), samples_read);
     }
 }
 
@@ -175,10 +198,10 @@ void printSystemDiagnostics() {
 extern "C" void app_main(void) {
     vTaskDelay(pdMS_TO_TICKS(500));
 
-    // 1. 打印硬件自检
+    // 1. 打印自检
     printSystemDiagnostics();
 
-    // 2. 播放开机和弦音
+    // 2. 播放开机和弦
     if (s_audioPlayer.init() == ESP_OK) {
         s_audioPlayer.playBootSound();
     }
@@ -186,9 +209,9 @@ extern "C" void app_main(void) {
     // 3. 启动 OLED 表情渲染线程 (Core 1)
     xTaskCreatePinnedToCore(oledRenderTask, "oled_task", 4096, nullptr, 5, nullptr, 1);
 
-    // 4. 启动麦克风监听线程 (Core 0)
+    // 4. 启动语音识别与声画联动线程 (Core 0)
     xTaskCreatePinnedToCore(audioListenTask, "audio_task", 4096, nullptr, 4, nullptr, 0);
 
-    // 5. 启动 50Hz 串口双向通信任务 (Core 1)
+    // 5. 启动 50Hz 串口控制下发线程 (Core 1)
     xTaskCreatePinnedToCore(uartCommTask, "uart_task", 4096, nullptr, 6, nullptr, 1);
 }

@@ -7,11 +7,13 @@ idf_component_register(
         "audio/audio_recorder.cpp"
         "comm/uart_comm.cpp"
         "comm/protocol_parser.cpp"
+        "voice/speech_engine.cpp"
     INCLUDE_DIRS 
         "." 
         "display" 
-        "audio"
+        "audio" 
         "comm"
+        "voice"
     REQUIRES 
         driver 
         esp_driver_i2c 

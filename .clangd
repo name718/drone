@@ -30,6 +30,12 @@ CompileFlags:
     - -I/Users/mjt/.cache/esp32_idf_headers/esp-idf/components/esp_hal_i2s/esp32s3/include
     - -I/Users/mjt/.cache/esp32_idf_headers/esp-idf/components/esp_driver_gpio/include
     - -I/Users/mjt/.cache/esp32_idf_headers/esp-idf/components/esp_driver_uart/include
+    - -I/Users/mjt/Desktop/workplace/drone/firmware_brain/main
+    - -I/Users/mjt/Desktop/workplace/drone/firmware_brain/main/audio
+    - -I/Users/mjt/Desktop/workplace/drone/firmware_brain/main/comm
+    - -I/Users/mjt/Desktop/workplace/drone/firmware_brain/main/display
+    - -I/Users/mjt/Desktop/workplace/drone/firmware_brain/main/voice
+    - -I/Users/mjt/Desktop/workplace/drone/protocol
     - -U__APPLE__
     - -U__MACH__
     - -D__XTENSA__=1
