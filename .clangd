@@ -49,3 +49,4 @@ Diagnostics:
     - "unknown_typename"
     - "typecheck_convert_incompatible"
     - "unused-includes"
+    - "member_reference_needs_struct_union"

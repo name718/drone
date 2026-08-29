@@ -16,9 +16,9 @@
 
 #include "oled_driver.hpp"
 
+#include <cmath>
 #include <cstring>
 
-#include "driver/i2c_master.h"
 #include "esp_log.h"
 
 static const char *TAG = "OLED_DRIVER";
@@ -214,6 +214,31 @@ void OledDriver::fillRect(int x, int y, int w, int h, bool color) {
     for (int i = x; i < x + w; i++) {
         for (int j = y; j < y + h; j++) {
             drawPixel(i, j, color);
+        }
+    }
+}
+
+void OledDriver::drawRoundRect(int x, int y, int w, int h, int r, bool color) {
+    // 1. 绘制四条直边
+    for (int i = x + r; i < x + w - r; i++) {
+        drawPixel(i, y, color);          // 上横边
+        drawPixel(i, y + h - 1, color);  // 下横边
+    }
+    for (int j = y + r; j < y + h - r; j++) {
+        drawPixel(x, j, color);          // 左竖边
+        drawPixel(x + w - 1, j, color);  // 右竖边
+    }
+
+    // 2. 绘制四个圆角的弧线边缘
+    for (int dx = 0; dx <= r; dx++) {
+        for (int dy = 0; dy <= r; dy++) {
+            int d = dx * dx + dy * dy;
+            if (d <= r * r && d >= (r - 1) * (r - 1)) {
+                drawPixel(x + r - dx, y + r - dy, color);                  // 左上弧
+                drawPixel(x + w - r - 1 + dx, y + r - dy, color);          // 右上弧
+                drawPixel(x + r - dx, y + h - r - 1 + dy, color);          // 左下弧
+                drawPixel(x + w - r - 1 + dx, y + h - r - 1 + dy, color);  // 右下弧
+            }
         }
     }
 }

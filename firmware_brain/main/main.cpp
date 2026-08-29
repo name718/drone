@@ -10,6 +10,7 @@
 #include "freertos/task.h"
 
 // 引入我们自己编写的 OLED 屏幕驱动类
+#include "./display/face_engine.hpp"
 #include "./display/oled_driver.hpp"
 
 // 引入与下位机 STM32 共享的纯 C 语言通信协议
@@ -22,6 +23,9 @@ static const char *TAG = "ROBOT_BRAIN";
 
 // 实例化全局 OLED 屏幕对象 (SDA: GPIO 8, SCL: GPIO 9, I2C从机地址: 0x3C)
 static OledDriver s_oled(8, 9, 0x3C);
+
+// 2. 实例化顶层拟人表情引擎，并绑定屏幕驱动
+static FaceEngine s_face(s_oled);
 
 /**
  * @brief OLED 眼睛与表情渲染后台任务 (运行在 CPU Core 1)
@@ -37,18 +41,16 @@ void oledRenderTask(void *pvParameters) {
         vTaskDelete(NULL);  // 初始化失败则销毁本任务
         return;
     }
-    // 2. 渲染主循环
+    // 默认进入正常大眼待机状态
+    s_face.setEmotion(EmotionState::NORMAL);
+
+    // 渲染主循环 (~33 FPS 丝滑动画)
     while (true) {
-        // 第一步：清空 1024 字节内存画布
-        s_oled.clear();
-        // 第二步：绘制左眼 (实心圆角矩形: 起点 x=24, y=16, 宽=28, 高=32, 圆角=6)
-        s_oled.fillRoundRect(24, 16, 28, 32, 6, true);
-        // 第三步：绘制右眼 (实心圆角矩形: 起点 x=76, y=16, 宽=28, 高=32, 圆角=6)
-        s_oled.fillRoundRect(76, 16, 28, 32, 6, true);
-        // 第四步：将内存画布中的点阵数据一口气通过 I2C 刷入屏幕硬件
-        s_oled.update();
-        // 延时 50ms (刷新率约 20 FPS，节能且不浪费 CPU)
-        vTaskDelay(pdMS_TO_TICKS(50));
+        // 调用表情引擎的心跳更新 (内部自动计算眨眼插值、清屏与刷屏)
+        s_face.update();
+
+        // 30ms 刷新一帧，眨眼过程极其流畅
+        vTaskDelay(pdMS_TO_TICKS(30));
     }
 }
 
@@ -105,4 +107,17 @@ extern "C" void app_main(void) {
     printSystemDiagnostics();
     // 2. 创建独立 OLED 表情渲染任务 (栈大小 4096 字节，优先级 5，绑定在 Core 1)
     xTaskCreatePinnedToCore(oledRenderTask, "oled_task", 4096, nullptr, 5, nullptr, 1);
+
+    // 3. 演示表情动态切换 (主线程每隔几秒切换一次表情)
+    while (true) {
+        // 状态 1: 正常大眼睛 + 随机眨眼 (持续 6 秒)
+        s_face.setEmotion(EmotionState::NORMAL);
+        vTaskDelay(pdMS_TO_TICKS(6000));
+        // 状态 2: 开心微笑月牙眼 (持续 3 秒)
+        s_face.setEmotion(EmotionState::HAPPY);
+        vTaskDelay(pdMS_TO_TICKS(3000));
+        // 状态 3: 灵动倾听好奇大眼 (持续 3 秒)
+        s_face.setEmotion(EmotionState::LISTENING);
+        vTaskDelay(pdMS_TO_TICKS(3000));
+    }
 }

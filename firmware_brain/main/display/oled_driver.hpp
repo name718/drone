@@ -2,8 +2,9 @@
 
 #include <cstddef>
 #include <cstdint>
-#include "esp_err.h"
+
 #include "driver/i2c_master.h"
+#include "esp_err.h"
 
 /**
  * @brief SSD1306 OLED 屏幕轻量驱动类 (128x64 分辨率)
@@ -11,8 +12,8 @@
  */
 class OledDriver {
 public:
-    static constexpr uint8_t SCREEN_WIDTH = 128;   // 屏幕宽度 (128 列)
-    static constexpr uint8_t SCREEN_HEIGHT = 64;   // 屏幕高度 (64 行)
+    static constexpr uint8_t SCREEN_WIDTH = 128;  // 屏幕宽度 (128 列)
+    static constexpr uint8_t SCREEN_HEIGHT = 64;  // 屏幕高度 (64 行)
 
     /**
      * @brief 构造函数：指定 SDA、SCL 引脚及 I2C 从机地址
@@ -52,6 +53,12 @@ public:
     void fillRect(int x, int y, int w, int h, bool color);
 
     /**
+     * @brief 绘制空心圆角矩形线条 (用于绘制月牙眉眼等轮廓)
+     * @param r 圆角半径
+     */
+    void drawRoundRect(int x, int y, int w, int h, int r, bool color);
+
+    /**
      * @brief 填充实心圆角矩形 (用于绘制科技感机器人大眼睛)
      * @param r 圆角半径
      */
@@ -61,8 +68,8 @@ private:
     int m_sdaPin;
     int m_sclPin;
     uint8_t m_i2cAddr;
-    i2c_master_bus_handle_t m_busHandle; // I2C 主机总线句柄
-    i2c_master_dev_handle_t m_devHandle; // OLED 挂载设备句柄
+    i2c_master_bus_handle_t m_busHandle;  // I2C 主机总线句柄
+    i2c_master_dev_handle_t m_devHandle;  // OLED 挂载设备句柄
 
     // 显存画布: 128 列 * (64行 / 8位) = 1024 字节
     uint8_t m_buffer[SCREEN_WIDTH * SCREEN_HEIGHT / 8];
@@ -70,5 +77,5 @@ private:
     // 发送单个控制命令字节 (0x00 前缀)
     esp_err_t writeCommand(uint8_t cmd);
     // 发送显存数据块 (0x40 前缀)
-    esp_err_t writeData(const uint8_t* data, size_t len);
+    esp_err_t writeData(const uint8_t *data, size_t len);
 };
