@@ -11,17 +11,23 @@ idf_component_register(
         "comm/uart_comm.cpp"
         "comm/protocol_parser.cpp"
         "comm/motion_service.cpp"
+        "network/wifi_manager.cpp"
     INCLUDE_DIRS 
         "." 
         "core"
         "display" 
         "audio" 
         "comm"
+        "network"
     REQUIRES 
         driver 
         esp_driver_i2c 
         esp_driver_i2s 
         esp_driver_uart
+        esp_wifi
+        nvs_flash
+        esp_event
+        esp_netif
         esp_timer 
         freertos 
         log 

@@ -56,10 +56,9 @@ void RobotBrain::printSystemDiagnostics() {
 }
 
 esp_err_t RobotBrain::init() {
-    // 延时等待供电稳定
     vTaskDelay(pdMS_TO_TICKS(500));
 
-    // 1. 打印硬件诊断报告
+    // 1. 打印硬件自检报告
     printSystemDiagnostics();
 
     // 2. 初始化视觉子系统
@@ -71,12 +70,25 @@ esp_err_t RobotBrain::init() {
     // 4. 初始化底盘通信子系统
     m_motion.init();
 
+    // 5. 初始化 Wi-Fi 协议栈与注册联网回调
+    m_wifi.init();
+    m_wifi.setOnConnectCallback([this](bool is_connected, const char* ip) {
+        if (is_connected) {
+            ESP_LOGI(TAG, "🎉 [网络事件] 机器人已连入互联网！分配 IP: %s", ip);
+            // 播放清脆联网成功提示音
+            m_audio.playTone(1046.50f, 120, 0.40f);
+            m_display.setEmotion(EmotionState::HAPPY);
+        } else {
+            ESP_LOGW(TAG, "⚠️ [网络事件] 机器人与 Wi-Fi 断开连接");
+        }
+    });
+
     ESP_LOGI(TAG, "✅ 大脑所有子系统初始化完成！");
     return ESP_OK;
 }
 
 esp_err_t RobotBrain::start() {
-    ESP_LOGI(TAG, "🚀 启动大脑多核任务系统...");
+    ESP_LOGI(TAG, "🚀 启动大脑多核服务与网络连接...");
 
     // 1. 播放开机科技上升和弦音
     m_audio.playBootSound();
@@ -97,6 +109,9 @@ esp_err_t RobotBrain::start() {
         nullptr,
         0 // 绑定在 Core 0
     );
+
+    // 5. 连接 Wi-Fi 热点
+    m_wifi.connect(ROBOT_WIFI_SSID, ROBOT_WIFI_PASS, 10000);
 
     return ESP_OK;
 }

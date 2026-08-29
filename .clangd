@@ -30,11 +30,19 @@ CompileFlags:
     - -I/Users/mjt/.cache/esp32_idf_headers/esp-idf/components/esp_hal_i2s/esp32s3/include
     - -I/Users/mjt/.cache/esp32_idf_headers/esp-idf/components/esp_driver_gpio/include
     - -I/Users/mjt/.cache/esp32_idf_headers/esp-idf/components/esp_driver_uart/include
+    - -I/Users/mjt/.cache/esp32_idf_headers/esp-idf/components/esp_event/include
+    - -I/Users/mjt/.cache/esp32_idf_headers/esp-idf/components/esp_wifi/include
+    - -I/Users/mjt/.cache/esp32_idf_headers/esp-idf/components/esp_netif/include
+    - -I/Users/mjt/.cache/esp32_idf_headers/esp-idf/components/nvs_flash/include
+    - -I/Users/mjt/.cache/esp32_idf_headers/esp-idf/components/esp_partition/include
+    - -I/Users/mjt/.cache/esp32_idf_headers/esp-idf/components/esp_http_client/include
+    - -I/Users/mjt/.cache/esp32_idf_headers/esp-idf/components/json/cJSON
     - -I/Users/mjt/Desktop/workplace/drone/firmware_brain/main
     - -I/Users/mjt/Desktop/workplace/drone/firmware_brain/main/core
     - -I/Users/mjt/Desktop/workplace/drone/firmware_brain/main/audio
     - -I/Users/mjt/Desktop/workplace/drone/firmware_brain/main/comm
     - -I/Users/mjt/Desktop/workplace/drone/firmware_brain/main/display
+    - -I/Users/mjt/Desktop/workplace/drone/firmware_brain/main/network
     - -I/Users/mjt/Desktop/workplace/drone/protocol
     - -U__APPLE__
     - -U__MACH__
@@ -58,3 +66,4 @@ Diagnostics:
     - "typecheck_convert_incompatible"
     - "unused-includes"
     - "member_reference_needs_struct_union"
+    - "pp_file_not_found"
