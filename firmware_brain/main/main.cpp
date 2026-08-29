@@ -76,8 +76,8 @@ void uartCommTask(void* pvParameters) {
         s_uart.send(&cmd, sizeof(cmd));
         s_txCount++;
 
-        // 2. 从 GPIO 2 (RX) 读取字节流并喂入状态机解析
-        int len = s_uart.read(rx_buf, sizeof(rx_buf), 5);
+        // 2. 从 GPIO 2 (RX) 读取字节流并喂入状态机解析 (非阻塞极速读取)
+        int len = s_uart.read(rx_buf, sizeof(rx_buf), 0);
         if (len > 0) {
             s_parser.parse(rx_buf, len);
         }
