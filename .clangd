@@ -18,17 +18,32 @@ CompileFlags:
     - "-fno-malloc-dce"
     - "-Werror"
   Add:
+    - --target=arm-none-eabi
     - -nostdinc++
     - -isystem/Users/mjt/.cache/esp32_idf_headers/esp-idf-tools/tools/xtensa-esp-elf/esp-16.1.0_20260609/xtensa-esp-elf/xtensa-esp-elf/include/c++/16.1.0
     - -isystem/Users/mjt/.cache/esp32_idf_headers/esp-idf-tools/tools/xtensa-esp-elf/esp-16.1.0_20260609/xtensa-esp-elf/xtensa-esp-elf/include/c++/16.1.0/xtensa-esp-elf
     - -isystem/Users/mjt/.cache/esp32_idf_headers/esp-idf-tools/tools/xtensa-esp-elf/esp-16.1.0_20260609/xtensa-esp-elf/xtensa-esp-elf/include
     - -isystem/Users/mjt/.cache/esp32_idf_headers/esp-idf-tools/tools/xtensa-esp-elf/esp-16.1.0_20260609/xtensa-esp-elf/lib/gcc/xtensa-esp-elf/16.1.0/include
+    - -I/Users/mjt/.cache/esp32_idf_headers/esp-idf/components/esp_driver_i2c/include
+    - -I/Users/mjt/.cache/esp32_idf_headers/esp-idf/components/esp_driver_i2s/include
+    - -I/Users/mjt/.cache/esp32_idf_headers/esp-idf/components/esp_driver_gpio/include
+    - -I/Users/mjt/.cache/esp32_idf_headers/esp-idf/components/esp_driver_uart/include
     - -U__APPLE__
     - -U__MACH__
     - -D__XTENSA__=1
     - -DESP_PLATFORM
     - -DIDF_VER="v6.2.0"
-    - -w
+    - -Wno-unknown-warning-option
+    - -Wno-unused-command-line-argument
+    - -Wno-unknown-attributes
 Diagnostics:
-  Suppress: ["*"]
-  UnusedIncludes: None
+  Suppress:
+    - "drv_unknown_argument"
+    - "unknown-warning-option"
+    - "unused-command-line-argument"
+    - "inline-asm"
+    - "invalid_asm_output_constraint"
+    - "invalid_asm_input_constraint"
+    - "asm-operand-widths"
+    - "unknown_typename"
+    - "typecheck_convert_incompatible"
