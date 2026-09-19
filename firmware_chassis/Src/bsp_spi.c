@@ -53,15 +53,24 @@ void bsp_spi1_init() {
 
     // 5. 开启 SPI1 外设
     SPI1->CR1 |= SPI_CR1_SPE;
+
+    // 冲刷清理 RX FIFO 残留
+    while (SPI1->SR & SPI_SR_RXNE) {
+        volatile uint8_t dummy = *(__IO uint8_t *)&SPI1->DR;
+        (void)dummy;
+    }
 }
 
 void bsp_spi1_cs_set(bool high) {
     if (high) {
         while (SPI1->SR & SPI_SR_BSY)
             ;                     // 确保最后一个时钟打完再拉高，避免截断尾包
+        for (volatile int i = 0; i < 50; i++) __NOP();
         GPIOA->BSRR = (1U << 4);  // 拉高 PA4 (原子操作，置位)
+        for (volatile int i = 0; i < 100; i++) __NOP();
     } else {
         GPIOA->BSRR = (1U << (4 + 16));  // 拉低 PA4 (原子操作，复位)
+        for (volatile int i = 0; i < 50; i++) __NOP();
     }
 }
 
@@ -90,7 +99,7 @@ uint8_t bsp_spi1_swap_byte(uint8_t tx_byte) {
 
 void bsp_spi1_transfer(const uint8_t *tx_buf, uint8_t *rx_buf, uint16_t len) {
     for (uint16_t i = 0; i < len; i++) {
-        uint8_t send_val = tx_buf ? tx_buf[i] : 0xFF;
+        uint8_t send_val = tx_buf ? tx_buf[i] : 0x00;
         uint8_t recv_val = bsp_spi1_swap_byte(send_val);
         if (rx_buf) {
             rx_buf[i] = recv_val;
