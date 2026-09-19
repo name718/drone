@@ -22,7 +22,7 @@ set(CMAKE_ASM_FLAGS "${CPU_FLAGS} -x assembler-with-cpp")
 
 # 链接器参数
 set(LINKER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/STM32G473RCTx_FLASH.ld")
-set(CMAKE_EXE_LINKER_FLAGS "${CPU_FLAGS} -T${LINKER_SCRIPT} --specs=nano.specs --specs=nosys.specs -Wl,-Map=${PROJECT_NAME}.map,--cref -Wl,--gc-sections")
+set(CMAKE_EXE_LINKER_FLAGS "${CPU_FLAGS} -T${LINKER_SCRIPT} --specs=nano.specs --specs=nosys.specs -u _printf_float -Wl,-Map=${PROJECT_NAME}.map,--cref -Wl,--gc-sections")
 
 # 宏定义
 add_definitions(
@@ -42,6 +42,7 @@ set(SOURCES
         Src/icm42605.c
         Src/system_stm32g4xx.c
         Src/startup_stm32g473xx.s
+        Src/bsp_usart.c
     )
 
 add_executable(${PROJECT_NAME}.elf ${SOURCES})
