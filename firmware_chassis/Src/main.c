@@ -3,6 +3,7 @@
  * @brief 自平衡小车底盘主控程序 (FreeRTOS 多任务版本)
  */
 
+#include "attitude.h"
 #include "bsp.h"
 #include "bsp_spi.h"
 #include "bsp_usart.h"
@@ -25,28 +26,37 @@ static void Task_Control(void *pvParameters) {
     const TickType_t xPeriod = pdMS_TO_TICKS(10);  // 严格 10ms (100Hz)
 
     while (1) {
-        // 绝对精准周期延时 (无漂移)
         vTaskDelayUntil(&xLastWakeTime, xPeriod);
 
-        // 读取六轴姿态数据 (后续在这里加入卡尔曼滤波与自平衡 PID 控制)
+        // 1. 高速读取六轴原始物理量
         icm42605_read_data(&s_imu_data);
+
+        // 2. 100Hz 互补滤波姿态解算
+        attitude_update(&s_imu_data, 0.01f);
     }
 }
 
 /**
- * @brief 遥测与状态指示任务 (5Hz，优先级：Low = 2)
+ * @brief 遥测与波形绘制任务 (50Hz，优先级：Low = 2)
  */
 static void Task_Telemetry(void *pvParameters) {
     (void)pvParameters;
+    uint32_t led_count = 0;
 
     while (1) {
-        vTaskDelay(pdMS_TO_TICKS(200));  // 200ms (5Hz) 周期
+        vTaskDelay(pdMS_TO_TICKS(20));  // 20ms (50Hz)
 
-        led_toggle();
+        if (++led_count >= 25) {
+            led_count = 0;
+            led_toggle();
+        }
 
-        LOG_I("IMU", "Acc:[%+5.2f, %+5.2f, %+5.2f]g | Gyro:[%+6.1f, %+6.1f, %+6.1f]dps",
-              s_imu_data.ax, s_imu_data.ay, s_imu_data.az, s_imu_data.gx, s_imu_data.gy,
-              s_imu_data.gz);
+        // 推送给 VOFA+ 观察滤波效果:
+        // 通道 0: 滤波后的 Pitch 角度 (极其平滑稳健)
+        // 通道 1: 加速度计原始静态角度 (抖动毛刺)
+        // 通道 2: 俯仰角速度 PitchRate
+        const Attitude_t *att = attitude_get();
+        LOG_PLOT("%.2f,%.2f,%.2f\n", att->pitch, att->acc_pitch, att->pitch_rate);
     }
 }
 
@@ -66,6 +76,8 @@ int main(void) {
     // 2. 唤醒并校验 IMU 传感器
     if (icm42605_init()) {
         LOG_I("IMU", "HXY ICM-42605 Initialized Successfully!");
+        // 开机静止 1 秒自动校准陀螺仪零漂
+        attitude_init();
     } else {
         LOG_E("IMU", "IMU Initialization Failed!");
     }

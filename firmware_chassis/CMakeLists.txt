@@ -45,6 +45,7 @@ set(SOURCES
         Src/system_stm32g4xx.c
         Src/startup_stm32g473xx.s
         Src/bsp_usart.c
+        Src/attitude.c
         # --- FreeRTOS 核心组件 ---
         Middlewares/FreeRTOS/Source/tasks.c
         Middlewares/FreeRTOS/Source/list.c
@@ -56,6 +57,7 @@ set(SOURCES
     )
 
 add_executable(${PROJECT_NAME}.elf ${SOURCES})
+target_link_libraries(${PROJECT_NAME}.elf m)
 
 # 编译后自动提取生成 .bin 和 .hex 文件，并打印内存占用统计
 add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
