@@ -32,6 +32,8 @@ add_definitions(
 # 头文件包含路径
 include_directories(
         Inc
+        Middlewares/FreeRTOS/Source/include
+        Middlewares/FreeRTOS/Source/portable/GCC/ARM_CM4F
     )
 
 # 源文件列表 (包含我们手写的所有模块)
@@ -43,6 +45,14 @@ set(SOURCES
         Src/system_stm32g4xx.c
         Src/startup_stm32g473xx.s
         Src/bsp_usart.c
+        # --- FreeRTOS 核心组件 ---
+        Middlewares/FreeRTOS/Source/tasks.c
+        Middlewares/FreeRTOS/Source/list.c
+        Middlewares/FreeRTOS/Source/queue.c
+        Middlewares/FreeRTOS/Source/timers.c
+        Middlewares/FreeRTOS/Source/event_groups.c
+        Middlewares/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c
+        Middlewares/FreeRTOS/Source/portable/MemMang/heap_4.c
     )
 
 add_executable(${PROJECT_NAME}.elf ${SOURCES})

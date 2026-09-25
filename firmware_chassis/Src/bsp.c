@@ -5,29 +5,41 @@
 
 #include "bsp.h"
 
+#include "FreeRTOS.h"
 #include "stm32g4xx.h"
+#include "task.h"
+
+// 声明 FreeRTOS 端口层的 SysTick 处理函数
+extern void xPortSysTickHandler(void);
 
 // 记录系统开机以来的毫秒数 (声明为 volatile，防止编译器过度优化)
 static volatile uint32_t s_ticks_ms = 0;
 
-/**
- * @brief Cortex-M4 内核硬件 SysTick 中断服务函数 (每 1ms 硬件自动触发一次)
- */
 void SysTick_Handler(void) {
+    // 1. 裸机毫秒基准始终累加 (供 bsp_get_ticks_ms 使用)
     s_ticks_ms++;
-}
 
+    // 2. 如果操作系统已经启动运行，则同时推进 FreeRTOS 内核时钟节拍
+    if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED) {
+        xPortSysTickHandler();
+    }
+}
 uint32_t bsp_get_ticks_ms(void) {
     return s_ticks_ms;
 }
 
 void delay_ms(uint32_t ms) {
-    uint32_t start = s_ticks_ms;
-    while ((s_ticks_ms - start) < ms) {
-        __NOP();  // 空操作指令，等待硬件中断累加节拍
+    // 如果 FreeRTOS 调度器已经跑起来，调用 vTaskDelay 让出 CPU，不浪费算力
+    if (xTaskGetSchedulerState() == taskSCHEDULER_RUNNING) {
+        vTaskDelay(pdMS_TO_TICKS(ms));
+    } else {
+        // 调度器未启动前 (如开机初始化)，使用纯裸机死等防死锁
+        uint32_t start = s_ticks_ms;
+        while ((s_ticks_ms - start) < ms) {
+            __NOP();
+        }
     }
 }
-
 /**
  * @brief 将系统主频配置为满血 160MHz (HSI16 16MHz -> PLL -> 160MHz)
  */
