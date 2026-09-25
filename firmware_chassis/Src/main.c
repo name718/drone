@@ -7,12 +7,18 @@
 #include "bsp.h"
 #include "bsp_spi.h"
 #include "bsp_usart.h"
+#include "encoder.h"
 #include "icm42605.h"
 #include "log.h"
+#include "motor.h"
 
 // 引入 FreeRTOS 核心头文件
 #include "FreeRTOS.h"
 #include "task.h"
+
+// --- 全局变量区增加轮速缓存 ---
+static volatile int16_t s_speed_left = 0;
+static volatile int16_t s_speed_right = 0;
 
 // 全局姿态数据缓存
 static Icm42605Data_t s_imu_data;
@@ -33,6 +39,9 @@ static void Task_Control(void *pvParameters) {
 
         // 2. 100Hz 互补滤波姿态解算
         attitude_update(&s_imu_data, 0.01f);
+
+        // 3. 100Hz 采样左右轮正交编码器增量 (脉冲数/10ms)
+        encoder_get_speed((int16_t *)&s_speed_left, (int16_t *)&s_speed_right);
     }
 }
 
@@ -51,12 +60,15 @@ static void Task_Telemetry(void *pvParameters) {
             led_toggle();
         }
 
-        // 推送给 VOFA+ 观察滤波效果:
-        // 通道 0: 滤波后的 Pitch 角度 (极其平滑稳健)
-        // 通道 1: 加速度计原始静态角度 (抖动毛刺)
+        // 推送给 VOFA+ (FireWater 协议):
+        // 通道 0: Pitch 滤波姿态角度
+        // 通道 1: 加速度计原始静态角度
         // 通道 2: 俯仰角速度 PitchRate
+        // 通道 3: 左轮速度 Speed_L (脉冲/10ms)
+        // 通道 4: 右轮速度 Speed_R (脉冲/10ms)
         const Attitude_t *att = attitude_get();
-        LOG_PLOT("%.2f,%.2f,%.2f\n", att->pitch, att->acc_pitch, att->pitch_rate);
+        LOG_PLOT("%.2f,%.2f,%.2f,%d,%d\n", att->pitch, att->acc_pitch, att->pitch_rate,
+                 s_speed_left, s_speed_right);
     }
 }
 
@@ -81,6 +93,15 @@ int main(void) {
     } else {
         LOG_E("IMU", "IMU Initialization Failed!");
     }
+
+    motor_init();
+    LOG_I("MOTOR", "Testing motors forward 1 second...");
+    motor_set_speed(200, 200);  // 20% 慢速轻微正转 (200 / 1000)
+    delay_ms(1000);             // 转动 1 秒
+    motor_stop();               // 立即停机
+    LOG_I("MOTOR", "Motor test finished!");
+    encoder_init();
+    LOG_I("ENC", "TIM2(L) & TIM1(R) Quadrature Encoders Initialized!");
 
     // 3. 创建 FreeRTOS 任务
     // 任务1: 控制任务 (栈大小 256 字 = 1024 字节，优先级 5)

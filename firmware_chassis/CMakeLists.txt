@@ -46,6 +46,8 @@ set(SOURCES
         Src/startup_stm32g473xx.s
         Src/bsp_usart.c
         Src/attitude.c
+        Src/motor.c
+        Src/encoder.c
         # --- FreeRTOS 核心组件 ---
         Middlewares/FreeRTOS/Source/tasks.c
         Middlewares/FreeRTOS/Source/list.c
