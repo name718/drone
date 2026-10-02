@@ -67,7 +67,7 @@ static void Task_Telemetry(void *pvParameters) {
         // 通道 3: 左轮速度 Speed_L (脉冲/10ms)
         // 通道 4: 右轮速度 Speed_R (脉冲/10ms)
         const Attitude_t *att = attitude_get();
-        LOG_PLOT("%.2f,%.2f,%.2f,%d,%d\n", att->pitch, att->acc_pitch, att->pitch_rate,
+        LOG_PLOT("%.2f,%.2f,%.2f,%d,%d", att->pitch, att->acc_pitch, att->pitch_rate,
                  s_speed_left, s_speed_right);
     }
 }
@@ -75,7 +75,7 @@ static void Task_Telemetry(void *pvParameters) {
 int main(void) {
     // 1. 底层硬件基准初始化 (160MHz、串口、SPI)
     bsp_init();
-    bsp_usart2_init(115200);
+    bsp_usart2_init(460800);
 
     LOG_I("SYS", "========================================");
     LOG_I("SYS", " STM32G473 Chassis Firmware (FreeRTOS)  ");

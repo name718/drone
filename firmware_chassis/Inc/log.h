@@ -5,6 +5,9 @@
 
 #include "bsp.h"
 
+// 显式声明 printf 原型，解决交叉编译环境或 LSP (clangd) 找不到系统 stdio.h 导致的隐式声明警告
+int printf(const char *format, ...);
+
 // ANSI 终端彩色高亮控制字符
 #define LOG_CLR_RESET "\033[0m"
 #define LOG_CLR_RED "\033[31m"
@@ -12,17 +15,17 @@
 #define LOG_CLR_YELLOW "\033[33m"
 #define LOG_CLR_BLUE "\033[34m"
 
-// 企业级格式化日志输出: [时间戳ms][级别][模块标签] 消息
-#define LOG_I(tag, fmt, ...)                                                                                 \
-    printf(LOG_CLR_GREEN "[%8lu][I][%s] " fmt LOG_CLR_RESET "\r\n", (unsigned long)bsp_get_ticks_ms(), tag, \
+// 企业级格式化日志输出: [STM32][时间戳ms][级别][模块标签] 消息
+#define LOG_I(tag, fmt, ...)                                                                                        \
+    printf(LOG_CLR_GREEN "[STM32][%8lu][I][%s] " fmt LOG_CLR_RESET "\r\n", (unsigned long)bsp_get_ticks_ms(), tag, \
            ##__VA_ARGS__)
 
-#define LOG_W(tag, fmt, ...)                                                                                  \
-    printf(LOG_CLR_YELLOW "[%8lu][W][%s] " fmt LOG_CLR_RESET "\r\n", (unsigned long)bsp_get_ticks_ms(), tag, \
+#define LOG_W(tag, fmt, ...)                                                                                         \
+    printf(LOG_CLR_YELLOW "[STM32][%8lu][W][%s] " fmt LOG_CLR_RESET "\r\n", (unsigned long)bsp_get_ticks_ms(), tag, \
            ##__VA_ARGS__)
 
-#define LOG_E(tag, fmt, ...)                                                                               \
-    printf(LOG_CLR_RED "[%8lu][E][%s] " fmt LOG_CLR_RESET "\r\n", (unsigned long)bsp_get_ticks_ms(), tag, \
+#define LOG_E(tag, fmt, ...)                                                                                      \
+    printf(LOG_CLR_RED "[STM32][%8lu][E][%s] " fmt LOG_CLR_RESET "\r\n", (unsigned long)bsp_get_ticks_ms(), tag, \
            ##__VA_ARGS__)
 
 // 专用于上位机 (如 VOFA+ 的 FireWater 引擎) 绘图的纯净波形宏 (CSV 格式)
