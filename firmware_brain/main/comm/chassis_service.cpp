@@ -15,7 +15,7 @@
 
 #include "esp_log.h"
 
-static const char *TAG = "ChassisSvc";
+static const char *TAG = "底盘服务";
 
 /**
  * @brief 单例静态获取函数实现 (C++11 保证静态局部变量线程安全)

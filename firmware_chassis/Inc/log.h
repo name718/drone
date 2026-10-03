@@ -15,17 +15,17 @@ int printf(const char *format, ...);
 #define LOG_CLR_YELLOW "\033[33m"
 #define LOG_CLR_BLUE "\033[34m"
 
-// 企业级格式化日志输出: [STM32][时间戳ms][级别][模块标签] 消息
+// 企业级格式化日志输出: [底盘][时间戳ms][级别][模块标签] 消息
 #define LOG_I(tag, fmt, ...)                                                                                        \
-    printf(LOG_CLR_GREEN "[STM32][%8lu][I][%s] " fmt LOG_CLR_RESET "\r\n", (unsigned long)bsp_get_ticks_ms(), tag, \
+    printf(LOG_CLR_GREEN "[底盘][%8lu][信息][%s] " fmt LOG_CLR_RESET "\r\n", (unsigned long)bsp_get_ticks_ms(), tag, \
            ##__VA_ARGS__)
 
 #define LOG_W(tag, fmt, ...)                                                                                         \
-    printf(LOG_CLR_YELLOW "[STM32][%8lu][W][%s] " fmt LOG_CLR_RESET "\r\n", (unsigned long)bsp_get_ticks_ms(), tag, \
+    printf(LOG_CLR_YELLOW "[底盘][%8lu][警告][%s] " fmt LOG_CLR_RESET "\r\n", (unsigned long)bsp_get_ticks_ms(), tag, \
            ##__VA_ARGS__)
 
 #define LOG_E(tag, fmt, ...)                                                                                      \
-    printf(LOG_CLR_RED "[STM32][%8lu][E][%s] " fmt LOG_CLR_RESET "\r\n", (unsigned long)bsp_get_ticks_ms(), tag, \
+    printf(LOG_CLR_RED "[底盘][%8lu][错误][%s] " fmt LOG_CLR_RESET "\r\n", (unsigned long)bsp_get_ticks_ms(), tag, \
            ##__VA_ARGS__)
 
 // 专用于上位机 (如 VOFA+ 的 FireWater 引擎) 绘图的纯净波形宏 (CSV 格式)

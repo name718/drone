@@ -4,7 +4,7 @@
 #include "driver/uart.h"
 #include "esp_log.h"
 
-static const char *TAG = "UartComm";
+static const char *TAG = "串口驱动";
 
 UartComm::UartComm() = default;
 

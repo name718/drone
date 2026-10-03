@@ -48,6 +48,7 @@ set(SOURCES
         Src/attitude.c
         Src/motor.c
         Src/encoder.c
+        Src/control.c
         # --- FreeRTOS 核心组件 ---
         Middlewares/FreeRTOS/Source/tasks.c
         Middlewares/FreeRTOS/Source/list.c

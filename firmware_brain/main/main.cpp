@@ -10,7 +10,7 @@
 #include "core/robot_brain.hpp"
 #include "esp_log.h"
 
-static const char *TAG = "MAIN";
+static const char *TAG = "主程序";
 
 /**
  * @brief ESP-IDF 系统级主入口函数

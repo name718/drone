@@ -16,7 +16,7 @@
 #include "esp_log.h"
 #include "esp_system.h"
 
-static const char *TAG = "RobotBrain";
+static const char *TAG = "大脑中枢";
 
 /**
  * @brief 单例静态获取函数实现
@@ -42,14 +42,14 @@ void RobotBrain::printSystemDiagnostics() {
 
     // 3. 规范化打印开机诊断报告
     ESP_LOGI(TAG, "=================================================");
-    ESP_LOGI(TAG, "       🧠 ROBOT BRAIN SYSTEM DIAGNOSTICS         ");
+    ESP_LOGI(TAG, "       🧠 机器人大脑系统硬件体检诊断报告         ");
     ESP_LOGI(TAG, "=================================================");
-    ESP_LOGI(TAG, " Silicon Model   : ESP32-S3 (Rev %d, %d Cores)", chip_info.revision,
+    ESP_LOGI(TAG, " 芯片型号   : ESP32-S3 (版本 %d, %d 核心)", chip_info.revision,
              chip_info.cores);
-    ESP_LOGI(TAG, " Flash Capacity  : %lu MB", (unsigned long)(flash_size / (1024 * 1024)));
-    ESP_LOGI(TAG, " Internal SRAM   : %lu KB free",
+    ESP_LOGI(TAG, " Flash 容量 : %lu MB", (unsigned long)(flash_size / (1024 * 1024)));
+    ESP_LOGI(TAG, " 内部 SRAM  : %lu KB 剩余",
              (unsigned long)(esp_get_free_internal_heap_size() / 1024));
-    ESP_LOGI(TAG, " Octal PSRAM     : %lu KB free",
+    ESP_LOGI(TAG, " 八线 PSRAM : %lu KB 剩余",
              (unsigned long)(heap_caps_get_free_size(MALLOC_CAP_SPIRAM) / 1024));
     ESP_LOGI(TAG, "=================================================");
 }

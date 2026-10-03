@@ -16,7 +16,7 @@
 static Attitude_t s_attitude = {0};
 
 void attitude_init(void) {
-    LOG_I("ATT", "Calibrating Gyroscope Bias... Keep Robot Still!");
+    LOG_I("姿态", "正在校准陀螺仪静态零偏... 请保持小车完全静止！");
 
     // 1. 采集 100 次静止数据，计算陀螺仪的自然静态漂移均值 (零偏)
     float sum_gx = 0.0f;
@@ -35,7 +35,7 @@ void attitude_init(void) {
     s_attitude.gyro_bias_y = sum_gy / (float)CALIB_SAMPLES;
     s_attitude.is_calibrated = true;
 
-    LOG_I("ATT", "Gyro Calibrated! Offset X: %+.2f, Offset Y: %+.2f dps", s_attitude.gyro_bias_x,
+    LOG_I("姿态", "陀螺仪校准完毕！零偏 X: %+.2f, 零偏 Y: %+.2f 度/秒", s_attitude.gyro_bias_x,
           s_attitude.gyro_bias_y);
 
     // 2. 利用初次加速度计读数，直接初始化初始 Pitch 角度 (消除开机大角度跳跃)
