@@ -20,3 +20,6 @@ CONFIG_SPIRAM_USE_MALLOC=y
 
 # 操作系统时钟频率：1000 Hz (1ms 滴答)
 CONFIG_FREERTOS_HZ=1000
+
+# 开启 HTTP 服务器的 WebSocket 全双工长连接支持
+CONFIG_HTTPD_WS_SUPPORT=y
