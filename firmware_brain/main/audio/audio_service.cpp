@@ -38,7 +38,7 @@ esp_err_t AudioService::init() {
         ESP_LOGW(TAG, "麦克风驱动初始化未就绪 (如果未接麦克风可忽略): %s", esp_err_to_name(err));
     }
 
-    ESP_LOGI(TAG, "✅ 音频子系统硬件初始化完成！");
+    ESP_LOGI(TAG, "音频子系统硬件初始化完成！");
     return ESP_OK;
 }
 
@@ -64,13 +64,13 @@ esp_err_t AudioService::start() {
         return ESP_FAIL;
     }
 
-    ESP_LOGI(TAG, "🎉 音频业务服务已在 Core 0 启动就绪！");
+    ESP_LOGI(TAG, "音频业务服务已在 Core 0 启动就绪！");
     return ESP_OK;
 }
 
 void AudioService::audioTask(void *param) {
     auto *self = static_cast<AudioService *>(param);
-    ESP_LOGI(TAG, "🎙️ 声学能量实时监测任务已在 Core 0 启动 (10Hz)");
+    ESP_LOGI(TAG, "声学能量实时监测任务已在 Core 0 启动 (10Hz)");
 
     while (self->is_running_) {
         // 采集并更新环境声能 (用于网页端 VU 跳动表)
@@ -84,7 +84,7 @@ void AudioService::audioTask(void *param) {
 }
 
 void AudioService::playBootChime() {
-    ESP_LOGI(TAG, "🎵 播放开机赛博和弦音效...");
+    ESP_LOGI(TAG, "播放开机赛博和弦音效...");
     speaker_.playBootSound();
 }
 
@@ -93,7 +93,7 @@ void AudioService::playBeep() {
 }
 
 void AudioService::playAlert() {
-    ESP_LOGI(TAG, "⚠️ 播放警报音效...");
+    ESP_LOGI(TAG, "播放警报音效...");
     speaker_.playAlert();
 }
 

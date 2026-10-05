@@ -18,7 +18,7 @@ static const char *TAG = "主程序";
  */
 extern "C" void app_main(void) {
     ESP_LOGI(TAG, "=========================================");
-    ESP_LOGI(TAG, "🤖 桌面平衡机器人 · ESP32-S3 大脑固件启动");
+    ESP_LOGI(TAG, "桌面平衡机器人 · ESP32-S3 大脑固件启动");
     ESP_LOGI(TAG, "=========================================");
 
     // 1. 获取全局单例大脑中枢引用
@@ -30,7 +30,7 @@ extern "C" void app_main(void) {
         brain.start();
     } else {
         // 初始化失败时输出最高等级错误告警
-        ESP_LOGE(TAG, "❌ 机器人大脑系统初始化失败，请检查硬件链路！");
+        ESP_LOGE(TAG, "机器人大脑系统初始化失败，请检查硬件链路！");
     }
 
     // app_main 执行完毕后会自动退出并被 FreeRTOS 回收，

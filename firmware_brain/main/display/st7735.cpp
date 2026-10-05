@@ -140,10 +140,10 @@ esp_err_t ST7735Driver::init() {
         frame_buffer_ = (uint16_t *)heap_caps_malloc(FB_SIZE, MALLOC_CAP_SPIRAM);
     }
     if (!frame_buffer_) {
-        ESP_LOGE(TAG, "❌ 无法为屏幕分配 40KB 显存！");
+        ESP_LOGE(TAG, "无法为屏幕分配 40KB 显存！");
         return ESP_ERR_NO_MEM;
     }
-    ESP_LOGI(TAG, "✅ 屏幕显存分配就绪 (首地址: %p, 尺寸: %u 字节)", frame_buffer_, (unsigned)FB_SIZE);
+    ESP_LOGI(TAG, "屏幕显存分配就绪 (首地址: %p, 尺寸: %u 字节)", frame_buffer_, (unsigned)FB_SIZE);
     clear(Colors::BLACK);
 
     // =========================================================================
@@ -247,7 +247,7 @@ esp_err_t ST7735Driver::init() {
     // 8. 点亮背光
     setBacklight(true);
 
-    ESP_LOGI(TAG, "✅ ST7735S 竖屏初始化完毕 (%dx%d 像素，显存: %u 字节)",
+    ESP_LOGI(TAG, "ST7735S 竖屏初始化完毕 (%dx%d 像素，显存: %u 字节)",
              SCREEN_W, SCREEN_H, (unsigned)FB_SIZE);
     return ESP_OK;
 }

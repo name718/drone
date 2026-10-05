@@ -41,7 +41,7 @@ void RobotBrain::printSystemDiagnostics() {
     esp_flash_get_size(nullptr, &flash_size);
 
     ESP_LOGI(TAG, "=================================================");
-    ESP_LOGI(TAG, "       🧠 机器人大脑系统硬件体检诊断报告         ");
+    ESP_LOGI(TAG, "       机器人大脑系统硬件体检诊断报告         ");
     ESP_LOGI(TAG, "=================================================");
     ESP_LOGI(TAG, " 芯片型号   : ESP32-S3 (版本 %d, %d 核心)", chip_info.revision, chip_info.cores);
     ESP_LOGI(TAG, " Flash 容量 : %lu MB", (unsigned long)(flash_size / (1024 * 1024)));
@@ -84,7 +84,7 @@ esp_err_t RobotBrain::init() {
     // 7. 初始化拟人自主交互行为引擎 (声-画-机多模态协同)
     InteractionService::getInstance().init();
 
-    ESP_LOGI(TAG, "✅ 基础服务初始化全部就绪！");
+    ESP_LOGI(TAG, "基础服务初始化全部就绪！");
     return ESP_OK;
 }
 
@@ -117,7 +117,7 @@ esp_err_t RobotBrain::start() {
     // 7. 播放标志性开机赛博和弦哨音，标志大脑全面苏醒就绪！
     AudioService::getInstance().playBootChime();
 
-    ESP_LOGI(TAG, "🎉 大脑系统启动完毕，全面进入运行态！");
+    ESP_LOGI(TAG, "大脑系统启动完毕，全面进入运行态！");
     return ESP_OK;
 }
 
@@ -126,7 +126,7 @@ void RobotBrain::networkTask(void *param) {
 
     // 阻塞等待 Wi-Fi 连接成功
     if (WifiManager::getInstance().waitForConnected(portMAX_DELAY)) {
-        ESP_LOGI(TAG, "📡 Wi-Fi 链路已就绪，正在拉起 Web 控制台与 WebSocket 服务...");
+        ESP_LOGI(TAG, "Wi-Fi 链路已就绪，正在拉起 Web 控制台与 WebSocket 服务...");
 
         // 一键启动 Web 服务器 (端口 80)
         WebServer::getInstance().start();

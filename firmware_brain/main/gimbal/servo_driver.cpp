@@ -83,7 +83,7 @@ esp_err_t ServoDriver::init(int pin_pan, int pin_tilt) {
     }
 
     is_initialized_ = true;
-    ESP_LOGI(TAG, "✅ 云台舵机硬件初始化完成 (Pan=GPIO%d, Tilt=GPIO%d, 均归位90°)", pin_pan, pin_tilt);
+    ESP_LOGI(TAG, "云台舵机硬件初始化完成 (Pan=GPIO%d, Tilt=GPIO%d, 均归位90°)", pin_pan, pin_tilt);
     return ESP_OK;
 }
 

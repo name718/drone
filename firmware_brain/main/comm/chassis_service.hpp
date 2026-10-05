@@ -54,6 +54,42 @@ public:
      */
     esp_err_t sendVelocityCommand(int16_t speed_mms, int16_t yaw_mrads);
 
+    /**
+     * @brief 获取底盘实时姿态角与动力学指标 (全维度)
+     */
+    float getPitch() const { return latest_pitch_.load(); }
+    float getRoll() const { return latest_roll_.load(); }
+    float getPitchRate() const { return latest_pitch_rate_.load(); }
+    float getAccPitch() const { return latest_acc_pitch_.load(); }
+    int16_t getLeftSpeed() const { return latest_left_speed_.load(); }
+    int16_t getRightSpeed() const { return latest_right_speed_.load(); }
+    int16_t getActualSpeed() const { return (latest_left_speed_.load() + latest_right_speed_.load()) / 2; }
+    int16_t getLeftPulse() const { return latest_left_pulse_.load(); }
+    int16_t getRightPulse() const { return latest_right_pulse_.load(); }
+    int16_t getLeftPwm() const { return latest_left_pwm_.load(); }
+    int16_t getRightPwm() const { return latest_right_pwm_.load(); }
+    uint16_t getBatteryMv() const { return latest_battery_mv_.load(); }
+    uint8_t getStatusFlags() const { return latest_status_flags_.load(); }
+    uint32_t getRxPackets() const { return total_rx_packets_.load(); }
+
+    /**
+     * @brief 获取 STM32 芯片级硬件存储与身份信息 (Flash/SRAM/UID)
+     */
+    uint16_t getFlashTotalKb() const { return flash_total_kb_.load(); }
+    uint16_t getFlashUsedKb() const { return flash_used_kb_.load(); }
+    uint16_t getSramTotalKb() const { return sram_total_kb_.load(); }
+    uint16_t getSramFreeKb() const { return sram_free_kb_.load(); }
+    void getChipUid(uint32_t uid[3]) const {
+        uid[0] = chip_uid_[0].load();
+        uid[1] = chip_uid_[1].load();
+        uid[2] = chip_uid_[2].load();
+    }
+
+    /**
+     * @brief 检查底盘通信链路是否处于活跃在线状态
+     */
+    bool isChassisOnline() const;
+
 private:
     // 构造与析构私有化，确保单例唯一性
     ChassisService();
@@ -79,6 +115,29 @@ private:
     TaskHandle_t task_handle_{nullptr};        // FreeRTOS 任务句柄
     std::atomic<bool> is_running_{false};      // 任务运行状态标志位
     std::atomic<uint64_t> total_rx_bytes_{0};  // 累计接收字节计数器
+    std::atomic<uint32_t> total_rx_packets_{0}; // 累计接收完整包计数器
 
     uint8_t cmd_seq_{0};  // 指令帧流水号 (0~255 循环递增)
+
+    // STM32 芯片级档案状态量 (原子多线程安全)
+    std::atomic<uint16_t> flash_total_kb_{256};
+    std::atomic<uint16_t> flash_used_kb_{32};
+    std::atomic<uint16_t> sram_total_kb_{112};
+    std::atomic<uint16_t> sram_free_kb_{60};
+    std::atomic<uint32_t> chip_uid_[3]{{0}, {0}, {0}};
+
+    // 底盘遥测全维度状态量 (原子多线程安全)
+    std::atomic<float> latest_pitch_{0.0f};
+    std::atomic<float> latest_roll_{0.0f};
+    std::atomic<float> latest_pitch_rate_{0.0f};
+    std::atomic<float> latest_acc_pitch_{0.0f};
+    std::atomic<int16_t> latest_left_speed_{0};
+    std::atomic<int16_t> latest_right_speed_{0};
+    std::atomic<int16_t> latest_left_pulse_{0};
+    std::atomic<int16_t> latest_right_pulse_{0};
+    std::atomic<int16_t> latest_left_pwm_{0};
+    std::atomic<int16_t> latest_right_pwm_{0};
+    std::atomic<uint16_t> latest_battery_mv_{12100};
+    std::atomic<uint8_t> latest_status_flags_{0};
+    std::atomic<uint64_t> last_state_packet_ms_{0};
 };

@@ -70,7 +70,7 @@ esp_err_t SpeakerDriver::init(int pin_din, int pin_bclk, int pin_lrc, uint32_t s
     }
 
     is_initialized_ = true;
-    ESP_LOGI(TAG, "✅ MAX98357A 音频功放驱动就绪！");
+    ESP_LOGI(TAG, "MAX98357A 音频功放驱动就绪！");
     return ESP_OK;
 }
 

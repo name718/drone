@@ -65,7 +65,7 @@ esp_err_t MicDriver::init(int pin_sd, int pin_ws, int pin_sck, uint32_t sample_r
     }
 
     is_initialized_ = true;
-    ESP_LOGI(TAG, "✅ INMP441 拾音麦克风驱动就绪！");
+    ESP_LOGI(TAG, "INMP441 拾音麦克风驱动就绪！");
     return ESP_OK;
 }
 

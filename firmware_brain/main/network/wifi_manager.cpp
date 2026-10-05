@@ -92,15 +92,15 @@ void WifiManager::eventHandler(void *arg, esp_event_base_t event_base, int32_t e
                      Config::Network::WIFI_MAX_RETRY);
             esp_wifi_connect();
         } else {
-            ESP_LOGE(TAG, "❌ Wi-Fi 连接重试次数达上限，请检查路由器名称与密码！");
+            ESP_LOGE(TAG, "Wi-Fi 连接重试次数达上限，请检查路由器名称与密码！");
         }
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         auto *event = static_cast<ip_event_got_ip_t *>(event_data);
         ESP_LOGI(TAG, "=================================================");
-        ESP_LOGI(TAG, "🎉 Wi-Fi 连接成功！");
-        ESP_LOGI(TAG, "📍 本机分配 IP : " IPSTR, IP2STR(&event->ip_info.ip));
-        ESP_LOGI(TAG, "📍 子网掩码    : " IPSTR, IP2STR(&event->ip_info.netmask));
-        ESP_LOGI(TAG, "📍 网关地址    : " IPSTR, IP2STR(&event->ip_info.gw));
+        ESP_LOGI(TAG, "Wi-Fi 连接成功！");
+        ESP_LOGI(TAG, "本机分配 IP : " IPSTR, IP2STR(&event->ip_info.ip));
+        ESP_LOGI(TAG, "子网掩码    : " IPSTR, IP2STR(&event->ip_info.netmask));
+        ESP_LOGI(TAG, "网关地址    : " IPSTR, IP2STR(&event->ip_info.gw));
         ESP_LOGI(TAG, "=================================================");
 
         self->retry_count_ = 0;

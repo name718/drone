@@ -11,9 +11,14 @@
 #include "comm/chassis_service.hpp"
 
 #include <cstdio>
+#include <cstring>
 #include <vector>
 
 #include "esp_log.h"
+#include "esp_timer.h"
+extern "C" {
+#include "robot_protocol.h"
+}
 
 static const char *TAG = "底盘服务";
 
@@ -27,6 +32,18 @@ ChassisService &ChassisService::getInstance() {
 
 ChassisService::ChassisService() = default;
 ChassisService::~ChassisService() = default;
+
+/**
+ * @brief 判断底盘通信链路是否处于活跃在线状态 (1000ms 超时心跳检测)
+ */
+bool ChassisService::isChassisOnline() const {
+    uint64_t last = last_state_packet_ms_.load();
+    if (last == 0) {
+        return false;
+    }
+    uint64_t now_ms = esp_timer_get_time() / 1000ULL;
+    return (now_ms - last) < 1000;
+}
 
 /**
  * @brief 服务初始化：拉起底层串口硬件
@@ -89,29 +106,84 @@ void ChassisService::taskEntry(void *param) {
 }
 
 /**
- * @brief 核心工作循环：负责从 STM32 抓取数据并透传至控制台
+ * @brief 核心工作循环：负责从 STM32 抓取数据并解析遥测帧
  */
 void ChassisService::runTask() {
-    // 分配临时接收缓冲区 (4KB)，匹配底层 RingBuffer 尺寸
-    std::vector<uint8_t> rx_buffer(Config::ChassisCom::RX_BUF_SIZE);
+    // 分配临时接收缓冲区 (1KB)
+    std::vector<uint8_t> rx_buffer(1024);
+    // 帧重组滑动窗口缓冲区
+    std::vector<uint8_t> frame_buf;
+    frame_buf.reserve(64);
 
-    ESP_LOGI(TAG, "跨芯片数据透传通道已激活！正在监听来自 STM32 的高速数据流...");
+    ESP_LOGI(TAG, "跨芯片遥测解析通道已激活！正在监听 STM32 状态遥测帧 (0x55)...");
 
     while (is_running_) {
         // 以 20ms 为单次阻塞超时从底层串口读取数据
-        // 机制：如果底盘正在发数据，会立即返回读取到的字节数；如果空闲，则最多让出 CPU20ms
-
-        int bytes_read = uart_.read(rx_buffer.data(), rx_buffer.size() - 1, 20);
+        int bytes_read = uart_.read(rx_buffer.data(), rx_buffer.size(), 20);
 
         if (bytes_read > 0) {
-            // 累加接收到的有效数据量
             total_rx_bytes_ += bytes_read;
 
-            // 【关键透传逻辑】：
-            // 使用 fwrite + fflush 直接将原始字节流写入系统 stdout (即 USB-CDC 控制台)
-            // 这种做法不破坏任何换行符与逗号分隔符，完美契合 VOFA+ FireWater 波形绘制
-            fwrite(rx_buffer.data(), 1, bytes_read, stdout);
-            fflush(stdout);
+            // 遍历接收到的每一个字节，进入滑动窗口协议解析器
+            for (int i = 0; i < bytes_read; i++) {
+                uint8_t b = rx_buffer[i];
+
+                if (frame_buf.empty()) {
+                    // 等待帧头 0x55
+                    if (b == PROTOCOL_FRAME_HEADER_STATE) {
+                        frame_buf.push_back(b);
+                    }
+                } else {
+                    frame_buf.push_back(b);
+
+                    // 检查是否已达到完整帧长度
+                    if (frame_buf.size() == sizeof(RobotStatePacket_t)) {
+                        RobotStatePacket_t pkt;
+                        std::memcpy(&pkt, frame_buf.data(), sizeof(RobotStatePacket_t));
+
+                        // 验证累加和校验码 (Checksum)
+                        uint16_t sum = 0;
+                        size_t payload_len = sizeof(RobotStatePacket_t) - sizeof(uint16_t);
+                        for (size_t k = 0; k < payload_len; k++) {
+                            sum += frame_buf[k];
+                        }
+
+                        if (sum == pkt.checksum) {
+                            // 校验成功，原子写入最新 STM32 芯片档案与全维度底盘遥测数据
+                            flash_total_kb_.store(pkt.flash_total_kb);
+                            flash_used_kb_.store(pkt.flash_used_kb);
+                            sram_total_kb_.store(pkt.sram_total_kb);
+                            sram_free_kb_.store(pkt.sram_free_kb);
+                            chip_uid_[0].store(pkt.chip_uid[0]);
+                            chip_uid_[1].store(pkt.chip_uid[1]);
+                            chip_uid_[2].store(pkt.chip_uid[2]);
+
+                            latest_pitch_.store(pkt.pitch_angle);
+                            latest_roll_.store(pkt.roll_angle);
+                            latest_pitch_rate_.store(pkt.pitch_rate);
+                            latest_acc_pitch_.store(pkt.acc_pitch);
+                            latest_left_speed_.store(pkt.left_speed);
+                            latest_right_speed_.store(pkt.right_speed);
+                            latest_left_pulse_.store(pkt.left_pulse);
+                            latest_right_pulse_.store(pkt.right_pulse);
+                            latest_left_pwm_.store(pkt.left_pwm);
+                            latest_right_pwm_.store(pkt.right_pwm);
+                            latest_battery_mv_.store(pkt.battery_mv);
+                            latest_status_flags_.store(pkt.status_flags);
+                            last_state_packet_ms_.store(esp_timer_get_time() / 1000ULL);
+                            total_rx_packets_++;
+
+                            frame_buf.clear();
+                        } else {
+                            // 校验失败：滑动窗口丢弃第一个字节，寻找下一个帧头
+                            frame_buf.erase(frame_buf.begin());
+                            while (!frame_buf.empty() && frame_buf[0] != PROTOCOL_FRAME_HEADER_STATE) {
+                                frame_buf.erase(frame_buf.begin());
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -119,10 +191,7 @@ void ChassisService::runTask() {
     vTaskDelete(nullptr);
 }
 
-// 引入跨芯片统一通信协议 (使用 extern "C" 告诉 C++ 编译器按 C 语言符号解析)
-extern "C" {
-#include "robot_protocol.h"
-}
+
 
 esp_err_t ChassisService::sendVelocityCommand(int16_t speed_mms, int16_t yaw_mrads) {
     // 1. 实例化标准控制帧结构体 (强制单字节紧凑对齐，无内存空洞)
@@ -151,7 +220,7 @@ esp_err_t ChassisService::sendVelocityCommand(int16_t speed_mms, int16_t yaw_mra
         return ESP_FAIL;
     }
 
-    ESP_LOGI(TAG, "🚀 下发底盘指令 -> 速度: %d mm/s | 转向: %d mrad/s (流水号: %u)", speed_mms,
+    ESP_LOGI(TAG, "下发底盘指令 -> 速度: %d mm/s | 转向: %d mrad/s (流水号: %u)", speed_mms,
              yaw_mrads, packet.cmd_id);
     return ESP_OK;
 }

@@ -5,21 +5,25 @@ static const char INDEX_HTML[] = R"rawliteral(<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>CYBER-ROBOT // 大脑控制台</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>CYBER-ROBOT // 双芯片座舱系统</title>
   <style>
     :root {
       --bg: #090d16;
-      --card-bg: rgba(16, 24, 40, 0.75);
+      --surface: #101726;
+      --surface-card: #151f32;
+      --surface-card-hover: #1a273f;
       --border: rgba(0, 240, 255, 0.2);
+      --border-subtle: rgba(255, 255, 255, 0.07);
       --cyan: #00f0ff;
-      --cyan-glow: rgba(0, 240, 255, 0.35);
+      --cyan-glow: rgba(0, 240, 255, 0.3);
       --green: #10b981;
       --red: #ef4444;
       --yellow: #f59e0b;
       --purple: #a855f7;
-      --text: #e2e8f0;
+      --text: #f8fafc;
       --text-muted: #94a3b8;
+      --text-dim: #64748b;
     }
 
     * {
@@ -28,42 +32,50 @@ static const char INDEX_HTML[] = R"rawliteral(<!DOCTYPE html>
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       -webkit-tap-highlight-color: transparent;
+      user-select: none;
     }
 
     body {
       background: var(--bg);
       background-image: 
-        radial-gradient(ellipse at top, rgba(0, 240, 255, 0.08), transparent 60%),
-        radial-gradient(ellipse at bottom, rgba(168, 85, 247, 0.08), transparent 60%);
+        radial-gradient(ellipse at 50% 0%, rgba(0, 240, 255, 0.08) 0%, transparent 65%),
+        radial-gradient(ellipse at 50% 100%, rgba(168, 85, 247, 0.06) 0%, transparent 65%);
       color: var(--text);
-      min-height: 100vh;
+      height: 100vh;
+      height: 100dvh;
       display: flex;
       flex-direction: column;
-      padding: 16px;
-      gap: 16px;
+      overflow: hidden;
     }
 
-    /* 顶部导航栏 */
+    /* ========================================================
+       1. 顶部全局固定状态栏 (APP 顶栏)
+       ======================================================== */
     header {
+      flex-shrink: 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px 18px;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      backdrop-filter: blur(12px);
+      padding: 8px 12px;
+      padding-top: max(8px, env(safe-area-inset-top));
+      padding-left: max(12px, env(safe-area-inset-left));
+      padding-right: max(12px, env(safe-area-inset-right));
+      background: rgba(16, 23, 38, 0.95);
+      border-bottom: 1px solid var(--border-subtle);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 100;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .brand-logo {
-      width: 14px;
-      height: 14px;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
       background: var(--cyan);
       box-shadow: 0 0 10px var(--cyan);
@@ -72,695 +84,946 @@ static const char INDEX_HTML[] = R"rawliteral(<!DOCTYPE html>
 
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
+      50% { opacity: 0.35; transform: scale(0.85); }
     }
 
     .brand-title {
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: 1px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
       color: #fff;
     }
 
-    .conn-status {
+    .status-capsules {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      padding: 4px 10px;
-      border-radius: 20px;
-      background: rgba(239, 68, 68, 0.15);
-      color: var(--red);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      transition: all 0.3s ease;
+      gap: 6px;
     }
 
-    .conn-status.connected {
-      background: rgba(16, 185, 129, 0.15);
-      color: var(--green);
-      border-color: rgba(16, 185, 129, 0.3);
+    .capsule {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      padding: 3px 7px;
+      border-radius: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      white-space: nowrap;
     }
 
-    .conn-dot {
-      width: 8px;
-      height: 8px;
+    .capsule-dot {
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       background: currentColor;
     }
 
-    /* 独立连接地址栏 (方便本地电脑打开调试) */
-    .ip-bar {
-      display: flex;
-      gap: 8px;
-      background: var(--card-bg);
-      padding: 8px 12px;
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      align-items: center;
-      font-size: 13px;
-    }
+    .cap-online { color: var(--green); border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.12); }
+    .cap-offline { color: var(--red); border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.12); }
+    .cap-battery { color: var(--cyan); border-color: rgba(0, 240, 255, 0.3); background: rgba(0, 240, 255, 0.12); }
+    .cap-alarm { color: var(--red); border-color: var(--red); background: rgba(239, 68, 68, 0.25); animation: pulse 1s infinite; }
 
-    .ip-bar input {
+    /* ========================================================
+       2. 中间多标签内容区域 (可自适应滚动)
+       ======================================================== */
+    main {
       flex: 1;
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #fff;
-      padding: 6px 10px;
-      border-radius: 6px;
-      outline: none;
-      font-family: monospace;
-      font-size: 13px;
-    }
-
-    .ip-bar input:focus {
-      border-color: var(--cyan);
-    }
-
-    .ip-bar button {
-      background: var(--cyan);
-      color: #000;
-      border: none;
-      font-weight: 600;
-      padding: 6px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: opacity 0.2s;
-    }
-
-    .ip-bar button:active {
-      opacity: 0.8;
-    }
-
-    /* 网格布局 */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 16px;
-    }
-
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
-      backdrop-filter: blur(12px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .card-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--cyan);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      padding-bottom: 8px;
-    }
-
-    /* 数据列表项 */
-    .stat-list {
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 10px 12px;
+      padding-left: max(12px, env(safe-area-inset-left));
+      padding-right: max(12px, env(safe-area-inset-right));
       display: flex;
       flex-direction: column;
       gap: 10px;
+      -webkit-overflow-scrolling: touch;
     }
 
-    .stat-item {
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    /* 模块通用卡片容器 */
+    .panel {
+      background: var(--surface-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    }
+
+    .panel-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 13px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 6px;
     }
 
-    .stat-label {
+    .panel-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .panel-subtitle {
+      font-size: 11px;
+      color: var(--text-dim);
+      font-weight: 400;
+    }
+
+    /* ========================================================
+       TAB 1: 驾驶座舱 (专业移动端车载 HUD 与双区触控)
+       ======================================================== */
+    /* HUD 抬头微缩显示条 */
+    .cockpit-hud {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 8px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .hud-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 2px;
+    }
+
+    .hud-lbl {
+      font-size: 10px;
       color: var(--text-muted);
     }
 
-    .stat-val {
+    .hud-val {
+      font-size: 13px;
       font-family: monospace;
-      font-weight: 600;
+      font-weight: 700;
       color: #fff;
+    }
+
+    /* 姿态地平仪微缩条 */
+    .mini-horizon-wrapper {
+      position: relative;
+      width: 100%;
+      height: 36px;
+      background: rgba(10, 16, 26, 0.85);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      margin-top: 2px;
+    }
+
+    .mini-horizon-center {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border: 1.5px solid rgba(255, 255, 255, 0.6);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .mini-horizon-center::before {
+      content: "";
+      position: absolute;
+      top: 50%; left: -8px; right: -8px; height: 1.5px;
+      background: rgba(255, 255, 255, 0.6);
+      transform: translateY(-50%);
+    }
+
+    .mini-horizon-bar {
+      position: absolute;
+      width: 80%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      box-shadow: 0 0 8px var(--cyan);
+      transition: transform 0.1s linear;
+      z-index: 1;
+    }
+
+    /* 触控操控双区域 (手机横向左右并列或竖向并列) */
+    .drive-control-stage {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 480px) {
+      .drive-control-stage {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .control-subpanel {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .subpanel-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--cyan);
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    /* 手机虚拟比例摇杆 */
+    .joystick-base {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 240, 255, 0.05) 0%, rgba(16, 24, 40, 0.8) 70%);
+      border: 2px solid rgba(0, 240, 255, 0.3);
+      box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.6);
+      position: relative;
+      touch-action: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .joystick-thumb {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #00f0ff, #0284c7);
+      box-shadow: 0 4px 12px rgba(0, 240, 255, 0.5);
+      position: absolute;
+      top: calc(50% - 27px);
+      left: calc(50% - 27px);
+      cursor: grab;
+      touch-action: none;
+    }
+
+    /* 云台快捷控制与雷达微视 */
+    .gimbal-pad-box {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .gimbal-radar-strip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 6px 8px;
+      border-radius: 8px;
+    }
+
+    .gimbal-radar-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 1px solid rgba(168, 85, 247, 0.5);
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, rgba(0,0,0,0.6) 80%);
+      position: relative;
+      flex-shrink: 0;
+    }
+    .gimbal-radar-circle::before {
+      content: ""; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(168, 85, 247, 0.25);
+    }
+    .gimbal-radar-circle::after {
+      content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(168, 85, 247, 0.25);
+    }
+
+    .gimbal-dot {
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--purple);
+      box-shadow: 0 0 8px var(--purple);
+      transform: translate(-50%, -50%);
+      top: 50%;
+      left: 50%;
+      transition: top 0.08s ease-out, left 0.08s ease-out;
+    }
+
+    .gimbal-dpad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      width: 100%;
+    }
+
+    .dpad-btn {
+      background: rgba(168, 85, 247, 0.08);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      color: #fff;
+      padding: 8px 4px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+    .dpad-btn:active {
+      background: var(--purple);
+      color: #fff;
+    }
+
+    .btn-stop-huge {
+      background: rgba(239, 68, 68, 0.18);
+      border: 1px solid var(--red);
+      color: var(--red);
+      font-weight: 800;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-stop-huge:active {
+      background: var(--red);
+      color: #fff;
+      box-shadow: 0 0 16px var(--red);
+    }
+
+    /* ========================================================
+       TAB 2: 双芯遥测 (硬件档案、存储硬盘、内存与动力学)
+       ======================================================== */
+    .metric-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .metric-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .metric-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+
+    @media (max-width: 560px) {
+      .metric-grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .metric-grid-3 { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .metric-chip {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 6px 8px;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .metric-chip-title {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .metric-chip-value {
+      font-size: 12px;
+      font-family: monospace;
+      font-weight: 700;
+      color: var(--cyan);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .progress-bar-bg {
       width: 100%;
-      height: 6px;
+      height: 4px;
       background: rgba(255, 255, 255, 0.08);
-      border-radius: 3px;
+      border-radius: 2px;
       overflow: hidden;
-      margin-top: 4px;
+      margin-top: 3px;
     }
 
     .progress-bar-fill {
       height: 100%;
       background: linear-gradient(90deg, var(--cyan), var(--purple));
       width: 0%;
-      transition: width 0.4s ease;
+      transition: width 0.25s ease;
     }
 
-    /* 遥控手柄面板 */
-    .controller-box {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 10px 0;
-      gap: 10px;
-    }
-
-    .ctrl-row {
-      display: flex;
-      gap: 12px;
-    }
-
-    .ctrl-btn {
-      width: 72px;
-      height: 64px;
-      border: 1px solid rgba(0, 240, 255, 0.3);
-      background: rgba(0, 240, 255, 0.06);
-      color: var(--cyan);
-      font-size: 20px;
-      font-weight: 700;
-      border-radius: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      cursor: pointer;
-      user-select: none;
-      transition: all 0.15s ease;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-
-    .ctrl-btn span {
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--text-muted);
-    }
-
-    .ctrl-btn:active, .ctrl-btn.active {
-      transform: scale(0.92);
-      background: var(--cyan);
-      color: #000;
-      border-color: var(--cyan);
-      box-shadow: 0 0 16px var(--cyan);
-    }
-
-    .ctrl-btn:active span, .ctrl-btn.active span {
-      color: #000;
-    }
-
-    .ctrl-btn.stop {
-      border-color: rgba(239, 68, 68, 0.4);
-      background: rgba(239, 68, 68, 0.1);
-      color: var(--red);
-    }
-
-    .ctrl-btn.stop:active, .ctrl-btn.stop.active {
-      background: var(--red);
-      color: #fff;
-      box-shadow: 0 0 16px var(--red);
-    }
-
-    /* 表情与动作网格按钮 */
+    /* ========================================================
+       TAB 3: 拟人交互 & TAB 4: AI 智脑
+       ======================================================== */
     .btn-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+    @media (max-width: 480px) {
+      .btn-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
     .action-btn {
-      padding: 10px 14px;
+      padding: 9px 8px;
       border: 1px solid rgba(0, 240, 255, 0.25);
       background: rgba(0, 240, 255, 0.05);
       color: #fff;
-      border-radius: 10px;
-      font-size: 13px;
+      border-radius: 8px;
+      font-size: 12px;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      transition: all 0.2s ease;
-      user-select: none;
+      gap: 4px;
     }
-
-    .action-btn:hover {
-      background: rgba(0, 240, 255, 0.15);
-      border-color: var(--cyan);
-    }
-
-    .action-btn:active, .action-btn.active {
-      transform: scale(0.95);
+    .action-btn:active {
+      transform: scale(0.96);
       background: var(--cyan);
       color: #000;
-      box-shadow: 0 0 14px var(--cyan);
     }
 
     .action-btn.purple {
       border-color: rgba(168, 85, 247, 0.3);
-      background: rgba(168, 85, 247, 0.06);
-    }
-    .action-btn.purple:hover {
-      border-color: var(--purple);
-      background: rgba(168, 85, 247, 0.18);
+      background: rgba(168, 85, 247, 0.08);
     }
     .action-btn.purple:active {
       background: var(--purple);
       color: #fff;
-      box-shadow: 0 0 14px var(--purple);
-    }
-
-    /* 舵机角度滑块 */
-    .slider-box {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      padding: 4px 0;
     }
 
     .slider-row {
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 13px;
+      gap: 8px;
+      font-size: 12px;
     }
+    .slider-label { width: 68px; color: var(--text-muted); }
+    .slider-val { width: 44px; font-family: monospace; color: var(--cyan); font-weight: 700; text-align: right; }
+    .slider-input { flex: 1; accent-color: var(--cyan); cursor: pointer; }
 
-    .slider-label {
-      width: 70px;
-      color: var(--text-muted);
-    }
-
-    .slider-val {
-      width: 38px;
-      font-family: monospace;
-      color: var(--cyan);
-      font-weight: 600;
-      text-align: right;
-    }
-
-    .slider-input {
-      flex: 1;
-      accent-color: var(--cyan);
-      cursor: pointer;
-    }
-
-    /* AI 大模型交互视窗 */
-    .ai-box {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      height: 100%;
-    }
-
+    /* 聊天视窗 */
     .chat-log {
-      flex: 1;
-      min-height: 140px;
-      max-height: 200px;
+      height: 180px;
       overflow-y: auto;
       background: rgba(0, 0, 0, 0.4);
       border-radius: 8px;
-      padding: 10px;
+      padding: 8px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      font-size: 13px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      gap: 6px;
+      font-size: 12px;
+      border: 1px solid var(--border-subtle);
     }
-
     .chat-msg {
       padding: 6px 10px;
       border-radius: 8px;
       max-width: 85%;
-      word-break: break-word;
       line-height: 1.4;
     }
+    .chat-msg.user { align-self: flex-end; background: rgba(168, 85, 247, 0.25); color: #f1f5f9; }
+    .chat-msg.robot { align-self: flex-start; background: rgba(0, 240, 255, 0.15); color: #38bdf8; }
 
-    .chat-msg.user {
-      align-self: flex-end;
-      background: rgba(168, 85, 247, 0.25);
-      border: 1px solid rgba(168, 85, 247, 0.4);
-      color: #f1f5f9;
-    }
-
-    .chat-msg.robot {
-      align-self: flex-start;
-      background: rgba(0, 240, 255, 0.15);
-      border: 1px solid rgba(0, 240, 255, 0.3);
-      color: #38bdf8;
-    }
-
-    .chat-input-row {
-      display: flex;
-      gap: 8px;
-    }
-
+    .chat-input-row { display: flex; gap: 6px; }
     .chat-input-row input {
-      flex: 1;
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #fff;
-      padding: 8px 12px;
-      border-radius: 8px;
-      outline: none;
-      font-size: 13px;
+      flex: 1; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff; padding: 7px 10px; border-radius: 8px; outline: none; font-size: 12px;
     }
-
-    .chat-input-row input:focus {
-      border-color: var(--purple);
-    }
-
     .chat-input-row button {
-      background: var(--purple);
-      color: #fff;
-      border: none;
-      padding: 0 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: opacity 0.2s;
+      background: var(--purple); color: #fff; border: none; padding: 0 14px; border-radius: 8px; font-weight: 600; cursor: pointer;
     }
 
-    .chat-input-row button:active {
-      opacity: 0.8;
-    }
-
-    /* 拟人自主模式滑动开关 */
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 44px;
-      height: 22px;
-    }
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
+    /* 拟人滑动开关 */
+    .switch { position: relative; display: inline-block; width: 38px; height: 20px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
     .toggle-slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: rgba(255, 255, 255, 0.15);
-      transition: .3s;
-      border-radius: 22px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(255, 255, 255, 0.15); transition: .25s; border-radius: 20px;
     }
     .toggle-slider:before {
-      position: absolute;
-      content: "";
-      height: 16px;
-      width: 16px;
-      left: 2px;
-      bottom: 2px;
-      background-color: #fff;
-      transition: .3s;
-      border-radius: 50%;
+      position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+      background-color: #fff; transition: .25s; border-radius: 50%;
     }
-    input:checked + .toggle-slider {
-      background-color: var(--cyan);
-      box-shadow: 0 0 10px var(--cyan);
+    input:checked + .toggle-slider { background-color: var(--cyan); }
+    input:checked + .toggle-slider:before { transform: translateX(18px); background-color: #000; }
+
+    /* ========================================================
+       3. 底部专属 App 导航分栏 (Bottom Tab Bar)
+       ======================================================== */
+    nav.bottom-nav {
+      flex-shrink: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      background: rgba(16, 23, 38, 0.98);
+      border-top: 1px solid var(--border-subtle);
+      padding-bottom: max(6px, env(safe-area-inset-bottom));
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 100;
     }
-    input:checked + .toggle-slider:before {
-      transform: translateX(22px);
-      background-color: #000;
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 13px 0;
+      color: var(--text-dim);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border-top: 2px solid transparent;
+    }
+
+    .nav-item.active {
+      color: var(--cyan);
+      border-top: 2px solid var(--cyan);
+      background: rgba(0, 240, 255, 0.05);
     }
   </style>
 </head>
 <body>
 
-  <!-- 头部状态栏 -->
+  <!-- =========================
+       1. 顶部全局极简状态栏
+       ========================= -->
   <header>
     <div class="brand">
       <div class="brand-logo"></div>
-      <div class="brand-title">CYBER-ROBOT // BRAIN</div>
+      <div class="brand-title">CYBER-ROBOT</div>
     </div>
-    <div class="conn-status" id="connStatus">
-      <div class="conn-dot"></div>
-      <span id="connText">未连接</span>
+    <div class="status-capsules">
+      <div class="capsule cap-battery" id="capBattery">
+        <span id="txtBat">12.1V</span>
+      </div>
+      <div class="capsule cap-offline" id="capChassis">
+        <div class="capsule-dot"></div><span>STM32</span>
+      </div>
+      <div class="capsule cap-offline" id="capBrain">
+        <div class="capsule-dot"></div><span>ESP32</span>
+      </div>
+      <div class="capsule cap-alarm" id="capAlarm" style="display: none;">
+        <span>跌倒倾覆!</span>
+      </div>
     </div>
   </header>
 
-  <!-- WebSocket 目标地址输入条 -->
-  <div class="ip-bar">
-    <span style="color: var(--text-muted);">WS 地址:</span>
-    <input type="text" id="wsUrlInput" placeholder="ws://192.168.x.x/ws">
-    <button onclick="reconnectWebSocket()">连接</button>
-  </div>
+  <!-- =========================
+       2. 中间多标签内容区域
+       ========================= -->
+  <main>
 
-  <!-- 主体卡片网格 -->
-  <div class="grid">
-    
-    <!-- 卡片 1: 硬件与内存指标 -->
-    <div class="card">
-      <div class="card-title">
-        <span>🧠 硬件与内存实时体检</span>
-      </div>
-      <div class="stat-list">
-        <div class="stat-item">
-          <span class="stat-label">芯片型号</span>
-          <span class="stat-val" id="valChip">ESP32-S3 (240MHz)</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">运行时间</span>
-          <span class="stat-val" id="valUptime">00:00:00</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">内部 SRAM 剩余</span>
-          <span class="stat-val" id="valSram">-- KB</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">八线 PSRAM 剩余</span>
-          <span class="stat-val" id="valPsram">-- KB</span>
-        </div>
-        <div>
-          <div class="stat-item">
-            <span class="stat-label">内存健康占用率</span>
-            <span class="stat-val" id="valMemPercent">0%</span>
+    <!-- ────────────────────────────────────────────────────────
+         TAB 1: 驾驶座舱 (Drive Cockpit)
+         ──────────────────────────────────────────────────────── -->
+    <div class="tab-content active" id="view-cockpit">
+      <!-- 抬头 HUD 仪表 (速度、俯仰姿态、电池、云台朝向) -->
+      <div class="panel">
+        <div class="cockpit-hud">
+          <div class="hud-box">
+            <span class="hud-lbl">线速度</span>
+            <span class="hud-val" id="hudSpeed" style="color:var(--cyan);">0 <small style="font-size:10px;">mm/s</small></span>
           </div>
-          <div class="progress-bar-bg">
-            <div class="progress-bar-fill" id="memBar"></div>
+          <div class="hud-box">
+            <span class="hud-lbl">俯仰角</span>
+            <span class="hud-val" id="hudPitch">0.0°</span>
+          </div>
+          <div class="hud-box">
+            <span class="hud-lbl">动力电量</span>
+            <span class="hud-val" id="hudBatPct" style="color:var(--green);">90%</span>
+          </div>
+          <div class="hud-box">
+            <span class="hud-lbl">头部朝向</span>
+            <span class="hud-val" id="hudGimbal">29° / 0°</span>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- 卡片 2: 运动遥控手柄 -->
-    <div class="card">
-      <div class="card-title">
-        <span>🎮 移动底盘控制中枢 (按键/WASD)</span>
-      </div>
-      <div class="controller-box">
-        <div class="ctrl-row">
-          <button class="ctrl-btn" onmousedown="sendCmd('FORWARD')" onmouseup="sendCmd('STOP')"
-                  ontouchstart="sendCmd('FORWARD')" ontouchend="sendCmd('STOP')">
-            ▲<span>前进</span>
-          </button>
-        </div>
-        <div class="ctrl-row">
-          <button class="ctrl-btn" onmousedown="sendCmd('LEFT')" onmouseup="sendCmd('STOP')"
-                  ontouchstart="sendCmd('LEFT')" ontouchend="sendCmd('STOP')">
-            ◀<span>左转</span>
-          </button>
-          <button class="ctrl-btn stop" onclick="sendCmd('STOP')">
-            ■<span>急停</span>
-          </button>
-          <button class="ctrl-btn" onmousedown="sendCmd('RIGHT')" onmouseup="sendCmd('STOP')"
-                  ontouchstart="sendCmd('RIGHT')" ontouchend="sendCmd('STOP')">
-            ▶<span>右转</span>
-          </button>
-        </div>
-        <div class="ctrl-row">
-          <button class="ctrl-btn" onmousedown="sendCmd('BACKWARD')" onmouseup="sendCmd('STOP')"
-                  ontouchstart="sendCmd('BACKWARD')" ontouchend="sendCmd('STOP')">
-            ▼<span>后退</span>
-          </button>
+        <!-- 拟真机体俯仰微缩地平条 -->
+        <div class="mini-horizon-wrapper">
+          <div class="mini-horizon-center"></div>
+          <div class="mini-horizon-bar" id="miniHorizonBar"></div>
+          <span style="position:absolute; right:6px; bottom:2px; font-size:9px; color:var(--text-dim); font-family:monospace;">PITCH HORIZON</span>
         </div>
       </div>
-    </div>
 
-    <!-- 卡片 3: 拟人赛博表情中枢 -->
-    <div class="card">
-      <div class="card-title">
-        <span>🎭 赛博拟人表情联动 (Face Engine)</span>
-      </div>
-      <div class="btn-grid">
-        <button class="action-btn" onclick="setEmotion('NORMAL')">
-          🤖 正常眨眼
-        </button>
-        <button class="action-btn" onclick="setEmotion('HAPPY')">
-          😄 开心月牙
-        </button>
-        <button class="action-btn" onclick="setEmotion('SURPRISED')">
-          😲 震惊大眼
-        </button>
-        <button class="action-btn" onclick="setEmotion('SLEEPY')">
-          😴 困倦打盹
-        </button>
-        <button class="action-btn" style="border-color: rgba(244, 114, 182, 0.4); background: rgba(244, 114, 182, 0.08); color: #f472b6;" onclick="setEmotion('LOVE')">
-          💖 喜爱爱心
-        </button>
-        <button class="action-btn" style="border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08); color: var(--red);" onclick="setEmotion('ANGRY')">
-          😠 生气警戒
-        </button>
-        <button class="action-btn" onclick="setEmotion('CONFUSED')">
-          🤔 疑惑挑眉
-        </button>
-        <button class="action-btn" onclick="setEmotion('DIZZY')">
-          💫 眩晕打转
-        </button>
-        <button class="action-btn purple" style="grid-column: 1 / -1; background: linear-gradient(90deg, rgba(168,85,247,0.25), rgba(0,240,255,0.25)); border-color: var(--cyan); font-weight: 700;" onclick="triggerDance()">
-          💃 赛博特技跳舞秀 (卡点节拍+变脸)
-        </button>
-      </div>
-      <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.06); margin-top: 4px;">
-        <span style="font-size: 13px; color: var(--text-muted);">🤖 拟人自主模式 (拍手唤醒/发呆)</span>
-        <label class="switch">
-          <input type="checkbox" id="autoModeToggle" checked onchange="toggleAutoMode(this.checked)">
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-    </div>
-
-    <!-- 卡片 4: 二自由度头部云台控制 -->
-    <div class="card">
-      <div class="card-title">
-        <span>🦾 二自由度头部云台 (SG90 舵机)</span>
-      </div>
-      <div class="btn-grid" style="margin-bottom: 8px;">
-        <button class="action-btn purple" onclick="sendGimbalGesture('NOD')">
-          🙆 点头认同
-        </button>
-        <button class="action-btn purple" onclick="sendGimbalGesture('SHAKE')">
-          🙅 摇头拒绝
-        </button>
-        <button class="action-btn purple" style="grid-column: 1 / -1;" onclick="sendGimbalGesture('RESET')">
-          🎯 回正居中 (29°, 0°)
-        </button>
-      </div>
-      <div class="slider-box">
-        <div class="slider-row">
-          <span class="slider-label">水平 Pan:</span>
-          <input type="range" class="slider-input" id="panSlider" min="0" max="180" value="29" oninput="onGimbalSliderChange()">
-          <span class="slider-val" id="panVal">29°</span>
+      <!-- 双区触控操控台 (左手摇杆 + 右手云台与急停) -->
+      <div class="drive-control-stage">
+        <!-- 左区: 底盘虚拟比例摇杆 (完全独立控制底盘) -->
+        <div class="control-subpanel">
+          <div class="subpanel-tag">
+            <span>底盘比例摇杆</span>
+            <span id="joyMetrics" style="font-family:monospace; color:var(--cyan);">0 mm/s | 0 mrad/s</span>
+          </div>
+          <div class="joystick-base" id="joystickBase">
+            <div class="joystick-thumb" id="joystickThumb"></div>
+          </div>
+          <span style="font-size:10px; color:var(--text-dim);">拖拽无级差速控车，松手刹车急停</span>
         </div>
-        <div class="slider-row">
-          <span class="slider-label">俯仰 Tilt:</span>
-          <input type="range" class="slider-input" id="tiltSlider" min="0" max="90" value="0" oninput="onGimbalSliderChange()">
-          <span class="slider-val" id="tiltVal">0°</span>
+
+        <!-- 右区: 二自由度头部云台微调与急停 -->
+        <div class="control-subpanel">
+          <div class="subpanel-tag">
+            <span>云台姿态与急停</span>
+            <span id="gimbalCurText" style="font-family:monospace; color:var(--purple);">29.0° / 0.0°</span>
+          </div>
+          <div class="gimbal-pad-box">
+            <div class="gimbal-radar-strip">
+              <div class="gimbal-radar-circle">
+                <div class="gimbal-dot" id="gimbalRadarDot"></div>
+              </div>
+              <div style="flex:1; display:flex; flex-direction:column; gap:2px;">
+                <span style="font-size:10px; color:var(--text-muted);">水平 Pan: <b id="gimbalPanVal" style="color:var(--cyan);">29.0°</b></span>
+                <span style="font-size:10px; color:var(--text-muted);">垂直 Tilt: <b id="gimbalTiltVal" style="color:var(--purple);">0.0°</b></span>
+              </div>
+            </div>
+
+            <!-- 云台快速步进微调按钮 -->
+            <div class="gimbal-dpad-grid">
+              <button class="dpad-btn" onclick="adjustGimbal(0, 10)"><span>抬头</span></button>
+              <button class="dpad-btn" onclick="sendGimbalGesture('RESET')"><span>居中</span></button>
+              <button class="dpad-btn" onclick="adjustGimbal(0, -10)"><span>低头</span></button>
+              <button class="dpad-btn" onclick="adjustGimbal(-15, 0)"><span>左转</span></button>
+              <button class="dpad-btn" onclick="sendGimbalGesture('NOD')"><span>点头</span></button>
+              <button class="dpad-btn" onclick="adjustGimbal(15, 0)"><span>右转</span></button>
+            </div>
+
+            <!-- 全局大尺寸急停按钮 -->
+            <button class="btn-stop-huge" onclick="sendCmd('STOP')">
+              急停刹车 (EMERGENCY STOP)
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 卡片 5: 声学系统 (MAX98357A 扬声器 & INMP441 麦克风) -->
-    <div class="card">
-      <div class="card-title">
-        <span>🔊 声学系统 (MAX98357A 功放 & INMP441 麦克风)</span>
+    <!-- ────────────────────────────────────────────────────────
+         TAB 2: 双芯遥测 (Dual-Chip Telemetry & Storage)
+         ──────────────────────────────────────────────────────── -->
+    <div class="tab-content" id="view-telemetry">
+      <!-- 芯片 A: STM32G473 底盘全景 -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>STM32G473 底盘主控</span>
+            <span class="panel-subtitle">(ARM Cortex-M4F @ 160MHz)</span>
+          </div>
+          <span class="capsule cap-online" id="stmStatusPill" style="font-size:10px;">在线 460.8k</span>
+        </div>
+
+        <!-- 芯片档案与存储空间 (内存 / 硬盘 / 96-Bit UID) -->
+        <div style="background:rgba(0,0,0,0.3); padding:8px; border-radius:8px; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; justify-content:space-between; font-size:11px; flex-wrap:wrap; gap:4px;">
+            <span style="color:var(--text-muted);">96-Bit 硬件唯一序列号 (UID):</span>
+            <span style="font-family:monospace; color:var(--cyan); font-weight:700;" id="valStmUid">--</span>
+          </div>
+
+          <div class="metric-grid-2">
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <div style="display:flex; justify-content:space-between; font-size:11px;">
+                <span style="color:var(--text-muted);">片上 Flash ("硬盘"):</span>
+                <span style="font-family:monospace; color:#fff;" id="valStmFlash">32K / 256K (12%)</span>
+              </div>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" id="barStmFlash" style="width:12%;"></div></div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <div style="display:flex; justify-content:space-between; font-size:11px;">
+                <span style="color:var(--text-muted);">片上 SRAM ("内存"):</span>
+                <span style="font-family:monospace; color:#fff;" id="valStmSram">堆余 60K / 总 112K</span>
+              </div>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" id="barStmSram" style="background:linear-gradient(90deg, var(--green), var(--cyan)); width:46%;"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 六轴 IMU ICM-42605 姿态解算 -->
+        <div class="metric-grid-4">
+          <div class="metric-chip">
+            <span class="metric-chip-title">俯仰角 (Pitch)</span>
+            <span class="metric-chip-value" id="valPitch">0.0°</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-chip-title">横滚角 (Roll)</span>
+            <span class="metric-chip-value" id="valRoll">0.0°</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-chip-title">角速度 (Rate)</span>
+            <span class="metric-chip-value" id="valPitchRate">0.0 °/s</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-chip-title">加速度俯仰 (Acc)</span>
+            <span class="metric-chip-value" id="valAccPitch">0.0°</span>
+          </div>
+        </div>
+
+        <!-- 双轮差速动力学与电机输出 -->
+        <div class="metric-grid-4">
+          <div class="metric-chip">
+            <span class="metric-chip-title">综合测速</span>
+            <span class="metric-chip-value" id="valSpeed">0 mm/s</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-chip-title">左轮速度/脉冲</span>
+            <span class="metric-chip-value" id="valLeftWheel">0 / 0</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-chip-title">右轮速度/脉冲</span>
+            <span class="metric-chip-value" id="valRightWheel">0 / 0</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-chip-title">电机驱动 PWM</span>
+            <span class="metric-chip-value" id="valMotorPwm">L:0 / R:0</span>
+          </div>
+        </div>
+
+        <!-- 动力电池与通信链路 -->
+        <div class="metric-grid-3">
+          <div class="metric-chip">
+            <span class="metric-chip-title">动力电池电压</span>
+            <span class="metric-chip-value" id="valBattery">12.10 V (90%)</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-chip-title">底盘健康标志</span>
+            <span class="metric-chip-value" id="valChassisStatus" style="color:var(--green);">IMU就绪 | 待机</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-chip-title">跨芯片收发统计</span>
+            <span class="metric-chip-value" id="valChassisComm">0 KB / 0 帧</span>
+          </div>
+        </div>
       </div>
-      <div class="btn-grid" style="margin-bottom: 8px;">
-        <button class="action-btn" onclick="sendAudioCmd('CHIME')">
-          🎶 开机和弦
-        </button>
-        <button class="action-btn" onclick="sendAudioCmd('BEEP')">
-          🔔 交互提示
-        </button>
-        <button class="action-btn" style="border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08); color: var(--red);" onclick="sendAudioCmd('ALERT')">
-          🚨 警报音效
-        </button>
-        <button class="action-btn" onclick="sendAudioCmd('BEEP')">
-          🎵 确认蜂鸣
-        </button>
+
+      <!-- 芯片 B: ESP32-S3 大脑中枢全景 -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>ESP32-S3 大脑中枢</span>
+            <span class="panel-subtitle">(Xtensa Dual-Core @ 240MHz)</span>
+          </div>
+          <span class="capsule cap-online" id="espStatusPill" style="font-size:10px;">AP 192.168.4.1</span>
+        </div>
+
+        <div class="metric-grid-2">
+          <div class="metric-chip">
+            <span class="metric-chip-title">系统运行时长</span>
+            <span class="metric-chip-value" id="valUptime">00:00:00</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-chip-title">外部 SPI Flash ("硬盘")</span>
+            <span class="metric-chip-value">16 MB (固件975K)</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-chip-title">内部 SRAM (Free/Min)</span>
+            <span class="metric-chip-value" id="valSram">-- / -- KB</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-chip-title">8MB PSRAM (Free / Total)</span>
+            <span class="metric-chip-value" id="valPsram">-- / 8192 KB</span>
+          </div>
+        </div>
+
+        <!-- PSRAM 占用率 -->
+        <div style="display:flex; flex-direction:column; gap:2px;">
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted);">
+            <span>PSRAM 内存健康占用率</span>
+            <span id="valPsramPct" style="font-family:monospace; color:#fff;">0%</span>
+          </div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" id="barPsram"></div></div>
+        </div>
       </div>
-      <div class="slider-box">
+    </div>
+
+    <!-- ────────────────────────────────────────────────────────
+         TAB 3: 拟人交互 (Emotions & Audio)
+         ──────────────────────────────────────────────────────── -->
+    <div class="tab-content" id="view-emotions">
+      <!-- 拟人表情 -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">赛博拟人表情中枢 (Face Engine)</div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="font-size:11px; color:var(--text-muted);">自主拟人模式</span>
+            <label class="switch">
+              <input type="checkbox" id="autoModeToggle" checked onchange="toggleAutoMode(this.checked)">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="btn-grid">
+          <button class="action-btn" onclick="setEmotion('NORMAL')">正常眨眼</button>
+          <button class="action-btn" onclick="setEmotion('HAPPY')">开心月牙</button>
+          <button class="action-btn" onclick="setEmotion('SURPRISED')">震惊大眼</button>
+          <button class="action-btn" onclick="setEmotion('SLEEPY')">困倦打盹</button>
+          <button class="action-btn" style="border-color: rgba(244, 114, 182, 0.4); color: #f472b6;" onclick="setEmotion('LOVE')">喜爱爱心</button>
+          <button class="action-btn" style="border-color: rgba(239, 68, 68, 0.4); color: var(--red);" onclick="setEmotion('ANGRY')">生气警戒</button>
+          <button class="action-btn" onclick="setEmotion('CONFUSED')">疑惑挑眉</button>
+          <button class="action-btn" onclick="setEmotion('DIZZY')">眩晕打转</button>
+          <button class="action-btn purple" style="grid-column: 1 / -1; font-weight: 700;" onclick="triggerDance()">
+            赛博特技跳舞秀 (卡点节拍+变脸)
+          </button>
+        </div>
+      </div>
+
+      <!-- 声学系统 -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">声学系统 (MAX98357A & INMP441)</div>
+        </div>
+        <div class="btn-grid">
+          <button class="action-btn" onclick="sendAudioCmd('CHIME')">开机和弦</button>
+          <button class="action-btn" onclick="sendAudioCmd('BEEP')">交互提示</button>
+          <button class="action-btn" style="border-color: rgba(239, 68, 68, 0.4); color: var(--red);" onclick="sendAudioCmd('ALERT')">警报音效</button>
+        </div>
         <div class="slider-row">
           <span class="slider-label">喇叭音量:</span>
           <input type="range" class="slider-input" id="volumeSlider" min="0" max="100" value="40" oninput="onVolumeChange()">
           <span class="slider-val" id="volumeVal">40%</span>
         </div>
-      </div>
-      <div style="margin-top: 4px;">
-        <div class="stat-item">
-          <span class="stat-label">🎙️ 麦克风实时能量 (VU 电平)</span>
-          <span class="stat-val" id="valMicEnergy" style="color: var(--green);">0%</span>
-        </div>
-        <div class="progress-bar-bg" style="height: 8px;">
-          <div class="progress-bar-fill" id="micEnergyBar" style="width: 0%; background: linear-gradient(90deg, var(--green), var(--cyan)); transition: width 0.15s ease, background 0.2s;"></div>
+        <div style="display:flex; flex-direction:column; gap:2px;">
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted);">
+            <span>麦克风实时能量 (VU 电平)</span>
+            <span id="valMicEnergy" style="color:var(--green); font-family:monospace; font-weight:700;">0%</span>
+          </div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" id="barMicEnergy" style="background:linear-gradient(90deg, var(--green), var(--cyan)); width:0%;"></div></div>
         </div>
       </div>
     </div>
 
-    <!-- 卡片 6: AI 大模型对话视窗 (预留双向流式通道) -->
-    <div class="card" style="grid-column: 1 / -1;">
-      <div class="card-title">
-        <span>💬 AI 智脑流式交互通道 (WebSocket 全双工)</span>
-      </div>
-      <div class="ai-box">
+    <!-- ────────────────────────────────────────────────────────
+         TAB 4: AI 智脑 (AI Stream Channel)
+         ──────────────────────────────────────────────────────── -->
+    <div class="tab-content" id="view-chat">
+      <div class="panel" style="flex:1;">
+        <div class="panel-header">
+          <div class="panel-title">AI 智脑流式通道 (WebSocket 全双工)</div>
+        </div>
         <div class="chat-log" id="chatLog">
-          <div class="chat-msg robot">你好！我是你的桌面赛博机器人大脑。WebSocket 通道已开启！</div>
+          <div class="chat-msg robot">你好！我是赛博双芯片智能小车。WebSocket 链路就绪！</div>
         </div>
         <div class="chat-input-row">
-          <input type="text" id="aiInput" placeholder="输入提示词或与大模型对话..." onkeydown="if(event.key==='Enter') sendAiMessage()">
+          <input type="text" id="aiInput" placeholder="输入对话或指令..." onkeydown="if(event.key==='Enter') sendAiMessage()">
           <button onclick="sendAiMessage()">发送</button>
         </div>
       </div>
+
+      <!-- 独立连接输入框 -->
+      <div class="panel" style="padding:8px 12px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:11px; color:var(--text-muted);">WS:</span>
+          <input type="text" id="wsUrlInput" style="flex:1; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); color:#fff; padding:4px 8px; border-radius:6px; font-family:monospace; font-size:11px;">
+          <button onclick="reconnectWebSocket()" style="background:var(--cyan); border:none; padding:4px 10px; border-radius:6px; font-weight:700; cursor:pointer;">连接</button>
+        </div>
+      </div>
     </div>
 
-  </div>
+  </main>
+
+  <!-- =========================
+       3. 底部 App 导航栏
+       ========================= -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" onclick="switchTab('cockpit')">
+      <span>驾驶座舱</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('telemetry')">
+      <span>双芯遥测</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('emotions')">
+      <span>拟人交互</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('chat')">
+      <span>AI智脑</span>
+    </div>
+  </nav>
 
   <script>
-    // 自动适配 WebSocket 地址 (如果是通过 ESP32 访问，自动使用当前 Host)
+    // ----------------------------------------------------
+    // 1. 标签页切换逻辑
+    // ----------------------------------------------------
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+      const targetView = document.getElementById('view-' + tabId);
+      if (targetView) targetView.classList.add('active');
+
+      const tabs = ['cockpit', 'telemetry', 'emotions', 'chat'];
+      const idx = tabs.indexOf(tabId);
+      if (idx !== -1) {
+        document.querySelectorAll('.nav-item')[idx].classList.add('active');
+      }
+    }
+
+    // ----------------------------------------------------
+    // 2. WebSocket 全双工流式通信
+    // ----------------------------------------------------
     let ws = null;
     const wsUrlInput = document.getElementById('wsUrlInput');
-    const defaultHost = window.location.host || '192.168.1.100';
-    const defaultUrl = `ws://${defaultHost}/ws`;
-    wsUrlInput.value = defaultUrl;
+    const defaultHost = window.location.host || '192.168.4.1';
+    wsUrlInput.value = `ws://${defaultHost}/ws`;
 
     function initWebSocket(url) {
-      if (ws) {
-        ws.close();
-      }
+      if (ws) ws.close();
 
-      const connStatus = document.getElementById('connStatus');
-      const connText = document.getElementById('connText');
-
-      connStatus.className = 'conn-status';
-      connText.innerText = '正在连接...';
+      const capBrain = document.getElementById('capBrain');
+      capBrain.className = 'capsule cap-offline';
+      capBrain.innerHTML = '<div class="capsule-dot"></div><span>连接中</span>';
 
       try {
         ws = new WebSocket(url);
       } catch (e) {
-        connText.innerText = '连接失败';
+        capBrain.innerHTML = '<div class="capsule-dot"></div><span>失败</span>';
         return;
       }
 
       ws.onopen = () => {
-        connStatus.className = 'conn-status connected';
-        connText.innerText = '在线连接';
-        addChatMessage('系统: 与 ESP32-S3 大脑建立长连接成功！', 'robot');
+        capBrain.className = 'capsule cap-online';
+        capBrain.innerHTML = '<div class="capsule-dot"></div><span>ESP32</span>';
+        addChatMessage('系统: 与 ESP32-S3 大脑建立全双工 WebSocket 长连接成功！', 'robot');
       };
 
       ws.onclose = () => {
-        connStatus.className = 'conn-status';
-        connText.innerText = '连接断开';
+        capBrain.className = 'capsule cap-offline';
+        capBrain.innerHTML = '<div class="capsule-dot"></div><span>断开</span>';
+        updateChassisOnlineUI(false);
       };
 
-      ws.onerror = (err) => {
-        connStatus.className = 'conn-status';
-        connText.innerText = '连接异常';
+      ws.onerror = () => {
+        capBrain.className = 'capsule cap-offline';
+        capBrain.innerHTML = '<div class="capsule-dot"></div><span>异常</span>';
       };
 
       ws.onmessage = (event) => {
         try {
           const msg = JSON.parse(event.data);
           handleServerMessage(msg);
-        } catch (e) {
-          console.log('接收到非 JSON 数据:', event.data);
-        }
+        } catch (e) {}
       };
     }
 
@@ -768,112 +1031,297 @@ static const char INDEX_HTML[] = R"rawliteral(<!DOCTYPE html>
       initWebSocket(wsUrlInput.value);
     }
 
-    // 处理来自 ESP32 的 WebSocket 消息
-    function handleServerMessage(msg) {
-      if (msg.type === 'telemetry') {
-        // 更新硬件指标
-        if (msg.uptime !== undefined) {
-          const s = msg.uptime;
-          const h = String(Math.floor(s / 3600)).padStart(2, '0');
-          const m = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
-          const sec = String(s % 60).padStart(2, '0');
-          document.getElementById('valUptime').innerText = `${h}:${m}:${sec}`;
+    function updateChassisOnlineUI(online) {
+      const capChassis = document.getElementById('capChassis');
+      const stmStatusPill = document.getElementById('stmStatusPill');
+      if (online) {
+        capChassis.className = 'capsule cap-online';
+        capChassis.innerHTML = '<div class="capsule-dot"></div><span>STM32</span>';
+        if (stmStatusPill) {
+          stmStatusPill.className = 'capsule cap-online';
+          stmStatusPill.innerText = '在线 460.8k';
         }
-        if (msg.sram_kb !== undefined) {
-          document.getElementById('valSram').innerText = msg.sram_kb + ' KB';
+      } else {
+        capChassis.className = 'capsule cap-offline';
+        capChassis.innerHTML = '<div class="capsule-dot"></div><span>STM32离线</span>';
+        if (stmStatusPill) {
+          stmStatusPill.className = 'capsule cap-offline';
+          stmStatusPill.innerText = '底盘断开';
         }
-        if (msg.psram_kb !== undefined) {
-          document.getElementById('valPsram').innerText = msg.psram_kb + ' KB';
-          const totalPsram = 8192;
-          const used = totalPsram - msg.psram_kb;
-          const pct = Math.max(5, Math.min(100, Math.round((used / totalPsram) * 100)));
-          document.getElementById('valMemPercent').innerText = pct + '%';
-          document.getElementById('memBar').style.width = pct + '%';
-        }
-        if (msg.mic_energy !== undefined) {
-          const energyPct = Math.min(100, Math.round(msg.mic_energy * 100));
-          document.getElementById('valMicEnergy').innerText = energyPct + '%';
-          const bar = document.getElementById('micEnergyBar');
-          if (bar) {
-            bar.style.width = energyPct + '%';
-            if (energyPct > 70) {
-              bar.style.background = 'var(--red)';
-              document.getElementById('valMicEnergy').style.color = 'var(--red)';
-            } else if (energyPct > 35) {
-              bar.style.background = 'var(--yellow)';
-              document.getElementById('valMicEnergy').style.color = 'var(--yellow)';
-            } else {
-              bar.style.background = 'linear-gradient(90deg, var(--green), var(--cyan))';
-              document.getElementById('valMicEnergy').style.color = 'var(--green)';
-            }
-          }
-        }
-        if (msg.auto_mode !== undefined) {
-          const toggle = document.getElementById('autoModeToggle');
-          if (toggle && document.activeElement !== toggle) {
-            toggle.checked = msg.auto_mode;
-          }
-        }
-      } else if (msg.type === 'ai_reply') {
-        // 大模型回复
-        addChatMessage(msg.text, 'robot');
       }
     }
 
-    // 发送运动控制指令
-    function sendCmd(action) {
-      if (!ws || ws.readyState !== WebSocket.OPEN) return;
-      const payload = JSON.stringify({ type: 'cmd', action: action });
-      ws.send(payload);
+    // ----------------------------------------------------
+    // 3. 实时遥测数据渲染
+    // ----------------------------------------------------
+    let currentGimbalPan = 29.0;
+    let currentGimbalTilt = 0.0;
+
+    function handleServerMessage(msg) {
+      if (msg.type !== 'telemetry') {
+        if (msg.type === 'ai_reply') addChatMessage(msg.text, 'robot');
+        return;
+      }
+
+      // 底盘链路
+      if (msg.chassis_online !== undefined) {
+        updateChassisOnlineUI(msg.chassis_online);
+      }
+
+      // 姿态俯仰角与微缩人工地平仪
+      if (msg.pitch !== undefined) {
+        const p = msg.pitch;
+        document.getElementById('hudPitch').innerText = (p >= 0 ? '+' : '') + p.toFixed(1) + '°';
+        document.getElementById('valPitch').innerText = (p >= 0 ? '+' : '') + p.toFixed(1) + '°';
+
+        const bar = document.getElementById('miniHorizonBar');
+        if (bar) {
+          const ty = Math.max(-14, Math.min(14, p * 0.7));
+          bar.style.transform = `translateY(${ty}px)`;
+          bar.style.background = Math.abs(p) > 30 ? 'var(--red)' : (Math.abs(p) > 15 ? 'var(--yellow)' : 'linear-gradient(90deg, transparent, var(--cyan), transparent)');
+        }
+      }
+
+      if (msg.roll !== undefined) document.getElementById('valRoll').innerText = (msg.roll >= 0 ? '+' : '') + msg.roll.toFixed(1) + '°';
+      if (msg.pitch_rate !== undefined) document.getElementById('valPitchRate').innerText = msg.pitch_rate.toFixed(1) + ' °/s';
+      if (msg.acc_pitch !== undefined) document.getElementById('valAccPitch').innerText = (msg.acc_pitch >= 0 ? '+' : '') + msg.acc_pitch.toFixed(1) + '°';
+
+      // 车速与双轮动力学
+      if (msg.speed !== undefined) {
+        document.getElementById('hudSpeed').innerHTML = `${msg.speed} <small style="font-size:10px;">mm/s</small>`;
+        document.getElementById('valSpeed').innerText = msg.speed + ' mm/s';
+      }
+      if (msg.l_spd !== undefined && msg.l_pulse !== undefined) {
+        document.getElementById('valLeftWheel').innerText = `${msg.l_spd}mm/s (${msg.l_pulse}p)`;
+      }
+      if (msg.r_spd !== undefined && msg.r_pulse !== undefined) {
+        document.getElementById('valRightWheel').innerText = `${msg.r_spd}mm/s (${msg.r_pulse}p)`;
+      }
+      if (msg.l_pwm !== undefined && msg.r_pwm !== undefined) {
+        document.getElementById('valMotorPwm').innerText = `L:${msg.l_pwm} / R:${msg.r_pwm}`;
+      }
+
+      // 动力电池
+      if (msg.battery_mv !== undefined) {
+        const v = (msg.battery_mv / 1000.0).toFixed(2);
+        const batPct = Math.max(0, Math.min(100, Math.round(((msg.battery_mv - 10500) / (12600 - 10500)) * 100)));
+        document.getElementById('txtBat').innerText = v + 'V';
+        document.getElementById('hudBatPct').innerText = batPct + '%';
+        document.getElementById('valBattery').innerText = `${v} V (${batPct}%)`;
+      }
+
+      // 跌倒告警与安全标志
+      if (msg.status_flags !== undefined) {
+        const fall = (msg.status_flags & 0x02) !== 0;
+        const calib = (msg.status_flags & 0x04) !== 0;
+        const run = (msg.status_flags & 0x08) !== 0;
+        document.getElementById('capAlarm').style.display = fall ? 'inline-flex' : 'none';
+        document.getElementById('valChassisStatus').innerText = (calib ? 'IMU就绪' : '校准中') + ' | ' + (run ? '输出中' : '待机');
+      }
+
+      // STM32 芯片级存储与 UID
+      if (msg.stm_uid) document.getElementById('valStmUid').innerText = msg.stm_uid;
+      if (msg.stm_flash_tot && msg.stm_flash_used) {
+        const tot = msg.stm_flash_tot, used = msg.stm_flash_used;
+        const pct = Math.max(1, Math.min(100, Math.round((used / tot) * 100)));
+        document.getElementById('valStmFlash').innerText = `${used}K / ${tot}K (${pct}%)`;
+        const b = document.getElementById('barStmFlash'); if (b) b.style.width = pct + '%';
+      }
+      if (msg.stm_sram_tot && msg.stm_sram_free) {
+        const tot = msg.stm_sram_tot, free = msg.stm_sram_free;
+        const used = Math.max(0, tot - free);
+        const pct = Math.max(1, Math.min(100, Math.round((used / tot) * 100)));
+        document.getElementById('valStmSram').innerText = `堆余 ${free}K / 总 ${tot}K`;
+        const b = document.getElementById('barStmSram'); if (b) b.style.width = pct + '%';
+      }
+      if (msg.rx_bytes && msg.rx_pkts) {
+        document.getElementById('valChassisComm').innerText = `${(msg.rx_bytes/1024).toFixed(1)} KB / ${msg.rx_pkts} 帧`;
+      }
+
+      // ESP32 大脑指标
+      if (msg.uptime) {
+        const s = msg.uptime;
+        const h = String(Math.floor(s / 3600)).padStart(2, '0');
+        const m = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
+        const sec = String(s % 60).padStart(2, '0');
+        document.getElementById('valUptime').innerText = `${h}:${m}:${sec}`;
+      }
+      if (msg.sram_free && msg.sram_min) {
+        document.getElementById('valSram').innerText = `${msg.sram_free} / ${msg.sram_min} KB`;
+      }
+      if (msg.psram_free && msg.psram_total) {
+        document.getElementById('valPsram').innerText = `${msg.psram_free} / ${msg.psram_total} KB`;
+        const pct = Math.max(3, Math.min(100, Math.round(((msg.psram_total - msg.psram_free) / msg.psram_total) * 100)));
+        document.getElementById('valPsramPct').innerText = pct + '%';
+        const b = document.getElementById('barPsram'); if (b) b.style.width = pct + '%';
+      }
+
+      // 云台当前实际角度与雷达光标
+      if (msg.g_pan !== undefined && msg.g_tilt !== undefined) {
+        currentGimbalPan = msg.g_pan;
+        currentGimbalTilt = msg.g_tilt;
+        const pStr = msg.g_pan.toFixed(1);
+        const tStr = msg.g_tilt.toFixed(1);
+        document.getElementById('hudGimbal').innerText = `${Math.round(msg.g_pan)}° / ${Math.round(msg.g_tilt)}°`;
+        document.getElementById('gimbalCurText').innerText = `${pStr}° / ${tStr}°`;
+        document.getElementById('gimbalPanVal').innerText = pStr + '°';
+        document.getElementById('gimbalTiltVal').innerText = tStr + '°';
+
+        const dot = document.getElementById('gimbalRadarDot');
+        if (dot) {
+          const nx = Math.max(0, Math.min(100, (msg.g_pan / 180.0) * 100));
+          const ny = Math.max(0, Math.min(100, 100 - (msg.g_tilt / 90.0) * 100));
+          dot.style.left = nx + '%';
+          dot.style.top = ny + '%';
+        }
+      }
+
+      // 麦克风与自主模式
+      if (msg.mic_energy !== undefined) {
+        const ep = Math.min(100, Math.round(msg.mic_energy * 100));
+        document.getElementById('valMicEnergy').innerText = ep + '%';
+        const b = document.getElementById('barMicEnergy'); if (b) b.style.width = ep + '%';
+      }
+      if (msg.auto_mode !== undefined) {
+        const t = document.getElementById('autoModeToggle');
+        if (t && document.activeElement !== t) t.checked = msg.auto_mode;
+      }
     }
 
-    // 🤖 自主拟人模式开关
+    // ----------------------------------------------------
+    // 4. 虚拟触控比例摇杆 (完全解耦底盘，绝不联动云台)
+    // ----------------------------------------------------
+    const joyBase = document.getElementById('joystickBase');
+    const joyThumb = document.getElementById('joystickThumb');
+    let isDraggingJoy = false;
+    let joyTimer = null;
+    let curSpeed = 0, curYaw = 0;
+
+    function handleJoyMove(cx, cy) {
+      const rect = joyBase.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      let dx = cx - centerX;
+      let dy = cy - centerY;
+      const maxR = (rect.width - 54) / 2;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist > maxR) {
+        dx = (dx / dist) * maxR;
+        dy = (dy / dist) * maxR;
+      }
+
+      joyThumb.style.transform = `translate(${dx}px, ${dy}px)`;
+
+      const normX = dx / maxR;
+      const normY = -dy / maxR;
+
+      curSpeed = Math.round(normY * 250);  // 前正后负 mm/s
+      curYaw = Math.round(-normX * 600);   // 左正右负 mrad/s
+
+      document.getElementById('joyMetrics').innerText = `${curSpeed} mm/s | ${curYaw} mrad/s`;
+    }
+
+    function resetJoy() {
+      isDraggingJoy = false;
+      joyThumb.style.transform = 'translate(0px, 0px)';
+      curSpeed = 0; curYaw = 0;
+      document.getElementById('joyMetrics').innerText = '0 mm/s | 0 mrad/s';
+      sendCmdVel(0, 0);
+    }
+
+    joyBase.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      isDraggingJoy = true;
+      handleJoyMove(e.touches[0].clientX, e.touches[0].clientY);
+      startJoyLoop();
+    }, { passive: false });
+
+    window.addEventListener('touchmove', (e) => {
+      if (!isDraggingJoy) return;
+      e.preventDefault();
+      handleJoyMove(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
+
+    window.addEventListener('touchend', () => {
+      if (isDraggingJoy) { stopJoyLoop(); resetJoy(); }
+    });
+
+    joyBase.addEventListener('mousedown', (e) => {
+      isDraggingJoy = true;
+      handleJoyMove(e.clientX, e.clientY);
+      startJoyLoop();
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDraggingJoy) return;
+      handleJoyMove(e.clientX, e.clientY);
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (isDraggingJoy) { stopJoyLoop(); resetJoy(); }
+    });
+
+    function startJoyLoop() {
+      if (joyTimer) clearInterval(joyTimer);
+      joyTimer = setInterval(() => {
+        if (isDraggingJoy) sendCmdVel(curSpeed, curYaw);
+      }, 50);
+    }
+
+    function stopJoyLoop() {
+      if (joyTimer) { clearInterval(joyTimer); joyTimer = null; }
+    }
+
+    function sendCmdVel(spd, yaw) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      ws.send(JSON.stringify({ type: 'cmd_vel', speed: spd, yaw: yaw }));
+    }
+
+    function sendCmd(action) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      ws.send(JSON.stringify({ type: 'cmd', action: action }));
+    }
+
+    // ----------------------------------------------------
+    // 5. 云台独立控制与微调
+    // ----------------------------------------------------
+    function adjustGimbal(dPan, dTilt) {
+      let p = Math.max(0, Math.min(180, Math.round(currentGimbalPan + dPan)));
+      let t = Math.max(0, Math.min(90, Math.round(currentGimbalTilt + dTilt)));
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      ws.send(JSON.stringify({ type: 'gimbal_angle', pan: p, tilt: t }));
+    }
+
+    function sendGimbalGesture(gesture) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      ws.send(JSON.stringify({ type: 'gimbal_gesture', gesture: gesture }));
+    }
+
+    // ----------------------------------------------------
+    // 6. 表情、音频与自主模式
+    // ----------------------------------------------------
     function toggleAutoMode(enabled) {
       if (!ws || ws.readyState !== WebSocket.OPEN) return;
       ws.send(JSON.stringify({ type: 'autonomous', enabled: enabled }));
     }
 
-    // 🎭 切换表情与拟人行为
     function setEmotion(state) {
       if (!ws || ws.readyState !== WebSocket.OPEN) return;
       ws.send(JSON.stringify({ type: 'emotion', state: state }));
     }
 
-    // 💃 赛博特技跳舞秀
     function triggerDance() {
       if (!ws || ws.readyState !== WebSocket.OPEN) return;
       ws.send(JSON.stringify({ type: 'dance' }));
     }
 
-    // 🦾 云台预设手势
-    function sendGimbalGesture(gesture) {
-      if (!ws || ws.readyState !== WebSocket.OPEN) return;
-      ws.send(JSON.stringify({ type: 'gimbal_gesture', gesture: gesture }));
-      if (gesture === 'RESET') {
-        document.getElementById('panSlider').value = 29;
-        document.getElementById('panVal').innerText = '29°';
-        document.getElementById('tiltSlider').value = 0;
-        document.getElementById('tiltVal').innerText = '0°';
-      }
-    }
-
-    // 🦾 云台滑条拖动
-    function onGimbalSliderChange() {
-      const pan = parseInt(document.getElementById('panSlider').value);
-      const tilt = parseInt(document.getElementById('tiltSlider').value);
-      document.getElementById('panVal').innerText = pan + '°';
-      document.getElementById('tiltVal').innerText = tilt + '°';
-      if (!ws || ws.readyState !== WebSocket.OPEN) return;
-      ws.send(JSON.stringify({ type: 'gimbal_angle', pan: pan, tilt: tilt }));
-    }
-
-    // 🔊 音频播放控制
     function sendAudioCmd(action) {
       if (!ws || ws.readyState !== WebSocket.OPEN) return;
       ws.send(JSON.stringify({ type: 'audio', action: action }));
     }
 
-    // 🔊 喇叭音量滑条
     function onVolumeChange() {
       const vol = parseInt(document.getElementById('volumeSlider').value);
       document.getElementById('volumeVal').innerText = vol + '%';
@@ -881,19 +1329,14 @@ static const char INDEX_HTML[] = R"rawliteral(<!DOCTYPE html>
       ws.send(JSON.stringify({ type: 'audio', action: 'VOLUME', volume: vol / 100.0 }));
     }
 
-    // 发送大模型消息
     function sendAiMessage() {
       const input = document.getElementById('aiInput');
       const text = input.value.trim();
       if (!text) return;
-
       addChatMessage(text, 'user');
       input.value = '';
-
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({ type: 'ai_prompt', text: text }));
-      } else {
-        addChatMessage('错误: WebSocket 尚未连接，无法上送大脑！', 'robot');
       }
     }
 
@@ -906,7 +1349,7 @@ static const char INDEX_HTML[] = R"rawliteral(<!DOCTYPE html>
       chatLog.scrollTop = chatLog.scrollHeight;
     }
 
-    // 键盘 WASD / 方向键 快捷控制
+    // 键盘 WASD 控制 (底盘完全独立，不联动云台)
     window.addEventListener('keydown', (e) => {
       if (document.activeElement.tagName === 'INPUT') return;
       if (e.repeat) return;
@@ -924,9 +1367,8 @@ static const char INDEX_HTML[] = R"rawliteral(<!DOCTYPE html>
       }
     });
 
-    // 启动初始连接
     window.onload = () => {
-      initWebSocket(defaultUrl);
+      initWebSocket(defaultHost ? `ws://${defaultHost}/ws` : 'ws://192.168.4.1/ws');
     };
   </script>
 </body>

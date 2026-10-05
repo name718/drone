@@ -22,7 +22,7 @@ esp_err_t DisplayService::init() {
         ESP_LOGE(TAG, "屏幕硬件初始化失败: %s", esp_err_to_name(ret));
         return ret;
     }
-    ESP_LOGI(TAG, "✅ 屏幕硬件就绪，准备拉起渲染任务。");
+    ESP_LOGI(TAG, "屏幕硬件就绪，准备拉起渲染任务。");
     return ESP_OK;
 }
 
@@ -45,7 +45,7 @@ esp_err_t DisplayService::start() {
         return ESP_FAIL;
     }
 
-    ESP_LOGI(TAG, "🎉 视觉服务已在 Core 1 启动 (33 FPS 高帧率渲染)！");
+    ESP_LOGI(TAG, "视觉服务已在 Core 1 启动 (33 FPS 高帧率渲染)！");
     return ESP_OK;
 }
 

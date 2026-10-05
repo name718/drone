@@ -33,21 +33,21 @@ void GimbalService::nod() {
     active_gesture_ = GimbalGesture::NOD;
     gesture_step_ = 0;
     gesture_tick_count_ = 0;
-    ESP_LOGI(TAG, "🙆 执行拟人动作: 点头");
+    ESP_LOGI(TAG, "执行拟人动作: 点头");
 }
 
 void GimbalService::shake() {
     active_gesture_ = GimbalGesture::SHAKE;
     gesture_step_ = 0;
     gesture_tick_count_ = 0;
-    ESP_LOGI(TAG, "🙅 执行拟人动作: 摇头");
+    ESP_LOGI(TAG, "执行拟人动作: 摇头");
 }
 
 void GimbalService::reset() {
     active_gesture_ = GimbalGesture::NONE;
     target_pan_ = Config::Gimbal::DEFAULT_PAN_ANGLE;
     target_tilt_ = Config::Gimbal::DEFAULT_TILT_ANGLE;
-    ESP_LOGI(TAG, "🎯 云台回正居中 (Pan=%.1f°, Tilt=%.1f°)", target_pan_, target_tilt_);
+    ESP_LOGI(TAG, "云台回正居中 (Pan=%.1f°, Tilt=%.1f°)", target_pan_.load(), target_tilt_.load());
 }
 
 void GimbalService::updateGesture() {
@@ -110,7 +110,7 @@ void GimbalService::updateGesture() {
 
 void GimbalService::gimbalTask(void *param) {
     auto *self = static_cast<GimbalService *>(param);
-    ESP_LOGI(TAG, "🦾 云台 50Hz 独立控制线程已启动并在 Core 1 运行");
+    ESP_LOGI(TAG, "云台 50Hz 独立控制线程已启动并在 Core 1 运行");
 
     while (self->is_running_) {
         // 1. 推进手势动作时间轴
@@ -119,23 +119,31 @@ void GimbalService::gimbalTask(void *param) {
         // 2. 指数平滑加减速滤波器 (一阶低通滤波算法)
         // 滤波公式: current = current + (target - current) * alpha
         // 0.18f 的滤波因子兼顾响应灵敏度与机械阻尼柔顺度，消除 SG90 塑料齿轮的剧烈颤抖
-        float diff_p = self->target_pan_ - self->current_pan_;
+        float t_pan = self->target_pan_.load();
+        float c_pan = self->current_pan_.load();
+        float diff_p = t_pan - c_pan;
         if (std::abs(diff_p) > 0.1f) {
-            self->current_pan_ += diff_p * 0.18f;
+            c_pan += diff_p * 0.18f;
+            self->current_pan_.store(c_pan);
         } else {
-            self->current_pan_ = self->target_pan_;
+            c_pan = t_pan;
+            self->current_pan_.store(c_pan);
         }
 
-        float diff_t = self->target_tilt_ - self->current_tilt_;
+        float t_tilt = self->target_tilt_.load();
+        float c_tilt = self->current_tilt_.load();
+        float diff_t = t_tilt - c_tilt;
         if (std::abs(diff_t) > 0.1f) {
-            self->current_tilt_ += diff_t * 0.18f;
+            c_tilt += diff_t * 0.18f;
+            self->current_tilt_.store(c_tilt);
         } else {
-            self->current_tilt_ = self->target_tilt_;
+            c_tilt = t_tilt;
+            self->current_tilt_.store(c_tilt);
         }
 
         // 3. 将滤波后的平滑角度输出给物理舵机
-        self->driver_.setPanAngle(self->current_pan_);
-        self->driver_.setTiltAngle(self->current_tilt_);
+        self->driver_.setPanAngle(c_pan);
+        self->driver_.setTiltAngle(c_tilt);
 
         // 4. 精确休眠 20ms (保持 50Hz 控制刷新率)
         vTaskDelay(pdMS_TO_TICKS(20));
@@ -164,6 +172,6 @@ esp_err_t GimbalService::start() {
         return ESP_FAIL;
     }
 
-    ESP_LOGI(TAG, "🎉 云台服务启动成功！");
+    ESP_LOGI(TAG, "云台服务启动成功！");
     return ESP_OK;
 }

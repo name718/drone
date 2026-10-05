@@ -10,6 +10,8 @@
  */
 #pragma once
 
+#include <atomic>
+
 #include "config/board_config.hpp"
 #include "esp_err.h"
 #include "freertos/FreeRTOS.h"
@@ -60,6 +62,26 @@ public:
      */
     void reset();
 
+    /**
+     * @brief 获取云台当前物理输出的实时水平角度 (Pan, 单位: 度)
+     */
+    float getCurrentPan() const { return current_pan_.load(); }
+
+    /**
+     * @brief 获取云台当前物理输出的实时俯仰角度 (Tilt, 单位: 度)
+     */
+    float getCurrentTilt() const { return current_tilt_.load(); }
+
+    /**
+     * @brief 获取云台当前目标设定水平角度 (Pan, 单位: 度)
+     */
+    float getTargetPan() const { return target_pan_.load(); }
+
+    /**
+     * @brief 获取云台当前目标设定俯仰角度 (Tilt, 单位: 度)
+     */
+    float getTargetTilt() const { return target_tilt_.load(); }
+
 private:
     GimbalService();
     ~GimbalService() = default;
@@ -77,11 +99,11 @@ private:
     TaskHandle_t task_handle_{nullptr};
     bool is_running_{false};
 
-    // 平滑插值目标与当前实际输出值 (使用单点信任源中的实机校准角度)
-    float target_pan_{Config::Gimbal::DEFAULT_PAN_ANGLE};
-    float target_tilt_{Config::Gimbal::DEFAULT_TILT_ANGLE};
-    float current_pan_{Config::Gimbal::DEFAULT_PAN_ANGLE};
-    float current_tilt_{Config::Gimbal::DEFAULT_TILT_ANGLE};
+    // 平滑插值目标与当前实际输出值 (使用单点信任源中的实机校准角度，原子线程安全)
+    std::atomic<float> target_pan_{Config::Gimbal::DEFAULT_PAN_ANGLE};
+    std::atomic<float> target_tilt_{Config::Gimbal::DEFAULT_TILT_ANGLE};
+    std::atomic<float> current_pan_{Config::Gimbal::DEFAULT_PAN_ANGLE};
+    std::atomic<float> current_tilt_{Config::Gimbal::DEFAULT_TILT_ANGLE};
 
     // 手势状态机
     GimbalGesture active_gesture_{GimbalGesture::NONE};

@@ -51,7 +51,7 @@ esp_err_t WebServer::indexHandler(httpd_req_t *req) {
 esp_err_t WebServer::wsHandler(httpd_req_t *req) {
     // 1. 如果是初次 HTTP 握手请求，系统握手成功后直接返回
     if (req->method == HTTP_GET) {
-        ESP_LOGI(TAG, "🤝 收到来自浏览器的 WebSocket 握手成功！(套接字 fd: %d)",
+        ESP_LOGI(TAG, "收到来自浏览器的 WebSocket 握手成功！(套接字 fd: %d)",
                  httpd_req_to_sockfd(req));
         return ESP_OK;
     }
@@ -83,19 +83,29 @@ esp_err_t WebServer::wsHandler(httpd_req_t *req) {
         // 获取底盘单例，准备下发运动
         auto &chassis = ChassisService::getInstance();
 
-        // 简易高效按键指令解析 (不依赖繁重第三方 JSON 库)
+        // 简易高效按键指令与摇杆连续控制解析 (底盘全权独立差速运动，不联动云台)
         if (payload.find("\"FORWARD\"") != std::string::npos) {
             chassis.sendVelocityCommand(200, 0);  // 前进: 200 mm/s
         } else if (payload.find("\"BACKWARD\"") != std::string::npos) {
             chassis.sendVelocityCommand(-200, 0);  // 后退: -200 mm/s
         } else if (payload.find("\"LEFT\"") != std::string::npos) {
-            chassis.sendVelocityCommand(0, 500);  // 左转: 500 mrad/s
+            chassis.sendVelocityCommand(0, 500);  // 原地左转: 500 mrad/s
         } else if (payload.find("\"RIGHT\"") != std::string::npos) {
-            chassis.sendVelocityCommand(0, -500);  // 右转: -500 mrad/s
+            chassis.sendVelocityCommand(0, -500);  // 原地右转: -500 mrad/s
         } else if (payload.find("\"STOP\"") != std::string::npos) {
-            chassis.sendVelocityCommand(0, 0);  // 停止
+            chassis.sendVelocityCommand(0, 0);  // 刹车急停
+        } else if (payload.find("\"cmd_vel\"") != std::string::npos) {
+            // 手机端虚拟摇杆连续比例速度通道: {"type":"cmd_vel","speed":150,"yaw":-200}
+            int speed = 0;
+            int yaw = 0;
+            const char *p_speed = std::strstr(buf, "\"speed\":");
+            const char *p_yaw = std::strstr(buf, "\"yaw\":");
+            if (p_speed) speed = std::atoi(p_speed + 8);
+            if (p_yaw) yaw = std::atoi(p_yaw + 6);
+
+            chassis.sendVelocityCommand(static_cast<int16_t>(speed), static_cast<int16_t>(yaw));
         } else if (payload.find("\"emotion\"") != std::string::npos || payload.find("\"EMOTION\"") != std::string::npos) {
-            // 🎭 表情与拟人行为联动通道
+            // 表情与拟人行为联动通道
             auto &interact = InteractionService::getInstance();
             if (payload.find("\"HAPPY\"") != std::string::npos) {
                 interact.triggerBehavior(RobotBehavior::HAPPY);
@@ -117,10 +127,10 @@ esp_err_t WebServer::wsHandler(httpd_req_t *req) {
                 interact.triggerBehavior(RobotBehavior::NORMAL);
             }
         } else if (payload.find("\"dance\"") != std::string::npos) {
-            // 💃 赛博跳舞特技专属指令通道
+            // 赛博跳舞特技专属指令通道
             InteractionService::getInstance().triggerDance();
         } else if (payload.find("\"gimbal_gesture\"") != std::string::npos) {
-            // 🦾 云台预设动作手势通道
+            // 云台预设动作手势通道
             auto &interact = InteractionService::getInstance();
             if (payload.find("\"NOD\"") != std::string::npos) {
                 interact.triggerBehavior(RobotBehavior::NOD);
@@ -130,7 +140,7 @@ esp_err_t WebServer::wsHandler(httpd_req_t *req) {
                 GimbalService::getInstance().reset();
             }
         } else if (payload.find("\"gimbal_angle\"") != std::string::npos) {
-            // 🦾 云台滑条指定绝对角度控制: {"type":"gimbal_angle","pan":90,"tilt":90}
+            // 云台滑条指定绝对角度控制: {"type":"gimbal_angle","pan":90,"tilt":90}
             int pan = 90;
             int tilt = 90;
             const char *p_pan = std::strstr(buf, "\"pan\":");
@@ -139,11 +149,11 @@ esp_err_t WebServer::wsHandler(httpd_req_t *req) {
             if (p_tilt) tilt = std::atoi(p_tilt + 7);
             GimbalService::getInstance().lookAt(static_cast<float>(pan), static_cast<float>(tilt));
         } else if (payload.find("\"autonomous\"") != std::string::npos || payload.find("\"AUTO_MODE\"") != std::string::npos) {
-            // 🤖 自主拟人交互模式开关
+            // 自主拟人交互模式开关
             bool enable = (payload.find("true") != std::string::npos || payload.find("1") != std::string::npos);
             InteractionService::getInstance().setAutonomousMode(enable);
         } else if (payload.find("\"audio\"") != std::string::npos || payload.find("\"AUDIO\"") != std::string::npos) {
-            // 🔊 音频播放与音量控制通道
+            // 音频播放与音量控制通道
             auto &audio = AudioService::getInstance();
             if (payload.find("\"CHIME\"") != std::string::npos) {
                 audio.playBootChime();
@@ -161,7 +171,7 @@ esp_err_t WebServer::wsHandler(httpd_req_t *req) {
         } else if (payload.find("\"ai_prompt\"") != std::string::npos) {
             // 【大模型预留通道】：收到网页端发来的文字，先给一个即时握手响应
             const char reply[] =
-                "{\"type\":\"ai_reply\",\"text\":\"🤖 [ESP32大脑已接收] WebSocket "
+                "{\"type\":\"ai_reply\",\"text\":\"[ESP32大脑已接收] WebSocket "
                 "全双工流式通道测试成功！待接入大模型音视频流。\"}";
             httpd_ws_frame_t out_pkt;
             std::memset(&out_pkt, 0, sizeof(httpd_ws_frame_t));
@@ -191,21 +201,76 @@ void WebServer::broadcastTelemetry() {
         return;
     }
 
-    // 收集硬件指标
-    uint32_t sram_kb = esp_get_free_internal_heap_size() / 1024;
-    uint32_t psram_kb = heap_caps_get_free_size(MALLOC_CAP_SPIRAM) / 1024;
+    // --- ESP32-S3 大脑核心指标 ---
+    uint32_t sram_free_kb = esp_get_free_internal_heap_size() / 1024;
+    uint32_t sram_min_kb = esp_get_minimum_free_heap_size() / 1024;
+    uint32_t psram_free_kb = heap_caps_get_free_size(MALLOC_CAP_SPIRAM) / 1024;
+    uint32_t psram_total_kb = heap_caps_get_total_size(MALLOC_CAP_SPIRAM) / 1024;
     uint32_t uptime_s = static_cast<uint32_t>(esp_timer_get_time() / 1000000ULL);
     float mic_energy = AudioService::getInstance().getMicEnergy();
+    float spk_vol = AudioService::getInstance().getVolume();
     bool auto_mode = InteractionService::getInstance().isAutonomousMode();
 
-    // 打包为轻量 JSON 字符串
-    char json_buf[220];
-    int len =
-        std::snprintf(json_buf, sizeof(json_buf),
-                      "{\"type\":\"telemetry\",\"uptime\":%lu,\"sram_kb\":%lu,\"psram_kb\":%lu,\"mic_energy\":%.2f,\"auto_mode\":%s}",
-                      static_cast<unsigned long>(uptime_s), static_cast<unsigned long>(sram_kb),
-                      static_cast<unsigned long>(psram_kb), static_cast<double>(mic_energy),
-                      auto_mode ? "true" : "false");
+    // 机器人二自由度云台实时与目标物理角度 (实时 50Hz 平滑滤波后当前角度)
+    auto &gimbal = GimbalService::getInstance();
+    float g_pan = gimbal.getCurrentPan();
+    float g_tilt = gimbal.getCurrentTilt();
+    float g_tgt_p = gimbal.getTargetPan();
+    float g_tgt_t = gimbal.getTargetTilt();
+
+    // --- STM32G473 底盘全维度遥测指标 ---
+    auto &chassis = ChassisService::getInstance();
+    bool chassis_online = chassis.isChassisOnline();
+    uint16_t stm_flash_tot = chassis.getFlashTotalKb();
+    uint16_t stm_flash_used = chassis.getFlashUsedKb();
+    uint16_t stm_sram_tot = chassis.getSramTotalKb();
+    uint16_t stm_sram_free = chassis.getSramFreeKb();
+    uint32_t uid[3] = {0};
+    chassis.getChipUid(uid);
+    char uid_str[36];
+    std::snprintf(uid_str, sizeof(uid_str), "%08lX-%08lX-%08lX",
+                  static_cast<unsigned long>(uid[0]),
+                  static_cast<unsigned long>(uid[1]),
+                  static_cast<unsigned long>(uid[2]));
+
+    float pitch = chassis.getPitch();
+    float roll = chassis.getRoll();
+    float pitch_rate = chassis.getPitchRate();
+    float acc_pitch = chassis.getAccPitch();
+    int16_t speed = chassis.getActualSpeed();
+    int16_t l_spd = chassis.getLeftSpeed();
+    int16_t r_spd = chassis.getRightSpeed();
+    int16_t l_pulse = chassis.getLeftPulse();
+    int16_t r_pulse = chassis.getRightPulse();
+    int16_t l_pwm = chassis.getLeftPwm();
+    int16_t r_pwm = chassis.getRightPwm();
+    uint16_t bat_mv = chassis.getBatteryMv();
+    uint8_t flags = chassis.getStatusFlags();
+    uint64_t rx_bytes = chassis.getTotalRxBytes();
+    uint32_t rx_pkts = chassis.getRxPackets();
+
+    // 打包为轻量高效 JSON 字符串 (单帧包含双芯片底层硬件全景参数)
+    char json_buf[768];
+    int len = std::snprintf(
+        json_buf, sizeof(json_buf),
+        "{\"type\":\"telemetry\","
+        "\"uptime\":%lu,\"sram_free\":%lu,\"sram_min\":%lu,\"psram_free\":%lu,\"psram_total\":%lu,"
+        "\"mic_energy\":%.2f,\"spk_vol\":%.2f,\"auto_mode\":%s,"
+        "\"g_pan\":%.1f,\"g_tilt\":%.1f,\"g_tgt_p\":%.1f,\"g_tgt_t\":%.1f,"
+        "\"chassis_online\":%s,\"stm_flash_tot\":%u,\"stm_flash_used\":%u,\"stm_sram_tot\":%u,\"stm_sram_free\":%u,\"stm_uid\":\"%s\","
+        "\"pitch\":%.2f,\"roll\":%.2f,\"pitch_rate\":%.2f,\"acc_pitch\":%.2f,"
+        "\"speed\":%d,\"l_spd\":%d,\"r_spd\":%d,\"l_pulse\":%d,\"r_pulse\":%d,"
+        "\"l_pwm\":%d,\"r_pwm\":%d,\"battery_mv\":%u,\"status_flags\":%u,\"rx_bytes\":%llu,\"rx_pkts\":%lu}",
+        static_cast<unsigned long>(uptime_s), static_cast<unsigned long>(sram_free_kb),
+        static_cast<unsigned long>(sram_min_kb), static_cast<unsigned long>(psram_free_kb),
+        static_cast<unsigned long>(psram_total_kb), static_cast<double>(mic_energy),
+        static_cast<double>(spk_vol), auto_mode ? "true" : "false",
+        static_cast<double>(g_pan), static_cast<double>(g_tilt),
+        static_cast<double>(g_tgt_p), static_cast<double>(g_tgt_t),
+        chassis_online ? "true" : "false", stm_flash_tot, stm_flash_used, stm_sram_tot, stm_sram_free, uid_str,
+        static_cast<double>(pitch), static_cast<double>(roll), static_cast<double>(pitch_rate), static_cast<double>(acc_pitch),
+        speed, l_spd, r_spd, l_pulse, r_pulse, l_pwm, r_pwm, bat_mv, flags,
+        static_cast<unsigned long long>(rx_bytes), static_cast<unsigned long>(rx_pkts));
 
     // 异步推送到所有处于 WebSocket 状态的客户端
     for (size_t i = 0; i < fds; i++) {
@@ -225,7 +290,7 @@ void WebServer::telemetryTask(void *param) {
     auto *self = static_cast<WebServer *>(param);
     while (self->is_running_) {
         self->broadcastTelemetry();
-        vTaskDelay(pdMS_TO_TICKS(1000));  // 每隔 1 秒主动向网页推送一次最新体检数据
+        vTaskDelay(pdMS_TO_TICKS(100));  // 100ms (10Hz) 动态刷新率，保证水平姿态仪与遥测丝滑响应
     }
     vTaskDelete(nullptr);
 }
@@ -269,7 +334,7 @@ esp_err_t WebServer::start() {
     is_running_ = true;
     xTaskCreatePinnedToCore(telemetryTask, "WsTelemetry", 4096, this, 3, nullptr, 0);
 
-    ESP_LOGI(TAG, "🎉 Web 控制台与 WebSocket 服务已成功就绪！");
+    ESP_LOGI(TAG, "Web 控制台与 WebSocket 服务已成功就绪！");
     return ESP_OK;
 }
 

@@ -32,7 +32,7 @@ esp_err_t InteractionService::init() {
     is_sleeping_ = false;
     is_in_sound_reaction_ = false;
 
-    ESP_LOGI(TAG, "✅ 拟人多模态交互引擎参数初始化完成！");
+    ESP_LOGI(TAG, "拟人多模态交互引擎参数初始化完成！");
     return ESP_OK;
 }
 
@@ -58,7 +58,7 @@ esp_err_t InteractionService::start() {
         return ESP_FAIL;
     }
 
-    ESP_LOGI(TAG, "🎉 拟人多模态交互引擎已在 Core 0 启动运行！");
+    ESP_LOGI(TAG, "拟人多模态交互引擎已在 Core 0 启动运行！");
     return ESP_OK;
 }
 
@@ -96,7 +96,7 @@ void InteractionService::triggerBehavior(RobotBehavior behavior) {
             break;
 
         case RobotBehavior::WAKE_UP:
-            ESP_LOGI(TAG, "⚡ 触发【声音唤醒】拟人反应！(睁大双眼 + 仰头探寻 + 提示音)");
+            ESP_LOGI(TAG, "触发【声音唤醒】拟人反应！(睁大双眼 + 仰头探寻 + 提示音)");
             display.setEmotion(EmotionState::SURPRISED);
             // 头部微仰 16 度，展现被声音吸引的好奇姿态
             gimbal.lookAt(Config::Gimbal::DEFAULT_PAN_ANGLE, 16.0f);
@@ -104,7 +104,7 @@ void InteractionService::triggerBehavior(RobotBehavior behavior) {
             break;
 
         case RobotBehavior::HAPPY:
-            ESP_LOGI(TAG, "😄 触发【开心欢喜】联动！(弯弯笑眼 + 活泼晃头 + 双音大调)");
+            ESP_LOGI(TAG, "触发【开心欢喜】联动！(弯弯笑眼 + 活泼晃头 + 双音大调)");
             display.setEmotion(EmotionState::HAPPY);
             gimbal.shake();  // 欢快摆头
             // 演奏两段欢快大调音符 (G5 -> C6)
@@ -114,35 +114,35 @@ void InteractionService::triggerBehavior(RobotBehavior behavior) {
             break;
 
         case RobotBehavior::ALERT:
-            ESP_LOGI(TAG, "🚨 触发【警觉避险】联动！(警惕眼神 + 紧急提示音 + 姿态居中)");
+            ESP_LOGI(TAG, "触发【警觉避险】联动！(警惕眼神 + 紧急提示音 + 姿态居中)");
             display.setEmotion(EmotionState::NORMAL);
             gimbal.reset();
             audio.playAlert();
             break;
 
         case RobotBehavior::SLEEP:
-            ESP_LOGI(TAG, "😴 触发【困倦打盹】挂机！(眯眼打盹 + 低头放平)");
+            ESP_LOGI(TAG, "触发【困倦打盹】挂机！(眯眼打盹 + 低头放平)");
             display.setEmotion(EmotionState::SLEEPY);
             // 头部微垂至 0 度，安静休眠
             gimbal.lookAt(Config::Gimbal::DEFAULT_PAN_ANGLE, 0.0f);
             break;
 
         case RobotBehavior::NOD:
-            ESP_LOGI(TAG, "🙆 触发【点头认同】联动！");
+            ESP_LOGI(TAG, "触发【点头认同】联动！");
             display.setEmotion(EmotionState::HAPPY);
             gimbal.nod();
             audio.playTone(880.0f, 70);
             break;
 
         case RobotBehavior::SHAKE:
-            ESP_LOGI(TAG, "🙅 触发【摇头否定】联动！");
+            ESP_LOGI(TAG, "触发【摇头否定】联动！");
             display.setEmotion(EmotionState::NORMAL);
             gimbal.shake();
             audio.playTone(392.0f, 90);
             break;
 
         case RobotBehavior::LOVE:
-            ESP_LOGI(TAG, "💖 触发【爱心心动】联动！(跳动粉红爱心 + 娇羞偏头 + 甜美双音)");
+            ESP_LOGI(TAG, "触发【爱心心动】联动！(跳动粉红爱心 + 娇羞偏头 + 甜美双音)");
             display.setEmotion(EmotionState::LOVE);
             gimbal.lookAt(Config::Gimbal::DEFAULT_PAN_ANGLE - 6.0f, 10.0f);
             audio.playTone(659.25f, 80);
@@ -151,7 +151,7 @@ void InteractionService::triggerBehavior(RobotBehavior behavior) {
             break;
 
         case RobotBehavior::ANGRY:
-            ESP_LOGI(TAG, "😠 触发【生气戒备】联动！(红光斜眉怒眼 + 低视怒瞪 + 警示音)");
+            ESP_LOGI(TAG, "触发【生气戒备】联动！(红光斜眉怒眼 + 低视怒瞪 + 警示音)");
             display.setEmotion(EmotionState::ANGRY);
             gimbal.lookAt(Config::Gimbal::DEFAULT_PAN_ANGLE, -5.0f);
             audio.playTone(220.0f, 70);
@@ -160,7 +160,7 @@ void InteractionService::triggerBehavior(RobotBehavior behavior) {
             break;
 
         case RobotBehavior::CONFUSED:
-            ESP_LOGI(TAG, "🤔 触发【疑惑挑眉】联动！(不对称挑眉 + 歪头探脑 + 问号音)");
+            ESP_LOGI(TAG, "触发【疑惑挑眉】联动！(不对称挑眉 + 歪头探脑 + 问号音)");
             display.setEmotion(EmotionState::CONFUSED);
             gimbal.lookAt(Config::Gimbal::DEFAULT_PAN_ANGLE + 14.0f, 12.0f);
             audio.playTone(587.33f, 70);
@@ -169,7 +169,7 @@ void InteractionService::triggerBehavior(RobotBehavior behavior) {
             break;
 
         case RobotBehavior::DIZZY:
-            ESP_LOGI(TAG, "💫 触发【眩晕打转】联动！(旋转蚊香圈 + 晃头 + 摇摆音)");
+            ESP_LOGI(TAG, "触发【眩晕打转】联动！(旋转蚊香圈 + 晃头 + 摇摆音)");
             display.setEmotion(EmotionState::DIZZY);
             gimbal.lookAt(Config::Gimbal::DEFAULT_PAN_ANGLE - 12.0f, 6.0f);
             audio.playTone(523.25f, 80);
@@ -184,7 +184,7 @@ void InteractionService::triggerBehavior(RobotBehavior behavior) {
 }
 
 void InteractionService::triggerDance() {
-    ESP_LOGI(TAG, "💃 启动赛博跳舞特技大秀 (Music & Dance Routine)！");
+    ESP_LOGI(TAG, "启动赛博跳舞特技大秀 (Music & Dance Routine)！");
     // 异步创建一次性特技表演任务，避免阻塞主业务线程
     xTaskCreatePinnedToCore(
         [](void *param) {
