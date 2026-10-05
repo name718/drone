@@ -8,6 +8,9 @@
 
 #include "comm/chassis_service.hpp"
 #include "config/board_config.hpp"
+#include "display/display_service.hpp"
+#include "gimbal/gimbal_service.hpp"
+#include "network/web_server.hpp"
 #include "network/wifi_manager.hpp"
 
 // ESP-IDF 硬件检测与系统库
@@ -67,6 +70,12 @@ esp_err_t RobotBrain::init() {
         return err;
     }
 
+    // 4. 初始化视觉表情服务 (Core 1)
+    DisplayService::getInstance().init();
+
+    // 5. 初始化二自由度头部云台硬件 (Core 1)
+    GimbalService::getInstance().init();
+
     ESP_LOGI(TAG, "✅ 基础服务初始化全部就绪！");
     return ESP_OK;
 }
@@ -78,14 +87,18 @@ esp_err_t RobotBrain::start() {
     ChassisService::getInstance().start();
 
     // 2. 创建独立的网络调度任务 (Core 0，负责等待 Wi-Fi 并拉起 MQTT)
-    xTaskCreatePinnedToCore(networkTask,
-                            Config::Tasks::NETWORK_TASK_NAME,
-                            Config::Tasks::NETWORK_STACK_SIZE,
-                            this,
+    xTaskCreatePinnedToCore(networkTask, Config::Tasks::NETWORK_TASK_NAME,
+                            Config::Tasks::NETWORK_STACK_SIZE, this,
                             Config::Tasks::NETWORK_PRIORITY,  // 优先级 6
                             nullptr,
-                            Config::Tasks::NETWORK_CORE_ID    // 绑定在 Core 0
+                            Config::Tasks::NETWORK_CORE_ID  // 绑定在 Core 0
     );
+
+    // 3. 启动视觉服务独立渲染线程 (Core 1 @ 33 FPS)
+    DisplayService::getInstance().start();
+
+    // 4. 启动头部云台 50Hz 独立控制线程 (Core 1)
+    GimbalService::getInstance().start();
 
     ESP_LOGI(TAG, "🎉 大脑系统启动完毕，全面进入运行态！");
     return ESP_OK;
@@ -96,7 +109,10 @@ void RobotBrain::networkTask(void *param) {
 
     // 阻塞等待 Wi-Fi 连接成功
     if (WifiManager::getInstance().waitForConnected(portMAX_DELAY)) {
-        ESP_LOGI(TAG, "📡 Wi-Fi 链路已就绪，网络中枢进入在线待命状态！");
+        ESP_LOGI(TAG, "📡 Wi-Fi 链路已就绪，正在拉起 Web 控制台与 WebSocket 服务...");
+
+        // 一键启动 Web 服务器 (端口 80)
+        WebServer::getInstance().start();
     }
 
     // 任务使命完成，自我注销释放栈内存
