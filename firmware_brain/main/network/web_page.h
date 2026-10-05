@@ -594,7 +594,44 @@ static const char INDEX_HTML[] = R"rawliteral(<!DOCTYPE html>
       </div>
     </div>
 
-    <!-- 卡片 5: AI 大模型对话视窗 (预留双向流式通道) -->
+    <!-- 卡片 5: 声学系统 (MAX98357A 扬声器 & INMP441 麦克风) -->
+    <div class="card">
+      <div class="card-title">
+        <span>🔊 声学系统 (MAX98357A 功放 & INMP441 麦克风)</span>
+      </div>
+      <div class="btn-grid" style="margin-bottom: 8px;">
+        <button class="action-btn" onclick="sendAudioCmd('CHIME')">
+          🎶 开机和弦
+        </button>
+        <button class="action-btn" onclick="sendAudioCmd('BEEP')">
+          🔔 交互提示
+        </button>
+        <button class="action-btn" style="border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08); color: var(--red);" onclick="sendAudioCmd('ALERT')">
+          🚨 警报音效
+        </button>
+        <button class="action-btn" onclick="sendAudioCmd('BEEP')">
+          🎵 确认蜂鸣
+        </button>
+      </div>
+      <div class="slider-box">
+        <div class="slider-row">
+          <span class="slider-label">喇叭音量:</span>
+          <input type="range" class="slider-input" id="volumeSlider" min="0" max="100" value="40" oninput="onVolumeChange()">
+          <span class="slider-val" id="volumeVal">40%</span>
+        </div>
+      </div>
+      <div style="margin-top: 4px;">
+        <div class="stat-item">
+          <span class="stat-label">🎙️ 麦克风实时能量 (VU 电平)</span>
+          <span class="stat-val" id="valMicEnergy" style="color: var(--green);">0%</span>
+        </div>
+        <div class="progress-bar-bg" style="height: 8px;">
+          <div class="progress-bar-fill" id="micEnergyBar" style="width: 0%; background: linear-gradient(90deg, var(--green), var(--cyan)); transition: width 0.15s ease, background 0.2s;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 卡片 6: AI 大模型对话视窗 (预留双向流式通道) -->
     <div class="card" style="grid-column: 1 / -1;">
       <div class="card-title">
         <span>💬 AI 智脑流式交互通道 (WebSocket 全双工)</span>
@@ -690,6 +727,24 @@ static const char INDEX_HTML[] = R"rawliteral(<!DOCTYPE html>
           document.getElementById('valMemPercent').innerText = pct + '%';
           document.getElementById('memBar').style.width = pct + '%';
         }
+        if (msg.mic_energy !== undefined) {
+          const energyPct = Math.min(100, Math.round(msg.mic_energy * 100));
+          document.getElementById('valMicEnergy').innerText = energyPct + '%';
+          const bar = document.getElementById('micEnergyBar');
+          if (bar) {
+            bar.style.width = energyPct + '%';
+            if (energyPct > 70) {
+              bar.style.background = 'var(--red)';
+              document.getElementById('valMicEnergy').style.color = 'var(--red)';
+            } else if (energyPct > 35) {
+              bar.style.background = 'var(--yellow)';
+              document.getElementById('valMicEnergy').style.color = 'var(--yellow)';
+            } else {
+              bar.style.background = 'linear-gradient(90deg, var(--green), var(--cyan))';
+              document.getElementById('valMicEnergy').style.color = 'var(--green)';
+            }
+          }
+        }
       } else if (msg.type === 'ai_reply') {
         // 大模型回复
         addChatMessage(msg.text, 'robot');
@@ -729,6 +784,20 @@ static const char INDEX_HTML[] = R"rawliteral(<!DOCTYPE html>
       document.getElementById('tiltVal').innerText = tilt + '°';
       if (!ws || ws.readyState !== WebSocket.OPEN) return;
       ws.send(JSON.stringify({ type: 'gimbal_angle', pan: pan, tilt: tilt }));
+    }
+
+    // 🔊 音频播放控制
+    function sendAudioCmd(action) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      ws.send(JSON.stringify({ type: 'audio', action: action }));
+    }
+
+    // 🔊 喇叭音量滑条
+    function onVolumeChange() {
+      const vol = parseInt(document.getElementById('volumeSlider').value);
+      document.getElementById('volumeVal').innerText = vol + '%';
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      ws.send(JSON.stringify({ type: 'audio', action: 'VOLUME', volume: vol / 100.0 }));
     }
 
     // 发送大模型消息

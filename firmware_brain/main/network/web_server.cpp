@@ -8,6 +8,7 @@
 #include <cstring>
 #include <string>
 
+#include "audio/audio_service.hpp"
 #include "comm/chassis_service.hpp"
 #include "display/display_service.hpp"
 #include "gimbal/gimbal_service.hpp"
@@ -120,6 +121,22 @@ esp_err_t WebServer::wsHandler(httpd_req_t *req) {
             if (p_pan) pan = std::atoi(p_pan + 6);
             if (p_tilt) tilt = std::atoi(p_tilt + 7);
             GimbalService::getInstance().lookAt(static_cast<float>(pan), static_cast<float>(tilt));
+        } else if (payload.find("\"audio\"") != std::string::npos || payload.find("\"AUDIO\"") != std::string::npos) {
+            // 🔊 音频播放与音量控制通道
+            auto &audio = AudioService::getInstance();
+            if (payload.find("\"CHIME\"") != std::string::npos) {
+                audio.playBootChime();
+            } else if (payload.find("\"BEEP\"") != std::string::npos) {
+                audio.playBeep();
+            } else if (payload.find("\"ALERT\"") != std::string::npos) {
+                audio.playAlert();
+            } else if (payload.find("\"VOLUME\"") != std::string::npos || payload.find("\"volume\"") != std::string::npos) {
+                const char *p_vol = std::strstr(buf, "\"volume\":");
+                if (p_vol) {
+                    float vol = static_cast<float>(std::atof(p_vol + 9));
+                    audio.setVolume(vol);
+                }
+            }
         } else if (payload.find("\"ai_prompt\"") != std::string::npos) {
             // 【大模型预留通道】：收到网页端发来的文字，先给一个即时握手响应
             const char reply[] =
@@ -157,14 +174,15 @@ void WebServer::broadcastTelemetry() {
     uint32_t sram_kb = esp_get_free_internal_heap_size() / 1024;
     uint32_t psram_kb = heap_caps_get_free_size(MALLOC_CAP_SPIRAM) / 1024;
     uint32_t uptime_s = static_cast<uint32_t>(esp_timer_get_time() / 1000000ULL);
+    float mic_energy = AudioService::getInstance().getMicEnergy();
 
     // 打包为轻量 JSON 字符串
-    char json_buf[160];
+    char json_buf[192];
     int len =
         std::snprintf(json_buf, sizeof(json_buf),
-                      "{\"type\":\"telemetry\",\"uptime\":%lu,\"sram_kb\":%lu,\"psram_kb\":%lu}",
+                      "{\"type\":\"telemetry\",\"uptime\":%lu,\"sram_kb\":%lu,\"psram_kb\":%lu,\"mic_energy\":%.2f}",
                       static_cast<unsigned long>(uptime_s), static_cast<unsigned long>(sram_kb),
-                      static_cast<unsigned long>(psram_kb));
+                      static_cast<unsigned long>(psram_kb), static_cast<double>(mic_energy));
 
     // 异步推送到所有处于 WebSocket 状态的客户端
     for (size_t i = 0; i < fds; i++) {

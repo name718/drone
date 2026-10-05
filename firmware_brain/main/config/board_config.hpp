@@ -75,7 +75,24 @@ constexpr float DEFAULT_TILT_ANGLE = 0.0f;  // 垂直基准归中回正角度：
 }  // namespace Gimbal
 
 // ============================================================================
-// 4. FreeRTOS 任务调度参数与核心分配策略
+// 4. 音频与声学子系统配置 (MAX98357A 扬声器 I2S1 + INMP441 麦克风 I2S0)
+// ============================================================================
+namespace Audio {
+// MAX98357A I2S 数字功放 (I2S1 硬件通道，驱动 3525 腔体喇叭)
+constexpr int PIN_SPK_DIN = 15;              // 音频串行数据线 (DIN) -> 接 GPIO 15
+constexpr int PIN_SPK_BCLK = 16;             // 扬声器位时钟线 (BCLK) -> 接 GPIO 16
+constexpr int PIN_SPK_LRC = 17;              // 左右声道帧时钟 (LRC)  -> 接 GPIO 17
+constexpr uint32_t SPK_SAMPLE_RATE = 16000;  // 默认音频采样率 16kHz (TTS 与赛博音效标准)
+
+// INMP441 I2S 全向数字 MEMS 麦克风 (I2S0 硬件通道)
+constexpr int PIN_MIC_SD = 4;                // 麦克风音频串行数据线 (SD) -> 接 GPIO 4
+constexpr int PIN_MIC_WS = 5;                // 麦克风字选择时钟线 (WS)  -> 接 GPIO 5
+constexpr int PIN_MIC_SCK = 6;               // 麦克风位时钟线 (SCK)     -> 接 GPIO 6
+constexpr uint32_t MIC_SAMPLE_RATE = 16000;  // 默认拾音采样率 16kHz
+}  // namespace Audio
+
+// ============================================================================
+// 5. FreeRTOS 任务调度参数与核心分配策略
 // ============================================================================
 namespace Tasks {
 // 底盘串口数据监听与透传任务 (运行在 Core 1)
@@ -89,6 +106,12 @@ constexpr const char *GIMBAL_TASK_NAME = "GimbalSvc";
 constexpr uint32_t GIMBAL_STACK_SIZE = 3072;
 constexpr UBaseType_t GIMBAL_PRIORITY = 5;
 constexpr BaseType_t GIMBAL_CORE_ID = 1;
+
+// 音频拾音与声波能量监测任务 (运行在 Core 0，避免争抢 Core 1 实时控制)
+constexpr const char *AUDIO_TASK_NAME = "AudioSvc";
+constexpr uint32_t AUDIO_STACK_SIZE = 4096;
+constexpr UBaseType_t AUDIO_PRIORITY = 4;
+constexpr BaseType_t AUDIO_CORE_ID = 0;
 
 // 后台网络监听与 Web 服务任务 (运行在 Core 0，不干扰 Core 1 实时控制)
 constexpr const char *NETWORK_TASK_NAME = "NetworkTask";

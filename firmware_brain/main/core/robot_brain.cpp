@@ -6,6 +6,7 @@
 
 #include <string>
 
+#include "audio/audio_service.hpp"
 #include "comm/chassis_service.hpp"
 #include "config/board_config.hpp"
 #include "display/display_service.hpp"
@@ -76,6 +77,9 @@ esp_err_t RobotBrain::init() {
     // 5. 初始化二自由度头部云台硬件 (Core 1)
     GimbalService::getInstance().init();
 
+    // 6. 初始化音频声学子系统 (MAX98357A 功放与 INMP441 麦克风)
+    AudioService::getInstance().init();
+
     ESP_LOGI(TAG, "✅ 基础服务初始化全部就绪！");
     return ESP_OK;
 }
@@ -99,6 +103,12 @@ esp_err_t RobotBrain::start() {
 
     // 4. 启动头部云台 50Hz 独立控制线程 (Core 1)
     GimbalService::getInstance().start();
+
+    // 5. 启动音频环境监测服务 (Core 0)
+    AudioService::getInstance().start();
+
+    // 6. 播放标志性开机赛博和弦哨音，标志大脑全面苏醒就绪！
+    AudioService::getInstance().playBootChime();
 
     ESP_LOGI(TAG, "🎉 大脑系统启动完毕，全面进入运行态！");
     return ESP_OK;

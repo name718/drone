@@ -22,6 +22,9 @@ idf_component_register(
             "display/display_service.cpp"
             "gimbal/servo_driver.cpp"    # 硬件 PWM 舵机驱动
             "gimbal/gimbal_service.cpp"  # 二自由度云台运动服务
+            "audio/speaker_driver.cpp"   # MAX98357A I2S 功放驱动
+            "audio/mic_driver.cpp"       # INMP441 I2S 麦克风驱动
+            "audio/audio_service.cpp"    # 音频声学业务服务
 
         INCLUDE_DIRS
             "."                          # 当前 main 根目录
@@ -31,6 +34,7 @@ idf_component_register(
             "network"			 # 网络、Wi-Fi 与 Web 模块头文件
             "display"			 # 1.8寸彩屏硬件驱动头文件
             "gimbal"			 # 舵机与头部云台头文件
+            "audio"			 # 音频与声学头文件
 
         REQUIRES
             driver			 # 传统外设驱动兼容基础库
@@ -38,6 +42,7 @@ idf_component_register(
             esp_driver_uart		 # 控制串口芯片通信 (GPIO 7/8 发送底盘指令)
             esp_driver_spi		 # 控制 SPI2 高速硬件总线 (GPIO 11/12/14 刷屏推流)
             esp_driver_ledc		 # 控制硬件 LEDC PWM 输出 (GPIO 1/2 控制 SG90 舵机)
+            esp_driver_i2s		 # 控制硬件 I2S 音频接口 (I2S0 麦克风 / I2S1 功放)
             freertos			 # FreeRTOS 实时多任务操作系统内核 (任务调度/队列)
             log                          # 提供 ESP_LOGI / ESP_LOGE 等彩色串口日志输出
             esp_system			 # 提供系统启动、芯片重启、硬件自检信息接口
