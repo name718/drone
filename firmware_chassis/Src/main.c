@@ -44,17 +44,39 @@ static void Task_Control(void *pvParameters) {
         // 3. 100Hz 采样左右轮正交编码器增量 (脉冲数/10ms)
         encoder_get_speed((int16_t *)&s_speed_left, (int16_t *)&s_speed_right);
 
-        // 4. 【核心控制闭环】：执行 100Hz 自平衡算法计算步进
-        const Attitude_t *att = attitude_get();
-        int16_t pwm_l = 0;
-        int16_t pwm_r = 0;
+        // 4. 【控制模式】：自平衡已停止，完全由上位机接管差速控制与安全防冲
+        int16_t cmd_speed = 0;
+        int16_t cmd_yaw = 0;
+        uint8_t cmd_mode = 0;
+        bool is_online = bsp_usart2_get_cmd(&cmd_speed, &cmd_yaw, &cmd_mode);
 
-        // 如果在正常站立姿态角范围内，正常驱动电机；如果跌倒或悬空，自动刹车
-        if (control_step(att->pitch, att->pitch_rate, s_speed_left, s_speed_right, &pwm_l,
-                         &pwm_r)) {
-            motor_set_speed(pwm_l, pwm_r);
-        } else {
+        if (!is_online || cmd_mode == 0 || cmd_mode == 2 || (cmd_speed == 0 && cmd_yaw == 0)) {
+            // 上位机离线 (>500ms)、处于待机/急停模式或发送速度为 0 -> 电机完全刹车停机
             motor_stop();
+        } else if (cmd_mode == 1) {
+            // 上位机使能运行模式：两轮差速驱动运动学转换
+            // 目标线速度 (mm/s, e.g. 200) 乘以 1.5 得到基准 PWM (~300)
+            // 目标角速度 (mrad/s, e.g. 500) 乘以 0.4 得到转向差值 PWM (~200)
+            float base = (float)cmd_speed * 1.5f;
+            float diff = (float)cmd_yaw * 0.4f;
+
+            float left_pwm = base - diff;
+            float right_pwm = base + diff;
+
+            // 死区补偿：克服 TB6612 驱动芯片与 N20 减速箱静摩擦阻力 (75 点)
+            if (left_pwm > 5.0f) {
+                left_pwm += 75.0f;
+            } else if (left_pwm < -5.0f) {
+                left_pwm -= 75.0f;
+            }
+
+            if (right_pwm > 5.0f) {
+                right_pwm += 75.0f;
+            } else if (right_pwm < -5.0f) {
+                right_pwm -= 75.0f;
+            }
+
+            motor_set_speed((int16_t)left_pwm, (int16_t)right_pwm);
         }
     }
 }
@@ -114,9 +136,8 @@ int main(void) {
     encoder_init();
     LOG_I("编码器", "TIM2(左) 与 TIM1(右) 硬件正交编码器初始化完成！");
 
-    // 【新增】：初始化自平衡控制器 (装载基准 PID 与安全保护阈值)
-    control_init();
-    LOG_I("控制", "串级自平衡 PID 控制器就绪 (跌倒保护阈值: ±35°)");
+    // 自平衡模式已停用，切换为上位机全权直控差速模式
+    LOG_I("控制", "自平衡功能已停止，底盘已进入【上位机全权差速直控模式】！");
 
     // 3. 创建 FreeRTOS 任务
     // 任务1: 控制任务 (栈大小 256 字 = 1024 字节，优先级 5)
