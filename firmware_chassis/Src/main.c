@@ -7,6 +7,7 @@
 #include "bsp.h"
 #include "bsp_spi.h"
 #include "bsp_usart.h"
+#include "control.h"
 #include "encoder.h"
 #include "icm42605.h"
 #include "log.h"
@@ -42,6 +43,19 @@ static void Task_Control(void *pvParameters) {
 
         // 3. 100Hz 采样左右轮正交编码器增量 (脉冲数/10ms)
         encoder_get_speed((int16_t *)&s_speed_left, (int16_t *)&s_speed_right);
+
+        // 4. 【核心控制闭环】：执行 100Hz 自平衡算法计算步进
+        const Attitude_t *att = attitude_get();
+        int16_t pwm_l = 0;
+        int16_t pwm_r = 0;
+
+        // 如果在正常站立姿态角范围内，正常驱动电机；如果跌倒或悬空，自动刹车
+        if (control_step(att->pitch, att->pitch_rate, s_speed_left, s_speed_right, &pwm_l,
+                         &pwm_r)) {
+            motor_set_speed(pwm_l, pwm_r);
+        } else {
+            motor_stop();
+        }
     }
 }
 
@@ -67,8 +81,8 @@ static void Task_Telemetry(void *pvParameters) {
         // 通道 3: 左轮速度 Speed_L (脉冲/10ms)
         // 通道 4: 右轮速度 Speed_R (脉冲/10ms)
         const Attitude_t *att = attitude_get();
-        LOG_PLOT("%.2f,%.2f,%.2f,%d,%d", att->pitch, att->acc_pitch, att->pitch_rate,
-                 s_speed_left, s_speed_right);
+        LOG_PLOT("%.2f,%.2f,%.2f,%d,%d", att->pitch, att->acc_pitch, att->pitch_rate, s_speed_left,
+                 s_speed_right);
     }
 }
 
@@ -77,31 +91,32 @@ int main(void) {
     bsp_init();
     bsp_usart2_init(460800);
 
-    LOG_I("SYS", "========================================");
-    LOG_I("SYS", " STM32G473 Chassis Firmware (FreeRTOS)  ");
-    LOG_I("SYS", " Clock: 160MHz | Kernel: FreeRTOS V10.5 ");
-    LOG_I("SYS", "========================================");
+    LOG_I("系统", "========================================");
+    LOG_I("系统", " 🏎️ STM32G473 底盘固件启动 (FreeRTOS)    ");
+    LOG_I("系统", " 主频: 160MHz | 实时内核: FreeRTOS V10.5 ");
+    LOG_I("系统", "========================================");
 
     bsp_spi1_init();
     delay_ms(50);
 
     // 2. 唤醒并校验 IMU 传感器
     if (icm42605_init()) {
-        LOG_I("IMU", "HXY ICM-42605 Initialized Successfully!");
+        LOG_I("姿态", "ICM-42605 六轴陀螺仪初始化成功！");
         // 开机静止 1 秒自动校准陀螺仪零漂
         attitude_init();
     } else {
-        LOG_E("IMU", "IMU Initialization Failed!");
+        LOG_E("姿态", "ICM-42605 六轴陀螺仪初始化失败！");
     }
 
     motor_init();
-    LOG_I("MOTOR", "Testing motors forward 1 second...");
-    motor_set_speed(200, 200);  // 20% 慢速轻微正转 (200 / 1000)
-    delay_ms(1000);             // 转动 1 秒
-    motor_stop();               // 立即停机
-    LOG_I("MOTOR", "Motor test finished!");
+    LOG_I("电机", "TB6612 电机驱动硬件就绪");
+
     encoder_init();
-    LOG_I("ENC", "TIM2(L) & TIM1(R) Quadrature Encoders Initialized!");
+    LOG_I("编码器", "TIM2(左) 与 TIM1(右) 硬件正交编码器初始化完成！");
+
+    // 【新增】：初始化自平衡控制器 (装载基准 PID 与安全保护阈值)
+    control_init();
+    LOG_I("控制", "串级自平衡 PID 控制器就绪 (跌倒保护阈值: ±35°)");
 
     // 3. 创建 FreeRTOS 任务
     // 任务1: 控制任务 (栈大小 256 字 = 1024 字节，优先级 5)
@@ -110,7 +125,7 @@ int main(void) {
     // 任务2: 遥测任务 (栈大小 256 字 = 1024 字节，优先级 2)
     xTaskCreate(Task_Telemetry, "Telemetry", 256, NULL, 2, NULL);
 
-    LOG_I("SYS", "Starting FreeRTOS Scheduler...");
+    LOG_I("系统", "正在启动 FreeRTOS 任务调度器...");
 
     // 4. 启动操作系统调度器 (正常情况下永远不会返回)
     vTaskStartScheduler();

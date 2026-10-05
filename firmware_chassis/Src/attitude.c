@@ -49,8 +49,10 @@ void attitude_update(const Icm42605Data_t *imu_data, float dt) {
         return;
 
     // 1. 扣除陀螺仪零漂，得到绝对纯净的实时角速度
-    // 注意：如果是绕 X 轴俯仰则使用 gx，如果是绕 Y 轴俯仰则使用 gy
-    float gyro_pitch_rate = imu_data->gx - s_attitude.gyro_bias_x;
+    // 关键修正：小车绕轮轴俯仰(Y-Z平面)对应 X 轴角速度 gx。
+    // 按 ICM-42605 坐标定义与 atan2(-ay, az) 几何定义，前倾时角度增加，但 gx 为负，
+    // 因此必须取负号，使陀螺仪角速度与加速度计倾角方向完全一致，实现 100Hz 零延迟响应！
+    float gyro_pitch_rate = -(imu_data->gx - s_attitude.gyro_bias_x);
     s_attitude.pitch_rate = gyro_pitch_rate;
 
     // 2. 由加速度计计算当下的静态重力倾角
