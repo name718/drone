@@ -46,6 +46,14 @@ public:
      */
     uint64_t getTotalRxBytes() const { return total_rx_bytes_.load(); }
 
+    /**
+     * @brief 向 STM32 底盘下发线速度与角速度指令
+     * @param speed_mms 目标线速度 (单位: mm/s，前正后负，例如 200 表示前进，-200 表示后退)
+     * @param yaw_mrads 目标角速度 (单位: mrad/s，左正右负，例如 500 表示左转)
+     * @return esp_err_t ESP_OK 表示发送成功
+     */
+    esp_err_t sendVelocityCommand(int16_t speed_mms, int16_t yaw_mrads);
+
 private:
     // 构造与析构私有化，确保单例唯一性
     ChassisService();
@@ -71,4 +79,6 @@ private:
     TaskHandle_t task_handle_{nullptr};        // FreeRTOS 任务句柄
     std::atomic<bool> is_running_{false};      // 任务运行状态标志位
     std::atomic<uint64_t> total_rx_bytes_{0};  // 累计接收字节计数器
+
+    uint8_t cmd_seq_{0};  // 指令帧流水号 (0~255 循环递增)
 };

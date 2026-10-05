@@ -4,27 +4,33 @@
 # ==============================================================================
 
 idf_component_register(
-    # 1. 参与编译的 C++ 源码文件列表
-    SRCS
-        "main.cpp"
-        "core/robot_brain.cpp"
-        "comm/uart_comm.cpp"
-        "comm/chassis_service.cpp"
+        # 1. 参与编译的 C++ 源码文件列表
+        SRCS
+            "main.cpp"
+            "core/robot_brain.cpp"
+            "comm/uart_comm.cpp"
+            "comm/chassis_service.cpp"
+            "network/wifi_manager.cpp"
 
-    # 2. 对外暴露的头文件搜索目录 (支持绝对或相对包含)
-    INCLUDE_DIRS
-        "."
-        "config"
-        "core"
-        "comm"
+        # 2. 对外暴露的头文件搜索目录
+        INCLUDE_DIRS
+            "."
+            "config"
+            "core"
+            "comm"
+            "network"
 
-    # 3. 依赖的 ESP-IDF 官方底层组件
-    REQUIRES
-        driver           # 传统外设基础驱动
-        esp_driver_uart  # ESP-IDF 5.x/6.x UART 独立驱动组件
-        freertos         # FreeRTOS 操作系统核心
-        log              # ESP 日志打印组件
-        esp_system       # 系统基础信息与芯片属性
-        esp_psram        # 8MB Octal PSRAM 内存管理
-        spi_flash        # 16MB Flash 容量查询与操作
-)
+        # 3. 依赖的 ESP-IDF 底层组件
+        REQUIRES
+            driver           # 基础外设驱动
+            esp_driver_uart  # UART 独立驱动
+            freertos         # FreeRTOS 核心
+            log              # 日志打印
+            esp_system       # 系统基础信息
+            esp_psram        # 8MB PSRAM 内存管理
+            spi_flash        # Flash 查询
+            nvs_flash        # NVS 存储 (Wi-Fi 必须)
+            esp_wifi         # Wi-Fi 硬件驱动
+            esp_event        # 系统事件循环
+            esp_netif        # TCP/IP 协议栈
+    )

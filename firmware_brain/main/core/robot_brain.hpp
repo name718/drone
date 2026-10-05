@@ -12,6 +12,7 @@
  */
 #pragma once
 
+#include <string>
 #include "esp_err.h"
 
 class RobotBrain {
@@ -48,4 +49,9 @@ private:
      * @brief 打印系统开机硬件诊断报告 (Flash / PSRAM / SRAM / 芯片信息)
      */
     void printSystemDiagnostics();
+
+    /**
+     * @brief 后台网络调度任务入口 (负责监听 Wi-Fi 状态)
+     */
+    static void networkTask(void *param);
 };

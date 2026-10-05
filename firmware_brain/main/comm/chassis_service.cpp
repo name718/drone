@@ -118,3 +118,40 @@ void ChassisService::runTask() {
     // 如果 is_running_ 被设为 false，优雅清理自身任务
     vTaskDelete(nullptr);
 }
+
+// 引入跨芯片统一通信协议 (使用 extern "C" 告诉 C++ 编译器按 C 语言符号解析)
+extern "C" {
+#include "robot_protocol.h"
+}
+
+esp_err_t ChassisService::sendVelocityCommand(int16_t speed_mms, int16_t yaw_mrads) {
+    // 1. 实例化标准控制帧结构体 (强制单字节紧凑对齐，无内存空洞)
+    RobotCmdPacket_t packet = {};
+    packet.header = PROTOCOL_FRAME_HEADER_CMD;  // 固定帧头: 0xAA
+    packet.cmd_id = cmd_seq_++;                 // 帧流水号自增
+    packet.target_speed = speed_mms;            // 目标线速度
+    packet.target_yaw = yaw_mrads;              // 目标角速度
+    packet.motion_mode = 1;                     // 运动模式: 1=自平衡使能运行
+
+    // 2. 计算 16 位累加和校验码 (Checksum)
+    // 校验范围从 header 开始，到 checksum 字段之前的所有字节
+    uint16_t sum = 0;
+    const auto *ptr = reinterpret_cast<const uint8_t *>(&packet);
+    size_t payload_len = sizeof(RobotCmdPacket_t) - sizeof(packet.checksum);
+
+    for (size_t i = 0; i < payload_len; i++) {
+        sum += ptr[i];
+    }
+    packet.checksum = sum;
+
+    // 3. 通过底层 UART1 硬件以 460800 波特率直接喷向 STM32
+    int written = uart_.write(reinterpret_cast<const uint8_t *>(&packet), sizeof(packet));
+    if (written != sizeof(packet)) {
+        ESP_LOGE(TAG, "底盘指令发送失败或未写完整 (期望 %u, 实际 %d)", sizeof(packet), written);
+        return ESP_FAIL;
+    }
+
+    ESP_LOGI(TAG, "🚀 下发底盘指令 -> 速度: %d mm/s | 转向: %d mrad/s (流水号: %u)", speed_mms,
+             yaw_mrads, packet.cmd_id);
+    return ESP_OK;
+}
