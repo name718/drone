@@ -118,6 +118,12 @@ constexpr const char *NETWORK_TASK_NAME = "NetworkTask";
 constexpr uint32_t NETWORK_STACK_SIZE = 4096;
 constexpr UBaseType_t NETWORK_PRIORITY = 6;
 constexpr BaseType_t NETWORK_CORE_ID = 0;
+
+// 多模态声画机自主交互引擎任务 (运行在 Core 0，10Hz 低频状态机)
+constexpr const char *INTERACTION_TASK_NAME = "InteractSvc";
+constexpr uint32_t INTERACTION_STACK_SIZE = 4096;
+constexpr UBaseType_t INTERACTION_PRIORITY = 3;
+constexpr BaseType_t INTERACTION_CORE_ID = 0;
 }  // namespace Tasks
 
 // ============================================================================

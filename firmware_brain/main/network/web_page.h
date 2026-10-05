@@ -449,6 +449,47 @@ static const char INDEX_HTML[] = R"rawliteral(<!DOCTYPE html>
     .chat-input-row button:active {
       opacity: 0.8;
     }
+
+    /* 拟人自主模式滑动开关 */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 22px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(255, 255, 255, 0.15);
+      transition: .3s;
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+      background-color: #fff;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    input:checked + .toggle-slider {
+      background-color: var(--cyan);
+      box-shadow: 0 0 10px var(--cyan);
+    }
+    input:checked + .toggle-slider:before {
+      transform: translateX(22px);
+      background-color: #000;
+    }
   </style>
 </head>
 <body>
@@ -561,6 +602,13 @@ static const char INDEX_HTML[] = R"rawliteral(<!DOCTYPE html>
         <button class="action-btn" onclick="setEmotion('SLEEPY')">
           😴 困倦打盹
         </button>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.06); margin-top: 4px;">
+        <span style="font-size: 13px; color: var(--text-muted);">🤖 拟人自主模式 (拍手唤醒/发呆)</span>
+        <label class="switch">
+          <input type="checkbox" id="autoModeToggle" checked onchange="toggleAutoMode(this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
       </div>
     </div>
 
@@ -745,6 +793,12 @@ static const char INDEX_HTML[] = R"rawliteral(<!DOCTYPE html>
             }
           }
         }
+        if (msg.auto_mode !== undefined) {
+          const toggle = document.getElementById('autoModeToggle');
+          if (toggle && document.activeElement !== toggle) {
+            toggle.checked = msg.auto_mode;
+          }
+        }
       } else if (msg.type === 'ai_reply') {
         // 大模型回复
         addChatMessage(msg.text, 'robot');
@@ -758,7 +812,13 @@ static const char INDEX_HTML[] = R"rawliteral(<!DOCTYPE html>
       ws.send(payload);
     }
 
-    // 🎭 切换表情
+    // 🤖 自主拟人模式开关
+    function toggleAutoMode(enabled) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      ws.send(JSON.stringify({ type: 'autonomous', enabled: enabled }));
+    }
+
+    // 🎭 切换表情与拟人行为
     function setEmotion(state) {
       if (!ws || ws.readyState !== WebSocket.OPEN) return;
       ws.send(JSON.stringify({ type: 'emotion', state: state }));

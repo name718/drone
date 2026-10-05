@@ -10,6 +10,7 @@
 
 #include "audio/audio_service.hpp"
 #include "comm/chassis_service.hpp"
+#include "core/interaction_service.hpp"
 #include "display/display_service.hpp"
 #include "gimbal/gimbal_service.hpp"
 #include "esp_chip_info.h"
@@ -76,6 +77,9 @@ esp_err_t WebServer::wsHandler(httpd_req_t *req) {
         buf[ws_pkt.len] = '\0';  // 补全字符串结尾
         std::string payload(buf);
 
+        // 通知交互引擎用户活跃，重置空闲/打盹计时器
+        InteractionService::getInstance().notifyUserActivity();
+
         // 获取底盘单例，准备下发运动
         auto &chassis = ChassisService::getInstance();
 
@@ -91,26 +95,26 @@ esp_err_t WebServer::wsHandler(httpd_req_t *req) {
         } else if (payload.find("\"STOP\"") != std::string::npos) {
             chassis.sendVelocityCommand(0, 0);  // 停止
         } else if (payload.find("\"emotion\"") != std::string::npos || payload.find("\"EMOTION\"") != std::string::npos) {
-            // 🎭 表情切换控制通道
-            auto &display = DisplayService::getInstance();
+            // 🎭 表情与拟人行为联动通道
+            auto &interact = InteractionService::getInstance();
             if (payload.find("\"HAPPY\"") != std::string::npos) {
-                display.setEmotion(EmotionState::HAPPY);
+                interact.triggerBehavior(RobotBehavior::HAPPY);
             } else if (payload.find("\"SURPRISED\"") != std::string::npos) {
-                display.setEmotion(EmotionState::SURPRISED);
+                interact.triggerBehavior(RobotBehavior::WAKE_UP);
             } else if (payload.find("\"SLEEPY\"") != std::string::npos) {
-                display.setEmotion(EmotionState::SLEEPY);
+                interact.triggerBehavior(RobotBehavior::SLEEP);
             } else if (payload.find("\"NORMAL\"") != std::string::npos) {
-                display.setEmotion(EmotionState::NORMAL);
+                interact.triggerBehavior(RobotBehavior::NORMAL);
             }
         } else if (payload.find("\"gimbal_gesture\"") != std::string::npos) {
             // 🦾 云台预设动作手势通道
-            auto &gimbal = GimbalService::getInstance();
+            auto &interact = InteractionService::getInstance();
             if (payload.find("\"NOD\"") != std::string::npos) {
-                gimbal.nod();
+                interact.triggerBehavior(RobotBehavior::NOD);
             } else if (payload.find("\"SHAKE\"") != std::string::npos) {
-                gimbal.shake();
+                interact.triggerBehavior(RobotBehavior::SHAKE);
             } else if (payload.find("\"RESET\"") != std::string::npos || payload.find("\"CENTER\"") != std::string::npos) {
-                gimbal.reset();
+                GimbalService::getInstance().reset();
             }
         } else if (payload.find("\"gimbal_angle\"") != std::string::npos) {
             // 🦾 云台滑条指定绝对角度控制: {"type":"gimbal_angle","pan":90,"tilt":90}
@@ -121,6 +125,10 @@ esp_err_t WebServer::wsHandler(httpd_req_t *req) {
             if (p_pan) pan = std::atoi(p_pan + 6);
             if (p_tilt) tilt = std::atoi(p_tilt + 7);
             GimbalService::getInstance().lookAt(static_cast<float>(pan), static_cast<float>(tilt));
+        } else if (payload.find("\"autonomous\"") != std::string::npos || payload.find("\"AUTO_MODE\"") != std::string::npos) {
+            // 🤖 自主拟人交互模式开关
+            bool enable = (payload.find("true") != std::string::npos || payload.find("1") != std::string::npos);
+            InteractionService::getInstance().setAutonomousMode(enable);
         } else if (payload.find("\"audio\"") != std::string::npos || payload.find("\"AUDIO\"") != std::string::npos) {
             // 🔊 音频播放与音量控制通道
             auto &audio = AudioService::getInstance();
@@ -175,14 +183,16 @@ void WebServer::broadcastTelemetry() {
     uint32_t psram_kb = heap_caps_get_free_size(MALLOC_CAP_SPIRAM) / 1024;
     uint32_t uptime_s = static_cast<uint32_t>(esp_timer_get_time() / 1000000ULL);
     float mic_energy = AudioService::getInstance().getMicEnergy();
+    bool auto_mode = InteractionService::getInstance().isAutonomousMode();
 
     // 打包为轻量 JSON 字符串
-    char json_buf[192];
+    char json_buf[220];
     int len =
         std::snprintf(json_buf, sizeof(json_buf),
-                      "{\"type\":\"telemetry\",\"uptime\":%lu,\"sram_kb\":%lu,\"psram_kb\":%lu,\"mic_energy\":%.2f}",
+                      "{\"type\":\"telemetry\",\"uptime\":%lu,\"sram_kb\":%lu,\"psram_kb\":%lu,\"mic_energy\":%.2f,\"auto_mode\":%s}",
                       static_cast<unsigned long>(uptime_s), static_cast<unsigned long>(sram_kb),
-                      static_cast<unsigned long>(psram_kb), static_cast<double>(mic_energy));
+                      static_cast<unsigned long>(psram_kb), static_cast<double>(mic_energy),
+                      auto_mode ? "true" : "false");
 
     // 异步推送到所有处于 WebSocket 状态的客户端
     for (size_t i = 0; i < fds; i++) {

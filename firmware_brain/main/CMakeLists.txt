@@ -25,6 +25,7 @@ idf_component_register(
             "audio/speaker_driver.cpp"   # MAX98357A I2S 功放驱动
             "audio/mic_driver.cpp"       # INMP441 I2S 麦克风驱动
             "audio/audio_service.cpp"    # 音频声学业务服务
+            "core/interaction_service.cpp" # 多模态拟人自主交互行为引擎
 
         INCLUDE_DIRS
             "."                          # 当前 main 根目录

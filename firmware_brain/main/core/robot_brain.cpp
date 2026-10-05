@@ -9,6 +9,7 @@
 #include "audio/audio_service.hpp"
 #include "comm/chassis_service.hpp"
 #include "config/board_config.hpp"
+#include "core/interaction_service.hpp"
 #include "display/display_service.hpp"
 #include "gimbal/gimbal_service.hpp"
 #include "network/web_server.hpp"
@@ -80,6 +81,9 @@ esp_err_t RobotBrain::init() {
     // 6. 初始化音频声学子系统 (MAX98357A 功放与 INMP441 麦克风)
     AudioService::getInstance().init();
 
+    // 7. 初始化拟人自主交互行为引擎 (声-画-机多模态协同)
+    InteractionService::getInstance().init();
+
     ESP_LOGI(TAG, "✅ 基础服务初始化全部就绪！");
     return ESP_OK;
 }
@@ -107,7 +111,10 @@ esp_err_t RobotBrain::start() {
     // 5. 启动音频环境监测服务 (Core 0)
     AudioService::getInstance().start();
 
-    // 6. 播放标志性开机赛博和弦哨音，标志大脑全面苏醒就绪！
+    // 6. 启动拟人多模态交互引擎 (Core 0 @ 10Hz)
+    InteractionService::getInstance().start();
+
+    // 7. 播放标志性开机赛博和弦哨音，标志大脑全面苏醒就绪！
     AudioService::getInstance().playBootChime();
 
     ESP_LOGI(TAG, "🎉 大脑系统启动完毕，全面进入运行态！");
