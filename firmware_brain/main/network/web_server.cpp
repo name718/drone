@@ -103,9 +103,22 @@ esp_err_t WebServer::wsHandler(httpd_req_t *req) {
                 interact.triggerBehavior(RobotBehavior::WAKE_UP);
             } else if (payload.find("\"SLEEPY\"") != std::string::npos) {
                 interact.triggerBehavior(RobotBehavior::SLEEP);
+            } else if (payload.find("\"LOVE\"") != std::string::npos || payload.find("\"HEART\"") != std::string::npos) {
+                interact.triggerBehavior(RobotBehavior::LOVE);
+            } else if (payload.find("\"ANGRY\"") != std::string::npos) {
+                interact.triggerBehavior(RobotBehavior::ANGRY);
+            } else if (payload.find("\"CONFUSED\"") != std::string::npos) {
+                interact.triggerBehavior(RobotBehavior::CONFUSED);
+            } else if (payload.find("\"DIZZY\"") != std::string::npos) {
+                interact.triggerBehavior(RobotBehavior::DIZZY);
+            } else if (payload.find("\"DANCE\"") != std::string::npos) {
+                interact.triggerDance();
             } else if (payload.find("\"NORMAL\"") != std::string::npos) {
                 interact.triggerBehavior(RobotBehavior::NORMAL);
             }
+        } else if (payload.find("\"dance\"") != std::string::npos) {
+            // 💃 赛博跳舞特技专属指令通道
+            InteractionService::getInstance().triggerDance();
         } else if (payload.find("\"gimbal_gesture\"") != std::string::npos) {
             // 🦾 云台预设动作手势通道
             auto &interact = InteractionService::getInstance();

@@ -4,15 +4,17 @@
  */
 #include "display/face_engine.hpp"
 
+#include <cmath>
 #include <cstdlib>
 
+#include "audio/audio_service.hpp"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
 // 屏幕中心坐标与双眼几何常量 (严格适配 128x160 竖屏比例)
 static constexpr int16_t EYE_LEFT_X = 36;    // 左眼水平中心 (距左边缘 20 像素)
 static constexpr int16_t EYE_RIGHT_X = 92;   // 右眼水平中心 (距右边缘 20 像素，对称分布)
-static constexpr int16_t EYE_CENTER_Y = 76;  // 眼睛垂直中心 (160 像素中轴微偏上，视觉拟人最自然)
+static constexpr int16_t EYE_CENTER_Y = 74;  // 眼睛垂直中心 (160 像素中轴微偏上，留出底部声浪视窗)
 
 static constexpr int16_t DEFAULT_W = 32;  // 正常眼宽 (两眼间距 24 像素)
 static constexpr int16_t DEFAULT_H = 48;  // 正常眼高
@@ -53,6 +55,115 @@ void FaceEngine::drawHappyEye(int16_t center_x, int16_t center_y) {
     driver_.fillRoundRect(x - 2, y + 6, 36, 20, 8, Colors::BLACK);
 }
 
+void FaceEngine::drawHeartEye(int16_t center_x, int16_t center_y, int16_t pulse) {
+    // 心动爱心眼：上方两个实心圆瓣 + 下方三角形收尾 (粉红少女萌宠)
+    int16_t r = 6 + pulse;
+    int16_t lobe_offset = 6 + pulse;
+
+    // 1. 上半部两个圆心
+    driver_.fillCircle(center_x - lobe_offset, center_y - 4, r, Colors::PINK);
+    driver_.fillCircle(center_x + lobe_offset, center_y - 4, r, Colors::PINK);
+
+    // 2. 下半部向下收敛的倒三角填充
+    int16_t start_w = (lobe_offset + r) * 2;
+    int16_t height = 16 + pulse * 2;
+    for (int16_t row = 0; row < height; row++) {
+        int16_t w = start_w - (row * start_w / height);
+        driver_.drawFastHLine(center_x - w / 2, center_y - 2 + row, w, Colors::PINK);
+    }
+
+    // 3. 绘制左上角萌宠高光闪烁小白点
+    driver_.fillCircle(center_x - lobe_offset - 1, center_y - 6, 2, Colors::WHITE);
+}
+
+void FaceEngine::drawAngryEye(int16_t center_x, int16_t center_y, bool is_left) {
+    // 生气怒火眼：红色主眼 + 倾斜下切锐利内斜眉
+    int16_t w = 32;
+    int16_t h = 42;
+    int16_t x = center_x - (w / 2);
+    int16_t y = center_y - (h / 2);
+
+    // 外轮廓橙光 + 内层炽红
+    driver_.fillRoundRect(x - 1, y - 1, w + 2, h + 2, 6, Colors::ORANGE);
+    driver_.fillRoundRect(x, y, w, h, 6, Colors::RED);
+
+    // 斜向黑角遮罩切出八字怒眉
+    if (is_left) {
+        // 左眼：向右上方向内切斜
+        for (int16_t i = 0; i < 18; i++) {
+            driver_.drawFastHLine(center_x - 16 + (i * 32 / 18), y + i, 36, Colors::BLACK);
+        }
+    } else {
+        // 右眼：向左上方向内切斜 (对称)
+        for (int16_t i = 0; i < 18; i++) {
+            driver_.drawFastHLine(x - 4, y + i, 32 - (i * 32 / 18), Colors::BLACK);
+        }
+    }
+}
+
+void FaceEngine::drawConfusedEyes() {
+    // 疑惑挑眉：左右眼不对称夸张拟人 (一高挑大，一低微眯)
+    // 左眼：抬高好奇挑大眼 (带高光)
+    drawEye(EYE_LEFT_X, EYE_CENTER_Y - 8, 34, 50, Colors::CYAN);
+    driver_.fillCircle(EYE_LEFT_X - 4, EYE_CENTER_Y - 18, 3, Colors::WHITE);
+
+    // 右眼：微垂眯眼 (困惑思考状)
+    drawEye(EYE_RIGHT_X, EYE_CENTER_Y + 8, 30, 18, Colors::DARK_CYAN);
+    driver_.fillRect(EYE_RIGHT_X - 12, EYE_CENTER_Y + 6, 24, 4, Colors::CYAN);
+}
+
+void FaceEngine::drawDizzyEye(int16_t center_x, int16_t center_y, float angle_rad) {
+    // 眩晕转圈：动态旋转阿基米德螺旋蚊香眼
+    for (float a = 0.5f; a < 4.8f * M_PI; a += 0.22f) {
+        float r = a * 2.3f;
+        int16_t px = center_x + static_cast<int16_t>(std::cos(a + angle_rad) * r);
+        int16_t py = center_y + static_cast<int16_t>(std::sin(a + angle_rad) * r);
+        driver_.fillCircle(px, py, 1, Colors::CYAN);
+    }
+}
+
+void FaceEngine::drawSoundwaveVisualizer(float energy) {
+    // 底部声波频谱动效：一阶低通平滑 + 对称 9 柱赛博律动声浪
+    smooth_energy_ = (smooth_energy_ * 0.70f) + (energy * 0.30f);
+
+    constexpr int16_t BASE_Y = 153;       // 底部基准线 Y
+    constexpr int16_t NUM_BARS = 9;       // 9 根对称声柱
+    constexpr int16_t BAR_W = 4;          // 每根声柱宽 4 像素
+    constexpr int16_t BAR_SPACING = 4;    // 柱间隙 4 像素
+    constexpr int16_t TOTAL_W = (NUM_BARS * BAR_W) + ((NUM_BARS - 1) * BAR_SPACING); // 68 像素
+    int16_t start_x = 64 - (TOTAL_W / 2); // 水平严格居中
+
+    // 绘制极简赛博基底细线
+    driver_.drawFastHLine(20, BASE_Y + 1, 88, Colors::DARK_GRAY);
+
+    for (int i = 0; i < NUM_BARS; i++) {
+        int16_t bx = start_x + (i * (BAR_W + BAR_SPACING));
+        int dist_center = std::abs(i - 4);  // 距中心声柱的距离 (0~4)
+
+        // 结合平滑声能与正弦相位波动
+        float factor = 1.0f - (static_cast<float>(dist_center) * 0.16f);
+        float wave = std::sin((breath_counter_ * 0.25f) + (i * 0.8f)) * 1.5f;
+        int16_t h = 2 + static_cast<int16_t>(smooth_energy_ * 18.0f * factor + wave);
+        if (h < 2) h = 2;
+        if (h > 20) h = 20;
+
+        // 根据声浪高度呈现动态变色渐变 (青色 -> 橙色 -> 红色)
+        uint16_t color = Colors::CYAN;
+        if (h > 15) {
+            color = Colors::RED;
+        } else if (h > 9) {
+            color = Colors::ORANGE;
+        } else if (h > 5) {
+            color = Colors::NEON_BLUE;
+        } else {
+            color = Colors::DARK_CYAN;
+        }
+
+        // 向上展开绘制实心圆柱
+        driver_.fillRect(bx, BASE_Y - h, BAR_W, h, color);
+    }
+}
+
 void FaceEngine::update() {
     uint32_t now_ticks = xTaskGetTickCount();
     breath_counter_++;
@@ -60,54 +171,76 @@ void FaceEngine::update() {
     // 1. 每帧开始：全屏显存清黑
     driver_.clear(Colors::BLACK);
 
-    // 2. 根据当前情绪状态机执行具体绘制
+    // 2. 根据当前情绪状态机执行具体双眼绘制
     switch (current_emotion_) {
         case EmotionState::NORMAL: {
-            // --- 拟人自然呼吸算法 (每 30 帧产生 1 像素微小轻柔起伏) ---
+            // --- 拟人自然呼吸算法 (每 16 帧产生 1 像素微小轻柔起伏) ---
             int16_t breath_h = DEFAULT_H + ((breath_counter_ / 16) % 2 == 0 ? 0 : 1);
 
             // --- 拟人自然随机眨眼算法 ---
             int16_t render_h = breath_h;
             if (blink_step_ >= 0) {
-                // 正在眨眼中：逐帧取出对应高度
                 render_h = BLINK_HEIGHTS[blink_step_];
                 blink_step_++;
                 if (blink_step_ >= BLINK_FRAME_COUNT) {
-                    // 眨眼动作播放完毕：生成下一次随机间隔 (2000ms ~ 4500ms 随机区间)
                     blink_step_ = -1;
                     uint32_t random_ms = 2000 + (std::rand() % 2500);
                     next_blink_tick_ = now_ticks + pdMS_TO_TICKS(random_ms);
                 }
             } else if (now_ticks >= next_blink_tick_) {
-                // 时间到达，触发新一轮眨眼
                 blink_step_ = 0;
             }
 
-            // 绘制左右两只赛博大眼
             drawEye(EYE_LEFT_X, EYE_CENTER_Y, DEFAULT_W, render_h, Colors::CYAN);
             drawEye(EYE_RIGHT_X, EYE_CENTER_Y, DEFAULT_W, render_h, Colors::CYAN);
             break;
         }
 
         case EmotionState::HAPPY:
-            // 绘制一对笑眯眯的月牙大眼
             drawHappyEye(EYE_LEFT_X, EYE_CENTER_Y);
             drawHappyEye(EYE_RIGHT_X, EYE_CENTER_Y);
             break;
 
         case EmotionState::SURPRISED:
-            // 惊讶：两只瞪圆的大眼睛 (放大为 36x44，保持垂直对称)
             drawEye(EYE_LEFT_X, EYE_CENTER_Y, 36, 44, Colors::CYAN);
             drawEye(EYE_RIGHT_X, EYE_CENTER_Y, 36, 44, Colors::CYAN);
             break;
 
         case EmotionState::SLEEPY:
-            // 困倦：半闭眼睑 (高度只有 8 像素的狭长慵懒眼)
             drawEye(EYE_LEFT_X, EYE_CENTER_Y + 12, DEFAULT_W, 8, Colors::DARK_CYAN);
             drawEye(EYE_RIGHT_X, EYE_CENTER_Y + 12, DEFAULT_W, 8, Colors::DARK_CYAN);
             break;
+
+        case EmotionState::LOVE: {
+            // 爱心跳动心律脉动微动画 (~60 BPM 拟人律动)
+            int16_t pulse = ((breath_counter_ / 6) % 6 < 2) ? 2 : 0;
+            drawHeartEye(EYE_LEFT_X, EYE_CENTER_Y, pulse);
+            drawHeartEye(EYE_RIGHT_X, EYE_CENTER_Y, pulse);
+            break;
+        }
+
+        case EmotionState::ANGRY:
+            drawAngryEye(EYE_LEFT_X, EYE_CENTER_Y, true);
+            drawAngryEye(EYE_RIGHT_X, EYE_CENTER_Y, false);
+            break;
+
+        case EmotionState::CONFUSED:
+            drawConfusedEyes();
+            break;
+
+        case EmotionState::DIZZY: {
+            // 动态旋转蚊香圈动画
+            float rot = static_cast<float>(breath_counter_) * 0.16f;
+            drawDizzyEye(EYE_LEFT_X, EYE_CENTER_Y, rot);
+            drawDizzyEye(EYE_RIGHT_X, EYE_CENTER_Y, rot);
+            break;
+        }
     }
 
-    // 3. 将计算好的整屏显存批量 DMA 推流上屏！
+    // 3. 屏幕底部渲染麦克风实时声波频谱动效 (声浪律动)
+    float mic_energy = AudioService::getInstance().getMicEnergy();
+    drawSoundwaveVisualizer(mic_energy);
+
+    // 4. 将计算好的整屏显存批量 DMA 推流上屏！
     driver_.flush();
 }

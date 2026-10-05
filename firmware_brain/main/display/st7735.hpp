@@ -21,6 +21,11 @@ constexpr uint16_t CYAN = 0x07FF;       // 经典赛博朋克青光
 constexpr uint16_t NEON_BLUE = 0x05BF;  // 霓虹冷蓝光
 constexpr uint16_t DARK_GRAY = 0x18C3;
 constexpr uint16_t DARK_CYAN = 0x0250;
+constexpr uint16_t MAGENTA = 0xF81F;    // 赛博品红
+constexpr uint16_t YELLOW = 0xFFE0;     // 亮黄
+constexpr uint16_t ORANGE = 0xFD20;     // 暖橙
+constexpr uint16_t PINK = 0xFE19;       // 少女粉红
+constexpr uint16_t PURPLE = 0x8010;     // 霓虹紫
 }  // namespace Colors
 
 class ST7735Driver {
@@ -50,6 +55,26 @@ public:
      * @brief 在显存中绘制单个像素
      */
     void drawPixel(int16_t x, int16_t y, uint16_t color);
+
+    /**
+     * @brief 绘制水平快速直线
+     */
+    void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
+
+    /**
+     * @brief 绘制垂直快速直线
+     */
+    void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
+
+    /**
+     * @brief 绘制两点间任意倾斜直线
+     */
+    void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color);
+
+    /**
+     * @brief 绘制实心圆形
+     */
+    void fillCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color);
 
     /**
      * @brief 绘制实心矩形

@@ -3,8 +3,10 @@
  * @brief 赛博拟人表情引擎算法模型头文件
  *
  * 【职责】：
- *  纯数学与图形渲染模型，负责计算眼睛当前帧的高低宽窄、眨眼状态机与情绪变换，
- *  不直接持有死循环线程，完全与底层硬件解耦。
+ *  1. 纯数学与图形渲染模型，负责计算眼睛当前帧的高低宽窄、眨眼状态机与情绪变换；
+ *  2. 扩展丰富赛博表情库：正常 (NORMAL)、开心 (HAPPY)、惊讶 (SURPRISED)、
+ *     困倦 (SLEEPY)、爱心心动 (LOVE)、生气戒备 (ANGRY)、疑惑挑眉 (CONFUSED)、眩晕转圈 (DIZZY)；
+ *  3. 集成屏底赛博动态频谱声浪 (Audio Soundwave Visualizer)，实时随环境声能跳跃共振。
  */
 #pragma once
 
@@ -17,7 +19,11 @@ enum class EmotionState {
     NORMAL,     // 正常状态 (赛博大眼 + 自然呼吸 + 随机眨眼)
     HAPPY,      // 开心状态 (月牙微笑弯弯眼)
     SURPRISED,  // 惊讶状态 (瞳孔放大圆形大眼)
-    SLEEPY      // 困倦状态 (半闭眼睑呼吸)
+    SLEEPY,     // 困倦状态 (半闭眼睑呼吸)
+    LOVE,       // 爱心心动 (跳动粉色爱心眼)
+    ANGRY,      // 生气戒备 (红色斜切怒火眼)
+    CONFUSED,   // 疑惑挑眉 (左眼挑高挑起，右眼微眯疑惑)
+    DIZZY       // 眩晕转圈 (动态旋转螺旋圈)
 };
 
 class FaceEngine {
@@ -39,12 +45,32 @@ public:
      */
     void setEmotion(EmotionState emotion);
 
+    /**
+     * @brief 获取当前情绪
+     */
+    EmotionState getEmotion() const { return current_emotion_; }
+
 private:
-    // 单眼绘制辅助函数
+    // 基础单眼绘制辅助函数
     void drawEye(int16_t center_x, int16_t center_y, int16_t w, int16_t h, uint16_t color);
 
     // 绘制开心月牙眼
     void drawHappyEye(int16_t center_x, int16_t center_y);
+
+    // 绘制跳动粉红爱心眼
+    void drawHeartEye(int16_t center_x, int16_t center_y, int16_t pulse);
+
+    // 绘制生气锐角斜眉怒眼
+    void drawAngryEye(int16_t center_x, int16_t center_y, bool is_left);
+
+    // 绘制疑惑不平衡挑眉大眼
+    void drawConfusedEyes();
+
+    // 绘制动态旋转螺旋蚊香眼
+    void drawDizzyEye(int16_t center_x, int16_t center_y, float angle_rad);
+
+    // 绘制屏幕底部声波频谱动效 (声浪律动)
+    void drawSoundwaveVisualizer(float energy);
 
     ST7735Driver &driver_;  // 屏幕驱动引用
     EmotionState current_emotion_{EmotionState::NORMAL};
@@ -52,5 +78,6 @@ private:
     // 眨眼状态机变量
     int blink_step_{-1};           // -1 表示睁眼状态，>=0 表示正在执行眨眼帧序列
     uint32_t next_blink_tick_{0};  // 下一次眨眼的时间戳 (FreeRTOS Ticks)
-    uint32_t breath_counter_{0};   // 呼吸循环计数器
+    uint32_t breath_counter_{0};   // 呼吸/动画帧计数器
+    float smooth_energy_{0.0f};    // 底部声浪滤波平滑能量
 };

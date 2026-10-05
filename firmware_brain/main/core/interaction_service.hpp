@@ -35,7 +35,12 @@ enum class RobotBehavior {
     ALERT,     // 警觉避险连招 (警惕眼神 + 紧急提示音 + 姿态收缩)
     SLEEP,     // 困倦打盹休眠 (困倦眯眼 + 垂头放平 + 舒缓呼吸)
     NOD,       // 赞同点头连招 (连续点头动作 + 提示音)
-    SHAKE      // 否定摇头连招 (连续摇头动作 + 沉闷双音)
+    SHAKE,     // 否定摇头连招 (连续摇头动作 + 沉闷双音)
+    LOVE,      // 喜爱爱心连招 (跳动粉红爱心 + 娇羞摆头 + 甜美双音)
+    ANGRY,     // 生气戒备连招 (红光怒火眼 + 警惕摆头 + 快速警示音)
+    CONFUSED,  // 疑惑好奇连招 (不对称挑眉 + 歪头探脑 + 问号音)
+    DIZZY,     // 眩晕打转连招 (动态旋转蚊香圈 + 晃晃悠悠 + 摇晃音)
+    DANCE      // 赛博特技跳舞秀 (电子节拍 + 连环变脸 + 节拍卡点律动)
 };
 
 class InteractionService {
@@ -77,6 +82,11 @@ public:
      * @param behavior 目标行为
      */
     void triggerBehavior(RobotBehavior behavior);
+
+    /**
+     * @brief 启动一套完整的赛博跳舞特技表演秀
+     */
+    void triggerDance();
 
 private:
     InteractionService();

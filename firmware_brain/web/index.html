@@ -599,6 +599,21 @@
         <button class="action-btn" onclick="setEmotion('SLEEPY')">
           😴 困倦打盹
         </button>
+        <button class="action-btn" style="border-color: rgba(244, 114, 182, 0.4); background: rgba(244, 114, 182, 0.08); color: #f472b6;" onclick="setEmotion('LOVE')">
+          💖 喜爱爱心
+        </button>
+        <button class="action-btn" style="border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08); color: var(--red);" onclick="setEmotion('ANGRY')">
+          😠 生气警戒
+        </button>
+        <button class="action-btn" onclick="setEmotion('CONFUSED')">
+          🤔 疑惑挑眉
+        </button>
+        <button class="action-btn" onclick="setEmotion('DIZZY')">
+          💫 眩晕打转
+        </button>
+        <button class="action-btn purple" style="grid-column: 1 / -1; background: linear-gradient(90deg, rgba(168,85,247,0.25), rgba(0,240,255,0.25)); border-color: var(--cyan); font-weight: 700;" onclick="triggerDance()">
+          💃 赛博特技跳舞秀 (卡点节拍+变脸)
+        </button>
       </div>
       <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.06); margin-top: 4px;">
         <span style="font-size: 13px; color: var(--text-muted);">🤖 拟人自主模式 (拍手唤醒/发呆)</span>
@@ -819,6 +834,12 @@
     function setEmotion(state) {
       if (!ws || ws.readyState !== WebSocket.OPEN) return;
       ws.send(JSON.stringify({ type: 'emotion', state: state }));
+    }
+
+    // 💃 赛博特技跳舞秀
+    function triggerDance() {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      ws.send(JSON.stringify({ type: 'dance' }));
     }
 
     // 🦾 云台预设手势

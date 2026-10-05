@@ -4,6 +4,7 @@
  */
 #include "display/st7735.hpp"
 
+#include <cmath>
 #include <cstdlib>
 #include <cstring>
 
@@ -265,6 +266,40 @@ void ST7735Driver::drawPixel(int16_t x, int16_t y, uint16_t color) {
     if (x < 0 || x >= SCREEN_W || y < 0 || y >= SCREEN_H || !frame_buffer_)
         return;
     frame_buffer_[y * SCREEN_W + x] = (color << 8) | (color >> 8);
+}
+
+void ST7735Driver::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color) {
+    fillRect(x, y, w, 1, color);
+}
+
+void ST7735Driver::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color) {
+    fillRect(x, y, 1, h, color);
+}
+
+void ST7735Driver::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color) {
+    // Bresenham 硬件经典高效画线算法
+    int16_t dx = std::abs(x1 - x0);
+    int16_t sx = (x0 < x1) ? 1 : -1;
+    int16_t dy = -std::abs(y1 - y0);
+    int16_t sy = (y0 < y1) ? 1 : -1;
+    int16_t err = dx + dy;
+
+    while (true) {
+        drawPixel(x0, y0, color);
+        if (x0 == x1 && y0 == y1) break;
+        int16_t e2 = 2 * err;
+        if (e2 >= dy) { err += dy; x0 += sx; }
+        if (e2 <= dx) { err += dx; y0 += sy; }
+    }
+}
+
+void ST7735Driver::fillCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color) {
+    if (!frame_buffer_ || r <= 0) return;
+    int16_t r2 = r * r;
+    for (int16_t dy = -r; dy <= r; dy++) {
+        int16_t dx = static_cast<int16_t>(std::sqrt(r2 - dy * dy));
+        drawFastHLine(x0 - dx, y0 + dy, dx * 2 + 1, color);
+    }
 }
 
 void ST7735Driver::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color) {

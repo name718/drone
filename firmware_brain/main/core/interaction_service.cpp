@@ -140,7 +140,105 @@ void InteractionService::triggerBehavior(RobotBehavior behavior) {
             gimbal.shake();
             audio.playTone(392.0f, 90);
             break;
+
+        case RobotBehavior::LOVE:
+            ESP_LOGI(TAG, "💖 触发【爱心心动】联动！(跳动粉红爱心 + 娇羞偏头 + 甜美双音)");
+            display.setEmotion(EmotionState::LOVE);
+            gimbal.lookAt(Config::Gimbal::DEFAULT_PAN_ANGLE - 6.0f, 10.0f);
+            audio.playTone(659.25f, 80);
+            vTaskDelay(pdMS_TO_TICKS(90));
+            audio.playTone(783.99f, 120);
+            break;
+
+        case RobotBehavior::ANGRY:
+            ESP_LOGI(TAG, "😠 触发【生气戒备】联动！(红光斜眉怒眼 + 低视怒瞪 + 警示音)");
+            display.setEmotion(EmotionState::ANGRY);
+            gimbal.lookAt(Config::Gimbal::DEFAULT_PAN_ANGLE, -5.0f);
+            audio.playTone(220.0f, 70);
+            vTaskDelay(pdMS_TO_TICKS(80));
+            audio.playTone(185.0f, 90);
+            break;
+
+        case RobotBehavior::CONFUSED:
+            ESP_LOGI(TAG, "🤔 触发【疑惑挑眉】联动！(不对称挑眉 + 歪头探脑 + 问号音)");
+            display.setEmotion(EmotionState::CONFUSED);
+            gimbal.lookAt(Config::Gimbal::DEFAULT_PAN_ANGLE + 14.0f, 12.0f);
+            audio.playTone(587.33f, 70);
+            vTaskDelay(pdMS_TO_TICKS(80));
+            audio.playTone(880.00f, 110);
+            break;
+
+        case RobotBehavior::DIZZY:
+            ESP_LOGI(TAG, "💫 触发【眩晕打转】联动！(旋转蚊香圈 + 晃头 + 摇摆音)");
+            display.setEmotion(EmotionState::DIZZY);
+            gimbal.lookAt(Config::Gimbal::DEFAULT_PAN_ANGLE - 12.0f, 6.0f);
+            audio.playTone(523.25f, 80);
+            vTaskDelay(pdMS_TO_TICKS(80));
+            audio.playTone(392.00f, 120);
+            break;
+
+        case RobotBehavior::DANCE:
+            triggerDance();
+            break;
     }
+}
+
+void InteractionService::triggerDance() {
+    ESP_LOGI(TAG, "💃 启动赛博跳舞特技大秀 (Music & Dance Routine)！");
+    // 异步创建一次性特技表演任务，避免阻塞主业务线程
+    xTaskCreatePinnedToCore(
+        [](void *param) {
+            auto *self = static_cast<InteractionService *>(param);
+            auto &display = DisplayService::getInstance();
+            auto &gimbal = GimbalService::getInstance();
+            auto &audio = AudioService::getInstance();
+
+            // 节拍 1: 准备起舞 - 疑惑探头
+            display.setEmotion(EmotionState::CONFUSED);
+            gimbal.lookAt(Config::Gimbal::DEFAULT_PAN_ANGLE + 14.0f, 8.0f);
+            audio.playTone(523.25f, 100);  // C5
+            vTaskDelay(pdMS_TO_TICKS(130));
+
+            // 节拍 2: 动感节奏展开 - 左右卡点律动
+            display.setEmotion(EmotionState::HAPPY);
+            gimbal.lookAt(Config::Gimbal::DEFAULT_PAN_ANGLE + 18.0f, 16.0f);
+            audio.playTone(659.25f, 100);  // E5
+            vTaskDelay(pdMS_TO_TICKS(130));
+
+            gimbal.lookAt(Config::Gimbal::DEFAULT_PAN_ANGLE - 18.0f, 2.0f);
+            audio.playTone(783.99f, 100);  // G5
+            vTaskDelay(pdMS_TO_TICKS(130));
+
+            // 节拍 3: 高潮电音段 - 爱心心动 + 快速点头
+            display.setEmotion(EmotionState::LOVE);
+            gimbal.nod();
+            audio.playTone(1046.50f, 140);  // C6
+            vTaskDelay(pdMS_TO_TICKS(160));
+            audio.playTone(880.00f, 100);   // A5
+            vTaskDelay(pdMS_TO_TICKS(130));
+
+            // 节拍 4: 旋转蚊香圈眩晕摆头
+            display.setEmotion(EmotionState::DIZZY);
+            gimbal.shake();
+            audio.playTone(659.25f, 90);
+            vTaskDelay(pdMS_TO_TICKS(110));
+            audio.playTone(523.25f, 180);
+            vTaskDelay(pdMS_TO_TICKS(220));
+
+            // 收尾优雅回正，刷新活跃时间戳
+            display.setEmotion(EmotionState::NORMAL);
+            gimbal.reset();
+            self->notifyUserActivity();
+
+            vTaskDelete(nullptr);
+        },
+        "DanceRoutine",
+        4096,
+        this,
+        4,
+        nullptr,
+        0
+    );
 }
 
 void InteractionService::interactionTask(void *param) {
