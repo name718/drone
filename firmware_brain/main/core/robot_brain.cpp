@@ -6,6 +6,7 @@
 
 #include <string>
 
+#include "ai/ai_service.hpp"
 #include "audio/audio_service.hpp"
 #include "comm/chassis_service.hpp"
 #include "config/board_config.hpp"
@@ -84,6 +85,9 @@ esp_err_t RobotBrain::init() {
     // 7. 初始化拟人自主交互行为引擎 (声-画-机多模态协同)
     InteractionService::getInstance().init();
 
+    // 8. 初始化云端大模型与语音合成中枢
+    AiService::getInstance().init();
+
     ESP_LOGI(TAG, "基础服务初始化全部就绪！");
     return ESP_OK;
 }
@@ -114,7 +118,10 @@ esp_err_t RobotBrain::start() {
     // 6. 启动拟人多模态交互引擎 (Core 0 @ 10Hz)
     InteractionService::getInstance().start();
 
-    // 7. 播放标志性开机赛博和弦哨音，标志大脑全面苏醒就绪！
+    // 7. 启动云端大模型与 CosyVoice 语音调度任务 (Core 0)
+    AiService::getInstance().start();
+
+    // 8. 播放标志性开机赛博和弦哨音，标志大脑全面苏醒就绪！
     AudioService::getInstance().playBootChime();
 
     ESP_LOGI(TAG, "大脑系统启动完毕，全面进入运行态！");
@@ -130,6 +137,10 @@ void RobotBrain::networkTask(void *param) {
 
         // 一键启动 Web 服务器 (端口 80)
         WebServer::getInstance().start();
+
+        // 网络就绪后触发语音问候播报
+        vTaskDelay(pdMS_TO_TICKS(600));
+        AiService::getInstance().playBootVoiceGreeting();
     }
 
     // 任务使命完成，自我注销释放栈内存

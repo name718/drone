@@ -124,15 +124,69 @@ constexpr const char *INTERACTION_TASK_NAME = "InteractSvc";
 constexpr uint32_t INTERACTION_STACK_SIZE = 4096;
 constexpr UBaseType_t INTERACTION_PRIORITY = 3;
 constexpr BaseType_t INTERACTION_CORE_ID = 0;
+
+// 云端大模型与语音合成处理任务 (运行在 Core 0，堆栈 16KB)
+constexpr const char *AI_TASK_NAME = "AiTask";
+constexpr uint32_t AI_STACK_SIZE = 16384;
+constexpr UBaseType_t AI_PRIORITY = 5;
+constexpr BaseType_t AI_CORE_ID = 0;
 }  // namespace Tasks
 
 // ============================================================================
-// 5. 网络 Wi-Fi 连接配置
+// 6. 网络 Wi-Fi 连接配置
 // ============================================================================
 namespace Network {
 constexpr const char *WIFI_SSID = "CMCC-eGK3";  // 你的 Wi-Fi 热点名称
 constexpr const char *WIFI_PASS = "vZwGHMMu";   // 你的 Wi-Fi 密码
 constexpr int WIFI_MAX_RETRY = 5;               // 最大断线重试次数
 }  // namespace Network
+
+// ============================================================================
+// 7. 阿里云百炼大模型与 CosyVoice 语音中枢配置
+// ============================================================================
+namespace CloudAI {
+// 阿里云 DashScope API 访问凭据 (Bearer Token)
+constexpr const char *API_KEY =
+    "sk-ws-H.PRYDLLE.SZZs.MEQCIEfq1g8baO-Mo9XKZU8QoC2fzjQvN_USaL1litxanVdYAiBux-6aZv2hFahiRikl333YLFOzO8if08HCyHiHXLrXMg";
+
+// LLM 大模型服务端点与默认模型 (兼容 OpenAI ChatCompletion 接口)
+constexpr const char *LLM_ENDPOINT =
+    "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions";
+constexpr const char *LLM_MODEL = "qwen-turbo";
+
+// CosyVoice 实时语音合成与 DashScope 实时语音识别 WebSocket 服务端点与参数
+constexpr const char *TTS_WS_ENDPOINT =
+    "wss://dashscope.aliyuncs.com/api-ws/v1/inference";
+constexpr const char *TTS_MODEL = "cosyvoice-v1";
+constexpr const char *TTS_VOICE = "longxiaochun";  // 灵动女声: longxiaochun, 元气男童: longjielidou
+constexpr uint32_t TTS_SAMPLE_RATE = 16000;       // 16kHz 采样率与底层 I2S 硬件完全对齐
+
+constexpr const char *ASR_WS_ENDPOINT =
+    "wss://dashscope.aliyuncs.com/api-ws/v1/inference";
+constexpr const char *ASR_MODEL = "paraformer-realtime-v2";
+
+// 支持的语音唤醒前缀词与常见同音词列表 (高容错率，杜绝因同音字误判为未唤醒)
+constexpr const char *WAKE_WORDS[] = {
+    "小智同学", "小智", "小志", "小制", "削制", "小致", "肖智", "晓智",
+    "小车小车", "小车", "校车", "你好小车", "你好小智", "你好", "小爱同学", "小爱", "小艾",
+    "在吗", "老帅"
+};
+constexpr size_t WAKE_WORDS_COUNT = sizeof(WAKE_WORDS) / sizeof(WAKE_WORDS[0]);
+
+// 机器人人设与动作标签 System Prompt
+constexpr const char *SYSTEM_PROMPT =
+    "你是桌面智能自平衡机器人「赛博小车」，拥有STM32底盘、双轴头部云台和彩色屏幕。"
+    "你机灵幽默、善解人意，情商高，热心解答天气、时间、闲聊与百科常识。"
+    "严禁以「我没有传感器」「我只是个机器人」等机械理由拒绝回答日常生活问题。"
+    "回答必须简短精炼、口语自然(35字以内)，严禁包含任何emoji表情符号或图标。"
+    "每次回答开头请务必选择输出1个最符合语境的情感标签："
+    "[EMOTION:HAPPY](开心微笑),[EMOTION:SURPRISED](吃惊瞪眼),[EMOTION:CONFUSED](疑惑歪头),"
+    "[EMOTION:LOVE](心动喜爱),[EMOTION:COOL](炫酷得意),[EMOTION:WINK](调皮眨眼),"
+    "[EMOTION:ANGRY](生气不满),[EMOTION:SLEEPY](困倦疲惫)。"
+    "并根据语境主动搭配1个机器人动作标签："
+    "[ACTION:NOD](点头赞同),[ACTION:SHAKE](摇头否定),[ACTION:HAPPY](开心微笑),"
+    "[ACTION:SURPRISED](吃惊瞪眼),[ACTION:CONFUSED](疑惑歪头),[ACTION:FORWARD](向前一小步),"
+    "[ACTION:BACKWARD](后退退让),[ACTION:SPIN](原地转圈跳舞)。";
+}  // namespace CloudAI
 
 }  // namespace Config

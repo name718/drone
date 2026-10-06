@@ -56,16 +56,12 @@ void DisplayService::setEmotion(EmotionState emotion) {
 void DisplayService::renderTask(void *param) {
     auto *self = static_cast<DisplayService *>(param);
 
-    // 恒定帧率节拍器 (约 30ms 一帧，相当于 33.3 FPS)
-    TickType_t last_wake_time = xTaskGetTickCount();
-    const TickType_t frame_period = pdMS_TO_TICKS(30);
-
     while (self->is_running_) {
         // 执行单帧数学计算与推流
         self->engine_.update();
 
-        // 绝对延时：保证动画帧率极其稳定匀速，绝无忽快忽慢的卡顿感
-        vTaskDelayUntil(&last_wake_time, frame_period);
+        // 保证让出 CPU 1 算力，防止饿死 IDLE1 引发看门狗超时
+        vTaskDelay(pdMS_TO_TICKS(30));
     }
 
     vTaskDelete(nullptr);

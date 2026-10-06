@@ -10,6 +10,7 @@
 
 #include "config/board_config.hpp"
 #include "esp_log.h"
+#include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
@@ -78,19 +79,61 @@ void SpeakerDriver::setVolume(float volume) {
     volume_ = std::clamp(volume, 0.0f, 1.0f);
 }
 
+bool SpeakerDriver::isPlaying() const {
+    if (is_playing_.load()) return true;
+    int64_t now_ms = esp_timer_get_time() / 1000;
+    return (now_ms - last_play_end_ms_.load()) < 350; // 350ms 软件回声抑制保护窗口
+}
+
+void SpeakerDriver::setPlaybackActive(bool active) {
+    is_playing_.store(active);
+    if (!active) {
+        last_play_end_ms_.store(esp_timer_get_time() / 1000);
+    }
+}
+
 esp_err_t SpeakerDriver::writePCM(const int16_t *samples, size_t sample_count) {
     if (!is_initialized_ || !tx_handle_) return ESP_ERR_INVALID_STATE;
 
+    is_playing_.store(true);
     // 双声道交织格式 (L, R, L, R...)：每个采样对占 2 个 int16_t (4 字节)
     size_t bytes_to_write = sample_count * 2 * sizeof(int16_t);
     size_t bytes_written = 0;
 
-    return i2s_channel_write(tx_handle_, samples, bytes_to_write, &bytes_written, portMAX_DELAY);
+    esp_err_t ret = i2s_channel_write(tx_handle_, samples, bytes_to_write, &bytes_written, portMAX_DELAY);
+    last_play_end_ms_.store(esp_timer_get_time() / 1000);
+    return ret;
+}
+
+void SpeakerDriver::playMonoPCM(const int16_t *mono_samples, size_t sample_count) {
+    if (!is_initialized_ || !tx_handle_ || !mono_samples || sample_count == 0) return;
+
+    is_playing_.store(true);
+    constexpr size_t CHUNK = 256;
+    int16_t stereo_chunk[CHUNK * 2];
+
+    size_t processed = 0;
+    while (processed < sample_count) {
+        size_t current = std::min(CHUNK, sample_count - processed);
+        for (size_t i = 0; i < current; i++) {
+            int32_t val = static_cast<int32_t>(mono_samples[processed + i] * volume_);
+            if (val > 32767) val = 32767;
+            if (val < -32768) val = -32768;
+            int16_t s_val = static_cast<int16_t>(val);
+            stereo_chunk[i * 2] = s_val;
+            stereo_chunk[i * 2 + 1] = s_val;
+        }
+        writePCM(stereo_chunk, current);
+        processed += current;
+    }
+    is_playing_.store(false);
+    last_play_end_ms_.store(esp_timer_get_time() / 1000);
 }
 
 void SpeakerDriver::playTone(float freq_hz, uint32_t duration_ms, float volume) {
     if (!is_initialized_ || freq_hz <= 0.0f || duration_ms == 0) return;
 
+    is_playing_.store(true);
     float vol = (volume >= 0.0f) ? std::clamp(volume, 0.0f, 1.0f) : volume_;
     size_t total_samples = (sample_rate_ * duration_ms) / 1000;
 
@@ -138,6 +181,8 @@ void SpeakerDriver::playTone(float freq_hz, uint32_t duration_ms, float volume) 
         writePCM(chunk_buffer, current_chunk);
         samples_generated += current_chunk;
     }
+    is_playing_.store(false);
+    last_play_end_ms_.store(esp_timer_get_time() / 1000);
 }
 
 void SpeakerDriver::playBootSound() {

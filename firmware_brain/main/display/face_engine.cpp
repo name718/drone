@@ -122,6 +122,82 @@ void FaceEngine::drawDizzyEye(int16_t center_x, int16_t center_y, float angle_ra
     }
 }
 
+void FaceEngine::drawBootingAnimation() {
+    boot_frame_++;
+
+    if (boot_frame_ < 40) {
+        // 阶段 1: 赛博朋克同心雷达与中心能量核自检展开
+        driver_.drawCircle(64, 74, 14, Colors::DARK_CYAN);
+        driver_.drawCircle(64, 74, 28, Colors::NEON_BLUE);
+        driver_.drawCircle(64, 74, 42, Colors::DARK_CYAN);
+
+        driver_.drawFastHLine(18, 74, 92, Colors::DARK_CYAN);
+        driver_.drawFastVLine(64, 28, 92, Colors::DARK_CYAN);
+
+        float rad = static_cast<float>(boot_frame_) * 0.22f;
+        int16_t ex = 64 + static_cast<int16_t>(std::cos(rad) * 40.0f);
+        int16_t ey = 74 + static_cast<int16_t>(std::sin(rad) * 40.0f);
+        driver_.drawLine(64, 74, ex, ey, Colors::CYAN);
+
+        driver_.fillCircle(64, 74, 3, Colors::WHITE);
+
+        // 底部高科技自检进度条
+        driver_.drawFastHLine(24, 134, 80, Colors::DARK_GRAY);
+        int16_t pw = static_cast<int16_t>((boot_frame_ * 80) / 40);
+        driver_.fillRect(24, 133, pw, 3, Colors::CYAN);
+        driver_.fillCircle(20, 134, 2, Colors::CYAN);
+        driver_.fillCircle(108, 134, 2, Colors::CYAN);
+    } else if (boot_frame_ < 75) {
+        // 阶段 2: 能量核平滑分裂演变为双眼并缓缓苏醒睁开
+        float t = static_cast<float>(boot_frame_ - 40) / 35.0f;
+        int16_t lx = 64 - static_cast<int16_t>(28.0f * t);
+        int16_t rx = 64 + static_cast<int16_t>(28.0f * t);
+        int16_t w = 14 + static_cast<int16_t>(18.0f * t);
+        int16_t h = 4 + static_cast<int16_t>(44.0f * t);
+
+        drawEye(lx, EYE_CENTER_Y, w, h, Colors::CYAN);
+        drawEye(rx, EYE_CENTER_Y, w, h, Colors::CYAN);
+    } else {
+        // 自检完毕，自然切入常态大眼
+        current_emotion_ = EmotionState::NORMAL;
+        blink_step_ = -1;
+    }
+}
+
+void FaceEngine::drawThinkingAnimation() {
+    // 思考推演：眼神微上扬，伴随科技水平扫描光束
+    drawEye(EYE_LEFT_X, EYE_CENTER_Y - 4, 30, 42, Colors::CYAN);
+    drawEye(EYE_RIGHT_X, EYE_CENTER_Y - 4, 30, 42, Colors::CYAN);
+
+    int16_t scan_offset = static_cast<int16_t>((breath_counter_ * 3) % 40);
+    int16_t scan_y = EYE_CENTER_Y - 22 + scan_offset;
+    driver_.drawFastHLine(EYE_LEFT_X - 14, scan_y, 28, Colors::WHITE);
+    driver_.drawFastHLine(EYE_RIGHT_X - 14, scan_y, 28, Colors::WHITE);
+}
+
+void FaceEngine::drawWinkEyes() {
+    // 调皮眨眼：左眼弯弯笑，右眼眯线闪耀星星
+    drawHappyEye(EYE_LEFT_X, EYE_CENTER_Y);
+    drawEye(EYE_RIGHT_X, EYE_CENTER_Y, 32, 6, Colors::CYAN);
+
+    // 闪耀十字星辉
+    driver_.drawLine(EYE_RIGHT_X - 6, EYE_CENTER_Y - 14, EYE_RIGHT_X + 10, EYE_CENTER_Y - 14, Colors::YELLOW);
+    driver_.drawLine(EYE_RIGHT_X + 2, EYE_CENTER_Y - 22, EYE_RIGHT_X + 2, EYE_CENTER_Y - 6, Colors::YELLOW);
+    driver_.fillCircle(EYE_RIGHT_X + 2, EYE_CENTER_Y - 14, 2, Colors::WHITE);
+}
+
+void FaceEngine::drawCoolShades() {
+    // 炫酷帅气：赛博墨镜造型，带有镜面反光条
+    int16_t y = EYE_CENTER_Y - 10;
+    driver_.fillRoundRect(16, y, 96, 26, 6, Colors::DARK_CYAN);
+    driver_.fillRoundRect(18, y + 2, 92, 22, 4, Colors::CYAN);
+
+    driver_.drawLine(30, y + 4, 46, y + 20, Colors::WHITE);
+    driver_.drawLine(31, y + 4, 47, y + 20, Colors::WHITE);
+    driver_.drawLine(76, y + 4, 92, y + 20, Colors::WHITE);
+    driver_.drawLine(77, y + 4, 93, y + 20, Colors::WHITE);
+}
+
 void FaceEngine::drawSoundwaveVisualizer(float energy) {
     // 底部声波频谱动效：一阶低通平滑 + 对称 9 柱赛博律动声浪
     smooth_energy_ = (smooth_energy_ * 0.70f) + (energy * 0.30f);
@@ -228,6 +304,22 @@ void FaceEngine::update() {
             drawConfusedEyes();
             break;
 
+        case EmotionState::BOOTING:
+            drawBootingAnimation();
+            break;
+
+        case EmotionState::THINKING:
+            drawThinkingAnimation();
+            break;
+
+        case EmotionState::WINK:
+            drawWinkEyes();
+            break;
+
+        case EmotionState::COOL:
+            drawCoolShades();
+            break;
+
         case EmotionState::DIZZY: {
             // 动态旋转蚊香圈动画
             float rot = static_cast<float>(breath_counter_) * 0.16f;
@@ -237,9 +329,11 @@ void FaceEngine::update() {
         }
     }
 
-    // 3. 屏幕底部渲染麦克风实时声波频谱动效 (声浪律动)
-    float mic_energy = AudioService::getInstance().getMicEnergy();
-    drawSoundwaveVisualizer(mic_energy);
+    // 3. 屏幕底部渲染麦克风实时声波频谱动效 (声浪律动，开机自检期间不遮挡进度条)
+    if (current_emotion_ != EmotionState::BOOTING) {
+        float mic_energy = AudioService::getInstance().getMicEnergy();
+        drawSoundwaveVisualizer(mic_energy);
+    }
 
     // 4. 将计算好的整屏显存批量 DMA 推流上屏！
     driver_.flush();

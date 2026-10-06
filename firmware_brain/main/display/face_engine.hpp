@@ -16,6 +16,7 @@
 
 // 强类型情绪枚举 (强类型 enum class 避免命名污染)
 enum class EmotionState {
+    BOOTING,    // 开机自检科技动画 (光圈雷达展开与双眼苏醒)
     NORMAL,     // 正常状态 (赛博大眼 + 自然呼吸 + 随机眨眼)
     HAPPY,      // 开心状态 (月牙微笑弯弯眼)
     SURPRISED,  // 惊讶状态 (瞳孔放大圆形大眼)
@@ -23,7 +24,10 @@ enum class EmotionState {
     LOVE,       // 爱心心动 (跳动粉色爱心眼)
     ANGRY,      // 生气戒备 (红色斜切怒火眼)
     CONFUSED,   // 疑惑挑眉 (左眼挑高挑起，右眼微眯疑惑)
-    DIZZY       // 眩晕转圈 (动态旋转螺旋圈)
+    DIZZY,      // 眩晕转圈 (动态旋转螺旋圈)
+    THINKING,   // 思考状态 (眼神微上扬与科技扫描波)
+    WINK,       // 调皮眨单眼 (左眼弯弯笑，右眼闪烁眨星)
+    COOL        // 炫酷帅气 (赛博墨镜造型)
 };
 
 class FaceEngine {
@@ -69,15 +73,28 @@ private:
     // 绘制动态旋转螺旋蚊香眼
     void drawDizzyEye(int16_t center_x, int16_t center_y, float angle_rad);
 
+    // 绘制开机科技感自检扫描动画
+    void drawBootingAnimation();
+
+    // 绘制思考推演动效
+    void drawThinkingAnimation();
+
+    // 绘制调皮眨单眼
+    void drawWinkEyes();
+
+    // 绘制炫酷赛博墨镜
+    void drawCoolShades();
+
     // 绘制屏幕底部声波频谱动效 (声浪律动)
     void drawSoundwaveVisualizer(float energy);
 
     ST7735Driver &driver_;  // 屏幕驱动引用
-    EmotionState current_emotion_{EmotionState::NORMAL};
+    EmotionState current_emotion_{EmotionState::BOOTING};  // 初始启动为开机动画
 
     // 眨眼状态机变量
     int blink_step_{-1};           // -1 表示睁眼状态，>=0 表示正在执行眨眼帧序列
     uint32_t next_blink_tick_{0};  // 下一次眨眼的时间戳 (FreeRTOS Ticks)
     uint32_t breath_counter_{0};   // 呼吸/动画帧计数器
+    uint32_t boot_frame_{0};       // 开机自检动画帧计数器
     float smooth_energy_{0.0f};    // 底部声浪滤波平滑能量
 };

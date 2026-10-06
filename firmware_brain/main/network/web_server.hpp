@@ -10,6 +10,8 @@
  */
 #pragma once
 
+#include <string>
+
 #include "esp_err.h"
 #include "esp_http_server.h"  // 官方 Web/WebSocket 核心驱动
 
@@ -35,6 +37,32 @@ public:
      * @brief 向所有已连接的 WebSocket 前端广播遥测 JSON 数据
      */
     void broadcastTelemetry();
+
+    /**
+     * @brief 向所有已连接的 WebSocket 网页客户端广播大模型回复消息
+     * @param reply_text 大模型回答内容
+     */
+    void broadcastAiReply(const std::string &reply_text);
+
+    /**
+     * @brief 向所有已连接的 WebSocket 网页客户端广播 AI 状态 (thinking, speaking, idle, listening)
+     * @param status 当前状态字符串
+     */
+    void broadcastAiStatus(const std::string &status);
+
+    /**
+     * @brief 向所有已连接的 WebSocket 网页客户端广播聊天消息
+     * @param text 消息内容
+     * @param sender 发送方 ("user" 或 "ai")
+     */
+    void broadcastChatMessage(const std::string &text, const std::string &sender);
+
+    /**
+     * @brief 底层通用 WebSocket 文本广播方法
+     * @param text 文本字符串
+     * @param len 文本长度
+     */
+    void broadcastText(const char *text, size_t len);
 
 private:
     WebServer();

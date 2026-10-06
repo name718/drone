@@ -9,6 +9,7 @@
 #include "config/board_config.hpp"
 #include "esp_log.h"
 #include "esp_netif.h"
+#include "esp_sntp.h"
 #include "esp_wifi.h"
 #include "nvs_flash.h"
 
@@ -45,7 +46,7 @@ esp_err_t WifiManager::init() {
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
     // 3. 创建默认 Station (STA) 网卡
-    esp_netif_create_default_wifi_sta();
+    sta_netif_ = esp_netif_create_default_wifi_sta();
 
     // 4. 初始化 Wi-Fi 硬件驱动
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
@@ -102,6 +103,30 @@ void WifiManager::eventHandler(void *arg, esp_event_base_t event_base, int32_t e
         ESP_LOGI(TAG, "子网掩码    : " IPSTR, IP2STR(&event->ip_info.netmask));
         ESP_LOGI(TAG, "网关地址    : " IPSTR, IP2STR(&event->ip_info.gw));
         ESP_LOGI(TAG, "=================================================");
+
+        // 配置主公共 DNS (阿里 223.5.5.5) 与备用公共 DNS (腾讯 119.29.29.29)
+        if (self->sta_netif_) {
+            esp_netif_dns_info_t dns_main = {};
+            dns_main.ip.type = ESP_IPADDR_TYPE_V4;
+            esp_netif_str_to_ip4("223.5.5.5", &dns_main.ip.u_addr.ip4);
+            esp_netif_set_dns_info(self->sta_netif_, ESP_NETIF_DNS_MAIN, &dns_main);
+
+            esp_netif_dns_info_t dns_backup = {};
+            dns_backup.ip.type = ESP_IPADDR_TYPE_V4;
+            esp_netif_str_to_ip4("119.29.29.29", &dns_backup.ip.u_addr.ip4);
+            esp_netif_set_dns_info(self->sta_netif_, ESP_NETIF_DNS_BACKUP, &dns_backup);
+
+            ESP_LOGI(TAG, "公共 DNS 配置就绪: 主 223.5.5.5, 备 119.29.29.29");
+        }
+
+        // 启动网络时间协议 SNTP 自动对齐现实北京时间
+        esp_sntp_setoperatingmode(ESP_SNTP_OPMODE_POLL);
+        esp_sntp_setservername(0, "ntp.aliyun.com");
+        esp_sntp_setservername(1, "cn.pool.ntp.org");
+        esp_sntp_init();
+        setenv("TZ", "CST-8", 1);
+        tzset();
+        ESP_LOGI(TAG, "已启动 SNTP 网络时间同步，时区设为中国标准时间 (UTC+8)");
 
         self->retry_count_ = 0;
         self->is_connected_.store(true);

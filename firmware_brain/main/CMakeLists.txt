@@ -26,6 +26,7 @@ idf_component_register(
             "audio/mic_driver.cpp"       # INMP441 I2S 麦克风驱动
             "audio/audio_service.cpp"    # 音频声学业务服务
             "core/interaction_service.cpp" # 多模态拟人自主交互行为引擎
+            "ai/ai_service.cpp"          # 云端大模型与 CosyVoice 语音中枢服务
 
         INCLUDE_DIRS
             "."                          # 当前 main 根目录
@@ -36,6 +37,7 @@ idf_component_register(
             "display"			 # 1.8寸彩屏硬件驱动头文件
             "gimbal"			 # 舵机与头部云台头文件
             "audio"			 # 音频与声学头文件
+            "ai"                         # 云端大模型与语音服务头文件
 
         REQUIRES
             driver			 # 传统外设驱动兼容基础库
@@ -55,4 +57,8 @@ idf_component_register(
             esp_netif			 # 提供 TCP/IP 协议栈网络接口适配层 (获取本机 IP)
             esp_http_server		 # 提供高性能嵌入式 Web 服务器与 WebSocket 全双工协议
             esp_timer			 # 提供高精度硬件微秒定时器 (计算系统开机运行时间 Uptime)
+            esp_http_client              # 阿里云大模型 HTTPS 客户端
+            esp_websocket_client         # CosyVoice 语音合成 WebSocket 客户端
+            cjson                        # JSON 序列化与反序列化解析库
+            mbedtls                      # SSL/TLS 加密通信协议栈
     )

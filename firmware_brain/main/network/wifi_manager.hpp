@@ -13,6 +13,7 @@
 
 #include "esp_err.h"
 #include "esp_event.h"
+#include "esp_netif.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
 
@@ -54,6 +55,7 @@ private:
     static void eventHandler(void *arg, esp_event_base_t event_base, int32_t event_id,
                              void *event_data);
 
+    esp_netif_t *sta_netif_{nullptr};
     std::atomic<bool> is_connected_{false};
     EventGroupHandle_t wifi_event_group_{nullptr};
     int retry_count_{0};

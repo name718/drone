@@ -1,7 +1,7 @@
 #pragma once
 
-// 自动内嵌的前端 SPA 静态网页资源 (存储在 Flash 中，零外部文件系统依赖)
-static const char INDEX_HTML[] = R"rawliteral(<!DOCTYPE html>
+static const char INDEX_HTML[] = R"rawliteral(
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
@@ -921,12 +921,14 @@ static const char INDEX_HTML[] = R"rawliteral(<!DOCTYPE html>
     <div class="tab-content" id="view-chat">
       <div class="panel" style="flex:1;">
         <div class="panel-header">
-          <div class="panel-title">AI 智脑流式通道 (WebSocket 全双工)</div>
+          <div class="panel-title">AI 智脑流式通道 (通义千问 + CosyVoice)</div>
+          <span class="capsule cap-online" id="aiStatusBadge" style="font-size:10px;">就绪</span>
         </div>
         <div class="chat-log" id="chatLog">
           <div class="chat-msg robot">你好！我是赛博双芯片智能小车。WebSocket 链路就绪！</div>
         </div>
         <div class="chat-input-row">
+          <button onclick="triggerVoiceListen()" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:var(--text); padding:0 14px; border-radius:6px; cursor:pointer; font-size:12px; white-space:nowrap;">声控倾听</button>
           <input type="text" id="aiInput" placeholder="输入对话或指令..." onkeydown="if(event.key==='Enter') sendAiMessage()">
           <button onclick="sendAiMessage()">发送</button>
         </div>
@@ -1058,10 +1060,36 @@ static const char INDEX_HTML[] = R"rawliteral(<!DOCTYPE html>
     let currentGimbalTilt = 0.0;
 
     function handleServerMessage(msg) {
-      if (msg.type !== 'telemetry') {
-        if (msg.type === 'ai_reply') addChatMessage(msg.text, 'robot');
+      if (msg.type === 'ai_reply') {
+        addChatMessage(msg.text, 'robot');
+        const badge = document.getElementById('aiStatusBadge');
+        if (badge) { badge.className = 'capsule cap-online'; badge.innerText = '回答完毕'; }
         return;
       }
+      if (msg.type === 'chat_msg') {
+        addChatMessage(msg.text, msg.sender || msg.role || 'user');
+        return;
+      }
+      if (msg.type === 'ai_status') {
+        const badge = document.getElementById('aiStatusBadge');
+        if (badge) {
+          if (msg.status === 'listening') {
+            badge.className = 'capsule cap-warn';
+            badge.innerText = '倾听中...';
+          } else if (msg.status === 'thinking') {
+            badge.className = 'capsule cap-alarm';
+            badge.innerText = '思考中...';
+          } else if (msg.status === 'speaking') {
+            badge.className = 'capsule cap-online';
+            badge.innerText = '正在发声';
+          } else {
+            badge.className = 'capsule cap-online';
+            badge.innerText = '就绪';
+          }
+        }
+        return;
+      }
+      if (msg.type !== 'telemetry') return;
 
       // 底盘链路
       if (msg.chassis_online !== undefined) {
@@ -1335,8 +1363,18 @@ static const char INDEX_HTML[] = R"rawliteral(<!DOCTYPE html>
       if (!text) return;
       addChatMessage(text, 'user');
       input.value = '';
+      const badge = document.getElementById('aiStatusBadge');
+      if (badge) { badge.className = 'capsule cap-alarm'; badge.innerText = '思考中...'; }
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({ type: 'ai_prompt', text: text }));
+      }
+    }
+
+    function triggerVoiceListen() {
+      const badge = document.getElementById('aiStatusBadge');
+      if (badge) { badge.className = 'capsule cap-warn'; badge.innerText = '倾听中...'; }
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'voice_listen' }));
       }
     }
 
@@ -1373,4 +1411,5 @@ static const char INDEX_HTML[] = R"rawliteral(<!DOCTYPE html>
   </script>
 </body>
 </html>
+
 )rawliteral";

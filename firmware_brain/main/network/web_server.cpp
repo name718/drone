@@ -8,7 +8,9 @@
 #include <cstring>
 #include <string>
 
+#include "ai/ai_service.hpp"
 #include "audio/audio_service.hpp"
+#include "cJSON.h"
 #include "comm/chassis_service.hpp"
 #include "core/interaction_service.hpp"
 #include "display/display_service.hpp"
@@ -169,16 +171,18 @@ esp_err_t WebServer::wsHandler(httpd_req_t *req) {
                 }
             }
         } else if (payload.find("\"ai_prompt\"") != std::string::npos) {
-            // 【大模型预留通道】：收到网页端发来的文字，先给一个即时握手响应
-            const char reply[] =
-                "{\"type\":\"ai_reply\",\"text\":\"[ESP32大脑已接收] WebSocket "
-                "全双工流式通道测试成功！待接入大模型音视频流。\"}";
-            httpd_ws_frame_t out_pkt;
-            std::memset(&out_pkt, 0, sizeof(httpd_ws_frame_t));
-            out_pkt.type = HTTPD_WS_TYPE_TEXT;
-            out_pkt.payload = reinterpret_cast<uint8_t *>(const_cast<char *>(reply));
-            out_pkt.len = std::strlen(reply);
-            httpd_ws_send_frame(req, &out_pkt);
+            // 解析网页发来的提问提示词并投入 AiService 异步调度队列
+            cJSON *root = cJSON_Parse(buf);
+            if (root) {
+                cJSON *text_item = cJSON_GetObjectItem(root, "text");
+                if (text_item && cJSON_IsString(text_item) && text_item->valuestring) {
+                    AiService::getInstance().ask(text_item->valuestring);
+                }
+                cJSON_Delete(root);
+            }
+        } else if (payload.find("\"voice_listen\"") != std::string::npos) {
+            // 触发麦克风语音聆听
+            AiService::getInstance().triggerVoiceListen();
         }
     }
 
@@ -272,18 +276,51 @@ void WebServer::broadcastTelemetry() {
         speed, l_spd, r_spd, l_pulse, r_pulse, l_pwm, r_pwm, bat_mv, flags,
         static_cast<unsigned long long>(rx_bytes), static_cast<unsigned long>(rx_pkts));
 
-    // 异步推送到所有处于 WebSocket 状态的客户端
+    // 广播遥测帧
+    broadcastText(json_buf, len);
+}
+
+void WebServer::broadcastText(const char *text, size_t len) {
+    if (!server_ || !text || len == 0) return;
+    size_t fds = 7;
+    int client_fds[7];
+    if (httpd_get_client_list(server_, &fds, client_fds) != ESP_OK) return;
+
     for (size_t i = 0; i < fds; i++) {
         int fd = client_fds[i];
         if (httpd_ws_get_fd_info(server_, fd) == HTTPD_WS_CLIENT_WEBSOCKET) {
             httpd_ws_frame_t frame;
             std::memset(&frame, 0, sizeof(httpd_ws_frame_t));
             frame.type = HTTPD_WS_TYPE_TEXT;
-            frame.payload = reinterpret_cast<uint8_t *>(json_buf);
+            frame.payload = reinterpret_cast<uint8_t *>(const_cast<char *>(text));
             frame.len = len;
             httpd_ws_send_frame_async(server_, fd, &frame);
         }
     }
+}
+
+void WebServer::broadcastAiReply(const std::string &reply_text) {
+    cJSON *root = cJSON_CreateObject();
+    cJSON_AddStringToObject(root, "type", "ai_reply");
+    cJSON_AddStringToObject(root, "text", reply_text.c_str());
+    char *json = cJSON_PrintUnformatted(root);
+    if (json) {
+        broadcastText(json, std::strlen(json));
+        cJSON_free(json);
+    }
+    cJSON_Delete(root);
+}
+
+void WebServer::broadcastAiStatus(const std::string &status) {
+    cJSON *root = cJSON_CreateObject();
+    cJSON_AddStringToObject(root, "type", "ai_status");
+    cJSON_AddStringToObject(root, "status", status.c_str());
+    char *json = cJSON_PrintUnformatted(root);
+    if (json) {
+        broadcastText(json, std::strlen(json));
+        cJSON_free(json);
+    }
+    cJSON_Delete(root);
 }
 
 void WebServer::telemetryTask(void *param) {
@@ -343,5 +380,21 @@ void WebServer::stop() {
         is_running_ = false;
         httpd_stop(server_);
         server_ = nullptr;
+    }
+}
+
+void WebServer::broadcastChatMessage(const std::string &text, const std::string &sender) {
+    if (!server_) return;
+    cJSON *root = cJSON_CreateObject();
+    cJSON_AddStringToObject(root, "type", "chat_msg");
+    cJSON_AddStringToObject(root, "sender", sender.c_str());
+    cJSON_AddStringToObject(root, "text", text.c_str());
+
+    char *buf = cJSON_PrintUnformatted(root);
+    cJSON_Delete(root);
+
+    if (buf) {
+        broadcastText(buf, strlen(buf));
+        cJSON_free(buf);
     }
 }

@@ -14,6 +14,7 @@
  */
 #pragma once
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include "driver/i2s_std.h"
@@ -79,9 +80,28 @@ public:
      */
     esp_err_t writePCM(const int16_t *samples, size_t sample_count);
 
+    /**
+     * @brief 播放单声道 16-bit 线性 PCM 音频数据 (直接对接 CosyVoice TTS 流)
+     * @param mono_samples 单声道 16-bit 采样数组指针
+     * @param sample_count 单声道采样点总数
+     */
+    void playMonoPCM(const int16_t *mono_samples, size_t sample_count);
+
+    /**
+     * @brief 检查当前功放是否正在发声或处于回声抑制延音期
+     */
+    bool isPlaying() const;
+
+    /**
+     * @brief 手动设置扬声器播放活跃状态
+     */
+    void setPlaybackActive(bool active);
+
 private:
     i2s_chan_handle_t tx_handle_{nullptr};  // I2S 硬件输出通道句柄
     uint32_t sample_rate_{16000};          // 当前采样率
     float volume_{0.4f};                   // 默认音量 (0.4 既清晰又温和)
     bool is_initialized_{false};
+    std::atomic<bool> is_playing_{false};
+    std::atomic<int64_t> last_play_end_ms_{0};
 };

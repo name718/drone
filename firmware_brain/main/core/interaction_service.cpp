@@ -6,9 +6,11 @@
 
 #include <cmath>
 
+#include "ai/ai_service.hpp"
 #include "config/board_config.hpp"
 #include "esp_log.h"
 #include "esp_random.h"
+#include "network/wifi_manager.hpp"
 
 static const char *TAG = "交互引擎";
 
@@ -96,11 +98,10 @@ void InteractionService::triggerBehavior(RobotBehavior behavior) {
             break;
 
         case RobotBehavior::WAKE_UP:
-            ESP_LOGI(TAG, "触发【声音唤醒】拟人反应！(睁大双眼 + 仰头探寻 + 提示音)");
+            ESP_LOGI(TAG, "触发【声音唤醒】拟人反应！(睁大双眼 + 仰头注视倾听)");
             display.setEmotion(EmotionState::SURPRISED);
-            // 头部微仰 16 度，展现被声音吸引的好奇姿态
+            // 头部微仰 16 度，展现被声音吸引的好奇注视姿态 (不鸣笛，避免杂音干扰录音麦克风)
             gimbal.lookAt(Config::Gimbal::DEFAULT_PAN_ANGLE, 16.0f);
-            audio.playBeep();
             break;
 
         case RobotBehavior::HAPPY:
@@ -245,8 +246,8 @@ void InteractionService::interactionTask(void *param) {
     auto *self = static_cast<InteractionService *>(param);
     ESP_LOGI(TAG, "拟人交互后台行为决策任务已在 Core 0 启动 (10Hz)");
 
-    constexpr float SOUND_WAKEUP_THRESHOLD = 0.40f;  // 声音唤醒阈值 (归一化 0.0 ~ 1.0)
-    constexpr uint64_t SOUND_COOLDOWN_MS = 2500;     // 唤醒防刷保护冷却 (2.5 秒)
+    constexpr float SOUND_WAKEUP_THRESHOLD = 0.065f; // 声音唤醒阈值 (100% 连续采样下，正常说话音量约 0.07~0.15)
+    constexpr uint64_t SOUND_COOLDOWN_MS = 1500;     // 唤醒保护冷却 (1.5 秒)
     constexpr uint64_t SLEEP_TIMEOUT_MS = 30000;     // 30 秒无操作进入打盹休眠
 
     while (self->is_running_) {
@@ -258,20 +259,34 @@ void InteractionService::interactionTask(void *param) {
 
             // 1. 声音感知与唤醒检测
             if (energy >= SOUND_WAKEUP_THRESHOLD && (now - self->last_sound_trigger_ms_) > SOUND_COOLDOWN_MS) {
-                self->last_sound_trigger_ms_ = now;
-                self->last_activity_time_ms_ = now;
-                self->is_in_sound_reaction_ = true;
-                self->is_sleeping_ = false;
-                self->wakeup_return_normal_ms_ = now + 3000;  // 保持好奇状态 3 秒
+                // 如果 AI 当前未在思考、播报或聆听中，且扬声器未在发声，则响应声音唤醒
+                if (!AiService::getInstance().isBusy() && !AudioService::getInstance().isPlaying()) {
+                    self->last_sound_trigger_ms_ = now;
+                    self->last_activity_time_ms_ = now;
+                    self->is_in_sound_reaction_ = true;
+                    self->is_sleeping_ = false;
+                    self->wakeup_return_normal_ms_ = now + 4000;
 
-                self->triggerBehavior(RobotBehavior::WAKE_UP);
+                    if (WifiManager::getInstance().isConnected()) {
+                        ESP_LOGI(TAG, "检测到有效声音刺激 (能量: %.2f)，触发 AI 语音倾听与大模型交互", energy);
+                        AiService::getInstance().triggerVoiceListen();
+                    } else {
+                        ESP_LOGI(TAG, "检测到声音刺激 (能量: %.2f)，未联网，仅执行基础拟人动作唤醒", energy);
+                        self->triggerBehavior(RobotBehavior::WAKE_UP);
+                    }
+                }
             }
 
             // 2. 声音唤醒后恢复常态检测
             if (self->is_in_sound_reaction_ && now >= self->wakeup_return_normal_ms_) {
-                self->is_in_sound_reaction_ = false;
-                self->triggerBehavior(RobotBehavior::NORMAL);
-                ESP_LOGI(TAG, "声音刺激结束，恢复平静常态。");
+                if (!AiService::getInstance().isBusy()) {
+                    self->is_in_sound_reaction_ = false;
+                    self->triggerBehavior(RobotBehavior::NORMAL);
+                    ESP_LOGI(TAG, "声音刺激结束，恢复平静常态。");
+                } else {
+                    // AI 服务仍在流式对话或朗读中，顺延复位时间
+                    self->wakeup_return_normal_ms_ = now + 1000;
+                }
             }
 
             // 3. 空闲挂机与困倦打盹状态机

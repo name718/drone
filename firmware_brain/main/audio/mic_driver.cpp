@@ -82,15 +82,59 @@ esp_err_t MicDriver::readPCM(int32_t *dest, size_t sample_count, size_t *samples
     return ret;
 }
 
+esp_err_t MicDriver::read16BitPCM(int16_t *dest, size_t sample_count, size_t *samples_read, uint32_t timeout_ms) {
+    if (!is_initialized_ || !rx_handle_ || !dest || sample_count == 0) return ESP_ERR_INVALID_STATE;
+
+    constexpr size_t BATCH = 128;
+    int32_t raw_buf[BATCH];
+    size_t total_read = 0;
+
+    while (total_read < sample_count) {
+        size_t to_read = std::min(BATCH, sample_count - total_read);
+        size_t actual = 0;
+        esp_err_t ret = readPCM(raw_buf, to_read, &actual, timeout_ms);
+        if (ret != ESP_OK || actual == 0) {
+            break;
+        }
+        for (size_t i = 0; i < actual; i++) {
+            // INMP441 24 位有效数据在高位，右移 14 位获得适当增益的 16 位有符号 PCM
+            float in_sample = static_cast<float>(raw_buf[i] >> 14);
+            // 一阶 IIR 去直流高通滤波 (截止频率约 20Hz: y[n] = x[n] - x[n-1] + 0.992 * y[n-1])
+            float out_sample = in_sample - dc_x_prev_ + 0.992f * dc_y_prev_;
+            dc_x_prev_ = in_sample;
+            dc_y_prev_ = out_sample;
+
+            // 软拐点饱和限制器，杜绝近距离大声破音削顶，极大提升语音识别声学保真度
+            float sample_f = out_sample;
+            if (sample_f > 29000.0f) {
+                sample_f = 29000.0f + (sample_f - 29000.0f) * 0.25f;
+            } else if (sample_f < -29000.0f) {
+                sample_f = -29000.0f + (sample_f + 29000.0f) * 0.25f;
+            }
+
+            int32_t val = static_cast<int32_t>(sample_f);
+            if (val > 32767) val = 32767;
+            if (val < -32768) val = -32768;
+            dest[total_read + i] = static_cast<int16_t>(val);
+        }
+        total_read += actual;
+    }
+
+    if (samples_read) {
+        *samples_read = total_read;
+    }
+    return (total_read > 0) ? ESP_OK : ESP_FAIL;
+}
+
 float MicDriver::readVolumeRMS() {
     if (!is_initialized_) return 0.0f;
 
     // 一次性采集 128 个采样点 (约 8ms 瞬时声压窗口)
     constexpr size_t SAMPLES = 128;
-    int32_t buffer[SAMPLES];
+    int16_t buffer[SAMPLES];
     size_t actual_samples = 0;
 
-    esp_err_t ret = readPCM(buffer, SAMPLES, &actual_samples, 20);
+    esp_err_t ret = read16BitPCM(buffer, SAMPLES, &actual_samples, 20);
     if (ret != ESP_OK || actual_samples == 0) {
         return 0.0f;
     }
@@ -98,15 +142,13 @@ float MicDriver::readVolumeRMS() {
     // 计算均方根 (RMS: Root Mean Square) 声压能量
     double sum_squares = 0.0;
     for (size_t i = 0; i < actual_samples; i++) {
-        // INMP441 数据位于高 24 位，右移 14 位截取有感幅度
-        int32_t sample = buffer[i] >> 14;
-        sum_squares += static_cast<double>(sample) * static_cast<double>(sample);
+        sum_squares += static_cast<double>(buffer[i]) * static_cast<double>(buffer[i]);
     }
 
     double mean_sq = sum_squares / static_cast<double>(actual_samples);
     double rms = std::sqrt(mean_sq);
 
-    // 归一化映射至 [0.0, 1.0] (以 8000 为饱和声压基准)
-    float normalized = static_cast<float>(rms / 8000.0);
+    // 归一化映射至 [0.0, 1.0] (以 6000 为饱和声压基准)
+    float normalized = static_cast<float>(rms / 6000.0);
     return std::clamp(normalized, 0.0f, 1.0f);
 }
