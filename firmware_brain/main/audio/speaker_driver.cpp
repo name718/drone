@@ -82,7 +82,8 @@ void SpeakerDriver::setVolume(float volume) {
 bool SpeakerDriver::isPlaying() const {
     if (is_playing_.load()) return true;
     int64_t now_ms = esp_timer_get_time() / 1000;
-    return (now_ms - last_play_end_ms_.load()) < 350; // 350ms 软件回声抑制保护窗口
+    // 350ms 软件回声抑制保护窗口：涵盖 DMA 硬件 FIFO 耗尽延迟 + 物理空间混响残响时间
+    return (now_ms - last_play_end_ms_.load()) < 350;
 }
 
 void SpeakerDriver::setPlaybackActive(bool active) {
@@ -96,10 +97,14 @@ esp_err_t SpeakerDriver::writePCM(const int16_t *samples, size_t sample_count) {
     if (!is_initialized_ || !tx_handle_) return ESP_ERR_INVALID_STATE;
 
     is_playing_.store(true);
-    // 双声道交织格式 (L, R, L, R...)：每个采样对占 2 个 int16_t (4 字节)
+    // 【I2S 物理传输数据计算】：
+    // 标准 Philips 双声道格式下，每个采样周期包含左、右两个声道的 16-bit 采样点
+    // 每个声道 2 字节 (int16_t)，故单对立体声采样占据 4 字节：
+    // 待写入总字节数 = 采样点对数 * 2 声道 * sizeof(int16_t)
     size_t bytes_to_write = sample_count * 2 * sizeof(int16_t);
     size_t bytes_written = 0;
 
+    // portMAX_DELAY: 阻塞等待硬件 DMA 描述符就绪，实现平滑无卡顿推流
     esp_err_t ret = i2s_channel_write(tx_handle_, samples, bytes_to_write, &bytes_written, portMAX_DELAY);
     last_play_end_ms_.store(esp_timer_get_time() / 1000);
     return ret;
@@ -109,6 +114,12 @@ void SpeakerDriver::playMonoPCM(const int16_t *mono_samples, size_t sample_count
     if (!is_initialized_ || !tx_handle_ || !mono_samples || sample_count == 0) return;
 
     is_playing_.store(true);
+
+    // 【单声道转双声道交织流 (Mono to Stereo Interleaved)】：
+    // MAX98357A 硬件功放默认按 Philips 立体声协议解析 BCLK 与 LRC 时钟信号。
+    // 为确保单声道语音（如 CosyVoice 输出的 16kHz Mono PCM）能够饱满输出，
+    // 我们将每个单声道输入采样复制为左声道与右声道相同的采样对：[L0, R0, L1, R1...]
+    // 采用 256 采样点的小分片（512 采样点 = 1024 字节）在片上栈中快速完成数学增益运算，无需堆内存分配。
     constexpr size_t CHUNK = 256;
     int16_t stereo_chunk[CHUNK * 2];
 
@@ -116,12 +127,17 @@ void SpeakerDriver::playMonoPCM(const int16_t *mono_samples, size_t sample_count
     while (processed < sample_count) {
         size_t current = std::min(CHUNK, sample_count - processed);
         for (size_t i = 0; i < current; i++) {
+            // 1. 软件音量乘法缩放 (Q15 线性音量增益)
             int32_t val = static_cast<int32_t>(mono_samples[processed + i] * volume_);
+
+            // 2. 饱和截断 (Saturation Clamping)：防止超出 int16_t [-32768, 32767] 产生整数溢出翻转爆音
             if (val > 32767) val = 32767;
             if (val < -32768) val = -32768;
             int16_t s_val = static_cast<int16_t>(val);
-            stereo_chunk[i * 2] = s_val;
-            stereo_chunk[i * 2 + 1] = s_val;
+
+            // 3. 复制填入左右声道
+            stereo_chunk[i * 2] = s_val;      // 左声道
+            stereo_chunk[i * 2 + 1] = s_val;  // 右声道
         }
         writePCM(stereo_chunk, current);
         processed += current;
@@ -137,7 +153,11 @@ void SpeakerDriver::playTone(float freq_hz, uint32_t duration_ms, float volume) 
     float vol = (volume >= 0.0f) ? std::clamp(volume, 0.0f, 1.0f) : volume_;
     size_t total_samples = (sample_rate_ * duration_ms) / 1000;
 
-    // 5ms 平滑淡入淡出（防破音核心算法）
+    // 【防爆音软包络 (Envelope Shaping) 核心算法】：
+    // 当扬声器突然从 0 电平跃迁到大振幅正弦波（或突然从大振幅切断到 0）时，在阶跃瞬间会产生
+    // 无穷大的一阶导数（高频瞬态冲激），在物理扬声器纸盆上表现为明显的清脆“咔哒/破音 (Pop/Click Noise)”。
+    // 本算法在音频起始前 5ms 执行线性淡入 (Fade-In)，在结束前 5ms 执行线性淡出 (Fade-Out)，
+    // 使波形平滑过渡至零点，从物理声学层面彻底消除启停破音。
     size_t fade_samples = (sample_rate_ * 5) / 1000;
     if (fade_samples * 2 > total_samples) {
         fade_samples = total_samples / 2;
@@ -147,6 +167,9 @@ void SpeakerDriver::playTone(float freq_hz, uint32_t duration_ms, float volume) 
     constexpr size_t CHUNK_SAMPLES = 256;
     int16_t chunk_buffer[CHUNK_SAMPLES * 2];  // 左右双声道缓冲
 
+    // 【离散时间正弦波数模合成公式】：
+    //   phase_step = 2 * PI * (f / Fs)
+    // 每次采样推进一个步长，并在达到 2*PI 时做回绕，防止长时间累加导致浮点数有效位精度丢失。
     float phase = 0.0f;
     float phase_step = (2.0f * M_PI * freq_hz) / static_cast<float>(sample_rate_);
     float max_amplitude = 32767.0f * vol;
@@ -161,12 +184,14 @@ void SpeakerDriver::playTone(float freq_hz, uint32_t duration_ms, float volume) 
             // 计算平滑包络因子 (Envelope: 0.0 ~ 1.0)
             float envelope = 1.0f;
             if (global_idx < fade_samples) {
+                // 起始 5ms 线性淡入：0.0 -> 1.0
                 envelope = static_cast<float>(global_idx) / static_cast<float>(fade_samples);
             } else if (global_idx > total_samples - fade_samples) {
+                // 尾部 5ms 线性淡出：1.0 -> 0.0
                 envelope = static_cast<float>(total_samples - global_idx) / static_cast<float>(fade_samples);
             }
 
-            // 正弦波生成
+            // 正弦波样值计算并应用包络振幅
             int16_t val = static_cast<int16_t>(std::sin(phase) * max_amplitude * envelope);
             phase += phase_step;
             if (phase >= 2.0f * M_PI) {

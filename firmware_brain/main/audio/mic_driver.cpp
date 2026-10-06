@@ -97,14 +97,27 @@ esp_err_t MicDriver::read16BitPCM(int16_t *dest, size_t sample_count, size_t *sa
             break;
         }
         for (size_t i = 0; i < actual; i++) {
-            // INMP441 24 位有效数据在高位，右移 14 位获得适当增益的 16 位有符号 PCM
+            // 【数字音频增益与位深映射】：
+            // INMP441 硬件输出 24-bit 有符号补码数据，在 32-bit I2S 物理槽位中按高位对齐 (MSB Aligned)。
+            // 理论降至 16-bit 需右移 16 位 (32 - 16 = 16)，但此处采用右移 14 位：
+            // 相当于预先注入了 +12dB (2^2 = 4倍) 的洁净数字增益，补偿微型 MEMS 振膜拾音灵敏度，
+            // 让人在 1~3 米正常距离说话时能饱满填满 16 位动态范围，显著提升远场识别率。
             float in_sample = static_cast<float>(raw_buf[i] >> 14);
-            // 一阶 IIR 去直流高通滤波 (截止频率约 20Hz: y[n] = x[n] - x[n-1] + 0.992 * y[n-1])
+
+            // 【一阶 IIR 去直流高通滤波器 (DC-Removal High-Pass Filter)】：
+            // 传递函数：H(z) = (1 - z^-1) / (1 - 0.992 * z^-1)
+            // 差分方程：y[n] = x[n] - x[n-1] + 0.992 * y[n-1]
+            // MEMS 麦克风由硅微机械结构与电荷泵供电，硬件底层存在固有直流零漂 (DC Offset)。
+            // 若不消除零漂，会导致声压能量计算基线抬高、甚至在后续大音量时单侧削顶。
+            // 本滤波器在 DC (0Hz) 处设置传输零点，截止频率约为 20Hz (人耳听觉下限)，彻底滤除直流漂移与低频抖晃。
             float out_sample = in_sample - dc_x_prev_ + 0.992f * dc_y_prev_;
             dc_x_prev_ = in_sample;
             dc_y_prev_ = out_sample;
 
-            // 软拐点饱和限制器，杜绝近距离大声破音削顶，极大提升语音识别声学保真度
+            // 【软拐点动态压缩限制器 (Soft-Knee Dynamic Peak Limiter)】：
+            // 针对近距离大声吼叫（如贴近麦克风喊话）设计。硬削顶（Hard Clipping）会瞬间产生
+            // 尖锐的奇次谐波方波，严重破坏 Paraformer 声学模型特征提取（MFCC/Fbank 频谱严重畸变）。
+            // 当振幅超过 29000 时，超出部分按 4:1 (斜率 0.25) 进行平滑对数型软压缩，保全波形包络完整性。
             float sample_f = out_sample;
             if (sample_f > 29000.0f) {
                 sample_f = 29000.0f + (sample_f - 29000.0f) * 0.25f;

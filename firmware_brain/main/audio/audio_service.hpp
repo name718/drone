@@ -102,22 +102,34 @@ public:
 
     /**
      * @brief 启动音频流消费 (供 ASR 语音识别流式提取)
-     * @param preroll_samples 从当前时间点往前提取的历史预缓冲采样点数 (如 12800 点 = 800ms)
+     *
+     * 【首字保全与预缓冲回溯 (Pre-roll Buffer) 核心机制】：
+     *  在声控交互中，当主人喊出“小智同学”时，声音能量需要经历起音阶段（约 200~500ms）
+     *  才能累积超过唤醒阈值。如果系统在检测到声音时才开始创建录音，往往会导致前 1~2 个字
+     *  （如“小”、“智”）被截断，云端 ASR 只能听到半截话而识别失败或无法匹配唤醒词。
+     *  本接口通过在 64KB PSRAM 环形缓冲区中将读指针回溯 preroll_samples（如 12800 点 = 800ms），
+     *  使得随后的 readAudioStream 能无损读出“尚未触发唤醒前”的历史发音，保全完整语音。
+     * @param preroll_samples 从当前时间点往前提取的历史预缓冲采样点数 (12800 点 @ 16kHz = 800ms)
      */
     void startAudioStream(size_t preroll_samples = 12800);
 
     /**
-     * @brief 停止音频流消费
+     * @brief 停止音频流消费 (重置消费状态，结束当前 ASR 会话推流)
      */
     void stopAudioStream();
 
     /**
      * @brief 从环形音频流中读取 16-Bit 单声道 PCM 数据 (非阻塞/带超时等待)
-     * @param dest 目标数据缓冲
-     * @param sample_count 期望读取的采样点数
-     * @param samples_read 实际读取的采样点数
-     * @param timeout_ms 超时毫秒
-     * @return esp_err_t ESP_OK 成功读取到数据
+     *
+     * 【单生产者单消费者 (SPSC) 队列模型】：
+     *  后台 audioTask 作为唯一生产者，以 100% 占空比不断将麦克风采集的 PCM 写入 PSRAM 环形缓冲区；
+     *  本接口作为唯一消费者从中读取数据。当缓冲区中积存数据不足 sample_count 时，
+     *  任务会自动挂起在 stream_sem_ 信号量上等待后台生产，避免忙轮询消耗 CPU 算力。
+     * @param dest 目标数据缓冲数组指针
+     * @param sample_count 期望读取的采样点数 (如 1600 点 = 100ms)
+     * @param samples_read 实际成功读取的采样点数指针
+     * @param timeout_ms 超时毫秒数
+     * @return esp_err_t ESP_OK 成功读取到数据，ESP_ERR_TIMEOUT 超时
      */
     esp_err_t readAudioStream(int16_t *dest, size_t sample_count, size_t *samples_read, uint32_t timeout_ms = 100);
 
@@ -130,18 +142,22 @@ private:
 
     static void audioTask(void *param);
 
-    SpeakerDriver speaker_;  // 扬声器底层硬件驱动
-    MicDriver mic_;          // 麦克风底层硬件驱动
+    SpeakerDriver speaker_;  // MAX98357A 扬声器底层硬件驱动
+    MicDriver mic_;          // INMP441 全向麦克风底层硬件驱动
 
     TaskHandle_t task_handle_{nullptr};
     bool is_running_{false};
-    float current_energy_{0.0f};  // 当前环境声压能量
+    float current_energy_{0.0f};  // 实时环境连续均方根声压能量 (0.0f ~ 1.0f)
 
-    static constexpr size_t RING_BUF_SAMPLES = 32000; // 2秒 16kHz PCM (64KB 环形预缓冲)
-    int16_t *ring_buffer_{nullptr};
-    size_t ring_write_count_{0};
-    size_t ring_read_count_{0};
-    std::atomic<bool> is_streaming_{false};
-    SemaphoreHandle_t stream_sem_{nullptr};
-    portMUX_TYPE ring_mux_ = portMUX_INITIALIZER_UNLOCKED;
+    // ========================================================================
+    // SPSC 全时态音频环形预缓冲区参数 (分配在 8MB 外部 PSRAM)
+    // ========================================================================
+    // 16000Hz * 2秒 * 2字节 = 32000 个采样点 (占据 64KB 连续内存)
+    static constexpr size_t RING_BUF_SAMPLES = 32000;
+    int16_t *ring_buffer_{nullptr};       // 指向 PSRAM 连续环形内存块的指针
+    size_t ring_write_count_{0};          // 生产者 (audioTask) 累积写入的历史采样总数
+    size_t ring_read_count_{0};           // 消费者 (readAudioStream) 累积读取的历史采样总数
+    std::atomic<bool> is_streaming_{false}; // 当前是否处于 ASR 流式消费状态
+    SemaphoreHandle_t stream_sem_{nullptr}; // 跨线程数据就绪同步信号量
+    portMUX_TYPE ring_mux_ = portMUX_INITIALIZER_UNLOCKED; // 多核自旋锁，保护读写指针一致性
 };

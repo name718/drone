@@ -106,14 +106,21 @@ void AudioService::audioTask(void *param) {
     auto *self = static_cast<AudioService *>(param);
     ESP_LOGI(TAG, "声学采集与全时段环形预缓冲任务已在 Core 0 启动 (100%% 占空比全时监听)");
 
-    constexpr size_t CHUNK = 320; // 20ms 分片 (320 samples @ 16kHz)
+    // 每次处理 20ms 音频分片 (16000Hz * 0.02s = 320 个采样点 = 640 字节)
+    // 20ms 是语音通信与声学信号处理的标准帧长（与人耳耳蜗短时傅里叶变换时间窗口相匹配）
+    constexpr size_t CHUNK = 320;
     int16_t chunk_buf[CHUNK];
 
     while (self->is_running_) {
-        // 1. 软件回声抑制 (AEC)：若扬声器当前正在发声，抑制拾音能量，清零声压
+        // ====================================================================
+        // 1. 软件回声抑制 (Software Acoustic Echo Cancellation, AEC)
+        // ====================================================================
+        // 如果扬声器当前正在输出声音（或处于停止发声后的 350ms 空间混响尾音保护窗口内）：
+        // 强制将环境声压能量清零，不触发任何声音唤醒与自激交互。
         if (self->speaker_.isPlaying()) {
             self->current_energy_ = 0.0f;
-            // 播放期间若未处于 ASR 录音会话中，持续更新读指针，避免录入机器人自发声音
+            // 扬声器播放期间若未处于 ASR 会话中，实时同步推进读指针，
+            // 确保环形缓冲区中不留存机器人自己说话的回声。
             if (!self->is_streaming_.load()) {
                 portENTER_CRITICAL(&self->ring_mux_);
                 self->ring_read_count_ = self->ring_write_count_;
@@ -123,27 +130,45 @@ void AudioService::audioTask(void *param) {
             continue;
         }
 
+        // ====================================================================
         // 2. 从硬件 I2S0 麦克风独占读取 20ms PCM 帧
+        // ====================================================================
+        // audioTask 是全系统中唯一直接调用 mic_.read16BitPCM 的任务，彻底消除硬件外设竞争冲突
         size_t samples_read = 0;
         esp_err_t ret = self->mic_.read16BitPCM(chunk_buf, CHUNK, &samples_read, 40);
         if (ret == ESP_OK && samples_read > 0) {
-            // 计算实时连续 RMS 能量
+            // ================================================================
+            // 3. 计算物理均方根声压能量 (RMS: Root Mean Square)
+            // ================================================================
+            //   RMS = sqrt( (sum(x[i]^2)) / N )
+            // RMS 代表交流声学信号的有效功率。相比简单取振幅绝对值最大值，RMS 对随机白噪声
+            // 更加平滑稳定，能准确反映真实人声声强。
             double sum_squares = 0.0;
             for (size_t i = 0; i < samples_read; i++) {
                 sum_squares += static_cast<double>(chunk_buf[i]) * static_cast<double>(chunk_buf[i]);
             }
             double rms = std::sqrt(sum_squares / static_cast<double>(samples_read));
+
+            // 归一化映射至 [0.0, 1.0]：
+            // 在去直流滤波与软拐点增益后，正常安静室内底噪 RMS 约为 100~200 (对应归一化 0.01~0.03)；
+            // 正常交谈音量 RMS 约为 400~1200 (对应归一化 0.07~0.20)；
+            // 故选取 6000 作为动态饱和上限 (约 75dB SPL 声压级)。
             float energy = std::clamp(static_cast<float>(rms / 6000.0), 0.0f, 1.0f);
             self->current_energy_ = energy;
 
-            // 写入环形缓冲区 (全时段滚动存储最近 2 秒音频)
+            // ================================================================
+            // 4. 写入 64KB PSRAM 全时态环形缓冲区 (滚动保存最近 2 秒音频)
+            // ================================================================
             if (self->ring_buffer_) {
+                // 进入多核自旋临界区 (Sub-microsecond 极低开销，多核 SMP 线程安全)
                 portENTER_CRITICAL(&self->ring_mux_);
                 for (size_t i = 0; i < samples_read; i++) {
+                    // 环形模运算回绕写入
                     self->ring_buffer_[(self->ring_write_count_ + i) % RING_BUF_SAMPLES] = chunk_buf[i];
                 }
                 self->ring_write_count_ += samples_read;
-                // 如果消费者落后超过整个缓冲区大小，强制推进读指针防止回绕
+
+                // 防溢出保护：若消费者消费过慢落后超过 2 秒整圈容量，强制推进一步以丢弃最老数据
                 if (self->is_streaming_.load()) {
                     if ((self->ring_write_count_ - self->ring_read_count_) > RING_BUF_SAMPLES) {
                         self->ring_read_count_ = self->ring_write_count_ - RING_BUF_SAMPLES;
@@ -151,6 +176,7 @@ void AudioService::audioTask(void *param) {
                 }
                 portEXIT_CRITICAL(&self->ring_mux_);
 
+                // 唤醒处于阻塞等待音频数据的消费任务 (如 ASR 推流线程)
                 if (self->is_streaming_.load() && self->stream_sem_) {
                     xSemaphoreGive(self->stream_sem_);
                 }
@@ -166,12 +192,15 @@ void AudioService::audioTask(void *param) {
 void AudioService::startAudioStream(size_t preroll_samples) {
     portENTER_CRITICAL(&ring_mux_);
     is_streaming_.store(true);
+    // 【首字保全核心逻辑】：
+    // 将读指针向前倒退 800ms (12800 采样点)，保全唤醒前主人说的话
     size_t safe_preroll = std::min(preroll_samples, RING_BUF_SAMPLES);
     safe_preroll = std::min(safe_preroll, ring_write_count_);
     ring_read_count_ = ring_write_count_ - safe_preroll;
     portEXIT_CRITICAL(&ring_mux_);
+
     if (stream_sem_) {
-        xSemaphoreTake(stream_sem_, 0); // 清空历史信号
+        xSemaphoreTake(stream_sem_, 0); // 清空历史积压的唤醒信号量
     }
     ESP_LOGI(TAG, "启动语音流消费，提取预缓冲采样点: %u (%.2f 秒)",
              (unsigned)safe_preroll, static_cast<float>(safe_preroll) / 16000.0f);
@@ -180,7 +209,7 @@ void AudioService::startAudioStream(size_t preroll_samples) {
 void AudioService::stopAudioStream() {
     is_streaming_.store(false);
     if (stream_sem_) {
-        xSemaphoreGive(stream_sem_);
+        xSemaphoreGive(stream_sem_); // 释放一次信号，唤醒可能正阻塞在 readAudioStream 的消费任务
     }
     ESP_LOGI(TAG, "停止语音流消费");
 }
@@ -193,6 +222,7 @@ esp_err_t AudioService::readAudioStream(int16_t *dest, size_t sample_count, size
     TickType_t start_tick = xTaskGetTickCount();
     TickType_t timeout_ticks = pdMS_TO_TICKS(timeout_ms);
 
+    // 循环消费直至装满 sample_count 或者超时退出
     while (total_copied < sample_count && is_streaming_.load()) {
         size_t available = 0;
         portENTER_CRITICAL(&ring_mux_);
@@ -211,7 +241,7 @@ esp_err_t AudioService::readAudioStream(int16_t *dest, size_t sample_count, size
             break;
         }
 
-        // 缓冲区暂时无足够数据，等待后台 audioTask 生产新数据
+        // 缓冲区暂时不足，计算剩余超时时间并挂起等待 audioTask 生产新数据
         TickType_t elapsed = xTaskGetTickCount() - start_tick;
         if (elapsed >= timeout_ticks) {
             break;
