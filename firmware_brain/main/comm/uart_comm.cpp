@@ -21,11 +21,17 @@ esp_err_t UartComm::init() {
 
     // 采用结构体零初始化，安全规避 -Wmissing-field-initializers 编译报错
     uart_config_t uart_config = {};
+    // static_cast类型转行，波特率
     uart_config.baud_rate = static_cast<int>(Config::ChassisCom::BAUD_RATE);
+    // 数据位
     uart_config.data_bits = UART_DATA_8_BITS;
+    // 校验位
     uart_config.parity = UART_PARITY_DISABLE;
+    // 停止位
     uart_config.stop_bits = UART_STOP_BITS_1;
+    // 流控
     uart_config.flow_ctrl = UART_HW_FLOWCTRL_DISABLE;
+    // 时钟源
     uart_config.source_clk = UART_SCLK_DEFAULT;
 
     // 1. 安装驱动并配置 RingBuffer
