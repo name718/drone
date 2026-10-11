@@ -36,3 +36,7 @@ EWARM/
 docs/计划/*.blend
 docs/计划/*.blend1
 docs/计划/*.blend2
+
+# Python venv
+.venv*/
+__pycache__/
