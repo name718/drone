@@ -123,6 +123,7 @@ struct AiCommand {
 //               收到后直接推入机载 I2S 硬件 DAC 驱动发声。
 struct TtsSessionContext {
     std::atomic<bool> is_connected{false};      // WebSocket TLS 握手连通
+    std::atomic<bool> is_started{false};        // 云端确认 task-started，已开启动态合成引擎
     std::atomic<bool> is_finished{false};       // 服务端播报结束通知 (task-finished)
     std::atomic<bool> has_error{false};          // 传输或模型生成异常 (task-failed)
     size_t total_bytes_received{0};             // 接收到的 PCM 音频总字节数
@@ -297,8 +298,22 @@ esp_err_t AiService::start() {
     return ESP_OK;
 }
 
+void AiService::abortTts() {
+    if (is_speaking_.load()) {
+        ESP_LOGI(TAG, "执行语音打断 (Barge-in)！截断当前 TTS 语音播音");
+        is_tts_abort_requested_.store(true);
+        AudioService::getInstance().stopPlayback();
+        is_speaking_.store(false);
+    }
+}
+
 void AiService::ask(const std::string &prompt) {
     if (prompt.empty() || !command_queue_) return;
+
+    // 语音打断：若正在播报上一轮回答，收到新提问立即截断
+    if (is_speaking_.load()) {
+        abortTts();
+    }
 
     auto *cmd = new AiCommand{AiCommandType::TEXT_PROMPT, prompt};
     if (xQueueSend(command_queue_, &cmd, 0) != pdTRUE) {
@@ -308,8 +323,13 @@ void AiService::ask(const std::string &prompt) {
 }
 
 void AiService::triggerVoiceListen() {
+    // 语音打断：正在朗读时收到唤醒，立即截断播音并转入倾听
+    if (is_speaking_.load()) {
+        abortTts();
+    }
+
     if (is_busy_.load() || !command_queue_) {
-        return; // 正在发声、思考或已在倾听中，不重复触发
+        return; // 正在思考或已在倾听中，不重复触发
     }
 
     auto *cmd = new AiCommand{AiCommandType::VOICE_LISTEN, ""};
@@ -1021,36 +1041,33 @@ std::string AiService::dispatchActions(const std::string &reply_raw) {
     if (text.find("[ACTION:CONFUSED]") != std::string::npos) {
         InteractionService::getInstance().triggerBehavior(RobotBehavior::CONFUSED);
     }
+    if (text.find("[ACTION:CURIOUS]") != std::string::npos) {
+        InteractionService::getInstance().triggerBehavior(RobotBehavior::CURIOUS);
+    }
+    if (text.find("[ACTION:SHY]") != std::string::npos) {
+        InteractionService::getInstance().triggerBehavior(RobotBehavior::SHY);
+    }
+    if (text.find("[ACTION:PATROL]") != std::string::npos) {
+        InteractionService::getInstance().triggerBehavior(RobotBehavior::PATROL);
+    }
+    if (text.find("[ACTION:EXCITED]") != std::string::npos) {
+        InteractionService::getInstance().triggerBehavior(RobotBehavior::EXCITED);
+    }
 
     // ------------------------------------------------------------------------
-    // 步骤 3：解析空间位移指令，启动瞬态异步任务执行定时安全自锁巡航
+    // 步骤 3：解析空间位移指令，调用底层硬件编码器闭环定距/定角走位
     // ------------------------------------------------------------------------
-    // 注意：嵌入式运动控制必须具备“看门狗式定时自锁制动”。
-    // 启动一个极轻量的 FreeRTOS 临时任务，在行进 1000~1200ms 后自动执行 sendVelocityCommand(0, 0)
-    // 减速刹车并销毁自身 (vTaskDelete(nullptr))，防止机器人失去控制撞击障碍物。
     if (text.find("[ACTION:FORWARD]") != std::string::npos) {
-        ChassisService::getInstance().sendVelocityCommand(60, 0);
-        xTaskCreate([](void *) {
-            vTaskDelay(pdMS_TO_TICKS(1000));
-            ChassisService::getInstance().sendVelocityCommand(0, 0); // 1秒后自动制动刹停
-            vTaskDelete(nullptr); // 任务生命周期结束，释放 TCB 与栈空间
-        }, "ChassisBriefMove", 2048, nullptr, 5, nullptr);
+        ESP_LOGI(TAG, "执行大模型具身指令 -> 闭环定距前进 150mm");
+        ChassisService::getInstance().sendStepMoveCommand(150, 0);
     }
     if (text.find("[ACTION:BACKWARD]") != std::string::npos) {
-        ChassisService::getInstance().sendVelocityCommand(-60, 0);
-        xTaskCreate([](void *) {
-            vTaskDelay(pdMS_TO_TICKS(1000));
-            ChassisService::getInstance().sendVelocityCommand(0, 0);
-            vTaskDelete(nullptr);
-        }, "ChassisBriefMove", 2048, nullptr, 5, nullptr);
+        ESP_LOGI(TAG, "执行大模型具身指令 -> 闭环定距后退 120mm");
+        ChassisService::getInstance().sendStepMoveCommand(-120, 0);
     }
     if (text.find("[ACTION:SPIN]") != std::string::npos) {
-        ChassisService::getInstance().sendVelocityCommand(0, 300);
-        xTaskCreate([](void *) {
-            vTaskDelay(pdMS_TO_TICKS(1200));
-            ChassisService::getInstance().sendVelocityCommand(0, 0);
-            vTaskDelete(nullptr);
-        }, "ChassisBriefMove", 2048, nullptr, 5, nullptr);
+        ESP_LOGI(TAG, "执行大模型具身指令 -> 闭环原地自转 360 度");
+        ChassisService::getInstance().sendStepMoveCommand(0, 3600);
     }
 
     // ------------------------------------------------------------------------
@@ -1117,7 +1134,10 @@ static void ttsWebsocketEventHandler(void *handler_args, esp_event_base_t base, 
                 // ------------------------------------------------------------
                 if (data->data_ptr && data->data_len > 0) {
                     std::string text_msg(data->data_ptr, data->data_len);
-                    if (text_msg.find("task-finished") != std::string::npos) {
+                    if (text_msg.find("task-started") != std::string::npos) {
+                        ESP_LOGI(TAG, "CosyVoice 任务已启动 (task-started)");
+                        ctx->is_started.store(true);
+                    } else if (text_msg.find("task-finished") != std::string::npos) {
                         ESP_LOGI(TAG, "CosyVoice 任务完成通知！共接收 %u 字节音频", (unsigned)ctx->total_bytes_received);
                         ctx->is_finished.store(true);
                     } else if (text_msg.find("task-failed") != std::string::npos) {
@@ -1146,9 +1166,19 @@ static void ttsWebsocketEventHandler(void *handler_args, esp_event_base_t base, 
 }
 
 void AiService::streamTts(const std::string &text_to_speak) {
-    if (text_to_speak.empty()) return;
+    // 清理首尾空白字符
+    std::string text_trimmed = text_to_speak;
+    while (!text_trimmed.empty() && (text_trimmed.front() == ' ' || text_trimmed.front() == '\t' || text_trimmed.front() == '\r' || text_trimmed.front() == '\n')) {
+        text_trimmed.erase(0, 1);
+    }
+    while (!text_trimmed.empty() && (text_trimmed.back() == ' ' || text_trimmed.back() == '\t' || text_trimmed.back() == '\r' || text_trimmed.back() == '\n')) {
+        text_trimmed.pop_back();
+    }
+    if (text_trimmed.empty()) return;
 
-    ESP_LOGI(TAG, "正在启动 CosyVoice 语音合成: \"%s\"", text_to_speak.c_str());
+    ESP_LOGI(TAG, "正在启动 CosyVoice 语音合成: \"%s\"", text_trimmed.c_str());
+    is_tts_abort_requested_.store(false);
+    is_speaking_.store(true);
 
     // ========================================================================
     // 【软件回声消除 (Software AEC) 状态锁定】
@@ -1210,6 +1240,7 @@ void AiService::streamTts(const std::string &text_to_speak) {
     //  - model: cosyvoice-v1 (百炼旗舰拟人化音色模型)
     //  - voice: longxiaochun (或配置中指定的专属拟人音色)
     //  - format: pcm, sample_rate: 16000 (与 MAX98357A I2S 硬件完全对齐)
+    //  - 规范要求：run-task 时 input 必须为空对象 {}
     char task_id[32];
     snprintf(task_id, sizeof(task_id), "task_%llu", static_cast<unsigned long long>(esp_timer_get_time()));
 
@@ -1234,8 +1265,7 @@ void AiService::streamTts(const std::string &text_to_speak) {
     cJSON_AddItemToObject(payload, "parameters", params);
 
     cJSON *input = cJSON_CreateObject();
-    cJSON_AddStringToObject(input, "text", text_to_speak.c_str());
-    cJSON_AddItemToObject(payload, "input", input);
+    cJSON_AddItemToObject(payload, "input", input); // run-task input 必须为空对象 {}
 
     cJSON_AddItemToObject(run_root, "payload", payload);
 
@@ -1247,8 +1277,47 @@ void AiService::streamTts(const std::string &text_to_speak) {
         cJSON_free(run_json);
     }
 
+    // 等待云端下发 task-started 确认事件
+    int wait_started_ms = 0;
+    while (!ctx.is_started.load() && !ctx.has_error.load() && wait_started_ms < 3000) {
+        vTaskDelay(pdMS_TO_TICKS(50));
+        wait_started_ms += 50;
+    }
+
+    if (!ctx.is_started.load()) {
+        ESP_LOGE(TAG, "等待 CosyVoice task-started 响应超时！");
+        esp_websocket_client_stop(ws_client);
+        esp_websocket_client_destroy(ws_client);
+        AudioService::getInstance().setPlaybackActive(false);
+        return;
+    }
+
     // ========================================================================
-    // 【阶段 3：发送 finish-task 指令告知服务端文本输入完毕】
+    // 【阶段 3：发送 continue-task 指令携带待合成的文本内容】
+    // ========================================================================
+    cJSON *cont_root = cJSON_CreateObject();
+    cJSON *c_header = cJSON_CreateObject();
+    cJSON_AddStringToObject(c_header, "action", "continue-task");
+    cJSON_AddStringToObject(c_header, "task_id", task_id);
+    cJSON_AddStringToObject(c_header, "streaming", "duplex");
+    cJSON_AddItemToObject(cont_root, "header", c_header);
+
+    cJSON *c_payload = cJSON_CreateObject();
+    cJSON *c_input = cJSON_CreateObject();
+    cJSON_AddStringToObject(c_input, "text", text_trimmed.c_str());
+    cJSON_AddItemToObject(c_payload, "input", c_input);
+    cJSON_AddItemToObject(cont_root, "payload", c_payload);
+
+    char *cont_json = cJSON_PrintUnformatted(cont_root);
+    cJSON_Delete(cont_root);
+
+    if (cont_json) {
+        esp_websocket_client_send_text(ws_client, cont_json, strlen(cont_json), portMAX_DELAY);
+        cJSON_free(cont_json);
+    }
+
+    // ========================================================================
+    // 【阶段 4：发送 finish-task 指令告知服务端文本输入完毕】
     // ========================================================================
     cJSON *finish_root = cJSON_CreateObject();
     cJSON *f_header = cJSON_CreateObject();
@@ -1271,23 +1340,29 @@ void AiService::streamTts(const std::string &text_to_speak) {
     }
 
     // ========================================================================
-    // 【阶段 4：边收边播并等待云端音频流完全下发与播放完成】
+    // 【阶段 5：边收边播并等待云端音频流完全下发与播放完成】
     // ========================================================================
     // 音频块在 ttsWebsocketEventHandler 中被实时推进 I2S 硬件，此处主线程等待任务结束
     int wait_play_ms = 0;
-    while (!ctx.is_finished.load() && wait_play_ms < 15000) {
+    while (!ctx.is_finished.load() && !is_tts_abort_requested_.load() && wait_play_ms < 15000) {
         vTaskDelay(pdMS_TO_TICKS(50));
         wait_play_ms += 50;
     }
 
+    if (is_tts_abort_requested_.load()) {
+        ESP_LOGI(TAG, "已确认语音打断 (Barge-in)，提前终止 TTS 音频流会话");
+    }
+
     // ========================================================================
-    // 【阶段 5：会话结束与硬件资源释放】
+    // 【阶段 6：会话结束与硬件资源释放】
     // ========================================================================
     esp_websocket_client_stop(ws_client);
     esp_websocket_client_destroy(ws_client);
 
     // 解除放音保护，进入 350ms 声学混响尾音消除倒计时
     AudioService::getInstance().setPlaybackActive(false);
+    is_speaking_.store(false);
+    is_tts_abort_requested_.store(false);
 
     ESP_LOGI(TAG, "CosyVoice 语音流会话结束，总接收 %u 字节 PCM", (unsigned)ctx.total_bytes_received);
 }

@@ -185,8 +185,9 @@ constexpr const char *SYSTEM_PROMPT =
     "[EMOTION:ANGRY](生气不满),[EMOTION:SLEEPY](困倦疲惫)。"
     "并根据语境主动搭配1个机器人动作标签："
     "[ACTION:NOD](点头赞同),[ACTION:SHAKE](摇头否定),[ACTION:HAPPY](开心微笑),"
-    "[ACTION:SURPRISED](吃惊瞪眼),[ACTION:CONFUSED](疑惑歪头),[ACTION:FORWARD](向前一小步),"
-    "[ACTION:BACKWARD](后退退让),[ACTION:SPIN](原地转圈跳舞)。";
+    "[ACTION:SURPRISED](吃惊瞪眼),[ACTION:CONFUSED](疑惑歪头),[ACTION:CURIOUS](好奇探脑),"
+    "[ACTION:SHY](害羞低头),[ACTION:PATROL](环顾巡视),[ACTION:EXCITED](兴奋雀跃),"
+    "[ACTION:FORWARD](向前一小步),[ACTION:BACKWARD](后退退让),[ACTION:SPIN](原地转圈跳舞)。";
 }  // namespace CloudAI
 
 }  // namespace Config

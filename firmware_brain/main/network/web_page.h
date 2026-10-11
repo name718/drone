@@ -669,6 +669,28 @@ static const char INDEX_HTML[] = R"rawliteral(
           <div class="mini-horizon-bar" id="miniHorizonBar"></div>
           <span style="position:absolute; right:6px; bottom:2px; font-size:9px; color:var(--text-dim); font-family:monospace;">PITCH HORIZON</span>
         </div>
+
+        <!-- 六轴 IMU 全身体感事件指示栏 -->
+        <div style="display:flex; justify-content:center; gap:6px; margin-top:8px; flex-wrap:wrap;">
+          <span class="status-capsule" id="hapticTapBadge" style="border-color:var(--yellow); color:var(--text-dim); font-size:10px;">敲击: 静止</span>
+          <span class="status-capsule" id="hapticPickupBadge" style="border-color:var(--purple); color:var(--text-dim); font-size:10px;">悬空: 接触</span>
+          <span class="status-capsule" id="hapticPushBadge" style="border-color:var(--cyan); color:var(--text-dim); font-size:10px;">推车: 无</span>
+          <span class="status-capsule" id="hapticFallBadge" style="border-color:var(--red); color:var(--text-dim); font-size:10px;">机身: 平稳</span>
+        </div>
+
+        <!-- 手机体感重力感应驾驶开关 & 精准闭环走位 -->
+        <div style="display:flex; gap:6px; margin-top:8px;">
+          <button class="dpad-btn" id="btnGyroDrive" onclick="toggleGyroDrive()" style="flex:1; background:rgba(0,240,255,0.08); border-color:var(--cyan);">
+            <span>手机重力感应驾驶: 关</span>
+          </button>
+        </div>
+        <div style="display:flex; gap:4px; margin-top:6px; flex-wrap:wrap;">
+          <button class="dpad-btn" onclick="sendStepMove(150, 0)" style="flex:1; min-width:60px; padding:6px 2px;"><span>前进15cm</span></button>
+          <button class="dpad-btn" onclick="sendStepMove(-120, 0)" style="flex:1; min-width:60px; padding:6px 2px;"><span>后退12cm</span></button>
+          <button class="dpad-btn" onclick="sendStepMove(0, 900)" style="flex:1; min-width:60px; padding:6px 2px;"><span>左旋90°</span></button>
+          <button class="dpad-btn" onclick="sendStepMove(0, -900)" style="flex:1; min-width:60px; padding:6px 2px;"><span>右旋90°</span></button>
+          <button class="dpad-btn" onclick="sendStepMove(0, 3600)" style="flex:1; min-width:60px; padding:6px 2px; border-color:var(--purple); color:var(--purple);"><span>打转360°</span></button>
+        </div>
       </div>
 
       <!-- 双区触控操控台 (左手摇杆 + 右手云台与急停) -->
@@ -1138,13 +1160,44 @@ static const char INDEX_HTML[] = R"rawliteral(
         document.getElementById('valBattery').innerText = `${v} V (${batPct}%)`;
       }
 
-      // 跌倒告警与安全标志
+      // 跌倒告警与体感安全标志
       if (msg.status_flags !== undefined) {
-        const fall = (msg.status_flags & 0x02) !== 0;
-        const calib = (msg.status_flags & 0x04) !== 0;
-        const run = (msg.status_flags & 0x08) !== 0;
+        const flags = msg.status_flags;
+        const fall = (flags & 0x02) !== 0;
+        const calib = (flags & 0x04) !== 0;
+        const run = (flags & 0x08) !== 0;
+        const tap = (flags & 0x10) !== 0;
+        const pickup = (flags & 0x20) !== 0;
+        const push = (flags & 0x40) !== 0;
+        const reached = (flags & 0x80) !== 0;
+
         document.getElementById('capAlarm').style.display = fall ? 'inline-flex' : 'none';
         document.getElementById('valChassisStatus').innerText = (calib ? 'IMU就绪' : '校准中') + ' | ' + (run ? '输出中' : '待机');
+
+        const elTap = document.getElementById('hapticTapBadge');
+        if (elTap) {
+          elTap.innerText = tap ? '敲击: 触发!' : '敲击: 静止';
+          elTap.style.color = tap ? 'var(--yellow)' : 'var(--text-dim)';
+          elTap.style.borderColor = tap ? 'var(--yellow)' : 'rgba(255,255,255,0.1)';
+        }
+        const elPickup = document.getElementById('hapticPickupBadge');
+        if (elPickup) {
+          elPickup.innerText = pickup ? '悬空: 离地!' : '悬空: 接触';
+          elPickup.style.color = pickup ? 'var(--purple)' : 'var(--text-dim)';
+          elPickup.style.borderColor = pickup ? 'var(--purple)' : 'rgba(255,255,255,0.1)';
+        }
+        const elPush = document.getElementById('hapticPushBadge');
+        if (elPush) {
+          elPush.innerText = push ? '推车: 滑行!' : '推车: 无';
+          elPush.style.color = push ? 'var(--cyan)' : 'var(--text-dim)';
+          elPush.style.borderColor = push ? 'var(--cyan)' : 'rgba(255,255,255,0.1)';
+        }
+        const elFall = document.getElementById('hapticFallBadge');
+        if (elFall) {
+          elFall.innerText = fall ? '机身: 倾覆报警!' : (reached ? '走位: 已到达' : '机身: 平稳');
+          elFall.style.color = fall ? 'var(--red)' : (reached ? 'var(--green)' : 'var(--text-dim)');
+          elFall.style.borderColor = fall ? 'var(--red)' : (reached ? 'var(--green)' : 'rgba(255,255,255,0.1)');
+        }
       }
 
       // STM32 芯片级存储与 UID
@@ -1310,6 +1363,88 @@ static const char INDEX_HTML[] = R"rawliteral(
     function sendCmd(action) {
       if (!ws || ws.readyState !== WebSocket.OPEN) return;
       ws.send(JSON.stringify({ type: 'cmd', action: action }));
+    }
+
+    // ----------------------------------------------------
+    // 4.1 手机重力感应驾驶 (Gyroscope Tilt Driving) & 定距走位
+    // ----------------------------------------------------
+    let isGyroDriving = false;
+    let gyroTimer = null;
+    let gyroSpeed = 0, gyroYaw = 0;
+
+    function toggleGyroDrive() {
+      const btn = document.getElementById('btnGyroDrive');
+      if (!isGyroDriving) {
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+          DeviceOrientationEvent.requestPermission().then(state => {
+            if (state === 'granted') {
+              startGyroDrive();
+            } else {
+              alert('未授予手机陀螺仪权限');
+            }
+          }).catch(console.error);
+        } else {
+          startGyroDrive();
+        }
+      } else {
+        stopGyroDrive();
+      }
+    }
+
+    function startGyroDrive() {
+      isGyroDriving = true;
+      const btn = document.getElementById('btnGyroDrive');
+      btn.innerHTML = '<span>手机重力感应驾驶: 开 (倾斜遥控中)</span>';
+      btn.style.background = 'rgba(0, 240, 255, 0.25)';
+      btn.style.boxShadow = '0 0 12px var(--cyan)';
+      window.addEventListener('deviceorientation', handleOrientation);
+      if (gyroTimer) clearInterval(gyroTimer);
+      gyroTimer = setInterval(() => {
+        if (isGyroDriving) sendCmdVel(gyroSpeed, gyroYaw);
+      }, 50);
+    }
+
+    function stopGyroDrive() {
+      isGyroDriving = false;
+      const btn = document.getElementById('btnGyroDrive');
+      btn.innerHTML = '<span>手机重力感应驾驶: 关</span>';
+      btn.style.background = 'rgba(0, 240, 255, 0.08)';
+      btn.style.boxShadow = 'none';
+      window.removeEventListener('deviceorientation', handleOrientation);
+      if (gyroTimer) { clearInterval(gyroTimer); gyroTimer = null; }
+      gyroSpeed = 0; gyroYaw = 0;
+      sendCmdVel(0, 0);
+    }
+
+    function handleOrientation(e) {
+      if (!isGyroDriving) return;
+      const pitch = e.beta || 0;
+      const roll = e.gamma || 0;
+
+      // 前后倾斜映射速度: 死区 ±6°，有效范围 6°~35°
+      if (pitch > 6) {
+        gyroSpeed = Math.min(250, Math.round((pitch - 6) * 8.5));
+      } else if (pitch < -6) {
+        gyroSpeed = Math.max(-250, Math.round((pitch + 6) * 8.5));
+      } else {
+        gyroSpeed = 0;
+      }
+
+      // 左右倾斜映射角速度: 死区 ±6°，有效范围 6°~40°
+      if (roll > 6) {
+        gyroYaw = Math.max(-600, Math.round(-(roll - 6) * 16));
+      } else if (roll < -6) {
+        gyroYaw = Math.min(600, Math.round(-(roll + 6) * 16));
+      } else {
+        gyroYaw = 0;
+      }
+
+      document.getElementById('joyMetrics').innerText = `[体感] ${gyroSpeed} mm/s | ${gyroYaw} mrad/s`;
+    }
+
+    function sendStepMove(dist, angle) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      ws.send(JSON.stringify({ type: 'step_move', dist: dist, angle: angle }));
     }
 
     // ----------------------------------------------------

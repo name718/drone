@@ -89,6 +89,13 @@ public:
     }
 
     /**
+     * @brief 强制中止当前音频播放并解除回声抑制状态 (用于语音打断)
+     */
+    void stopPlayback() {
+        speaker_.setPlaybackActive(false);
+    }
+
+    /**
      * @brief 设置实时环境音量能量分贝
      */
     void setCurrentEnergy(float energy) {

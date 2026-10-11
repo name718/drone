@@ -16,6 +16,7 @@
 
 #include "esp_log.h"
 #include "esp_timer.h"
+#include "core/interaction_service.hpp"
 extern "C" {
 #include "robot_protocol.h"
 }
@@ -169,9 +170,43 @@ void ChassisService::runTask() {
                             latest_left_pwm_.store(pkt.left_pwm);
                             latest_right_pwm_.store(pkt.right_pwm);
                             latest_battery_mv_.store(pkt.battery_mv);
-                            latest_status_flags_.store(pkt.status_flags);
+
+                            uint8_t old_flags = latest_status_flags_.load();
+                            uint8_t new_flags = pkt.status_flags;
+                            latest_status_flags_.store(new_flags);
+
                             last_state_packet_ms_.store(esp_timer_get_time() / 1000ULL);
                             total_rx_packets_++;
+
+                            // --------------------------------------------------------
+                            // 物理体感交互事件派发 (上升沿/边沿触发)
+                            // --------------------------------------------------------
+                            // 1. 敲击桌面/拍头事件 (上升沿)
+                            if ((new_flags & STATUS_FLAG_TAP) && !(old_flags & STATUS_FLAG_TAP)) {
+                                ESP_LOGI(TAG, "底盘检测到【敲击桌面/拍头】冲击！通知交互中枢");
+                                InteractionService::getInstance().handleHapticTap();
+                            }
+
+                            // 2. 悬空离地/抱起事件 (上升沿与下降沿)
+                            if ((new_flags & STATUS_FLAG_PICKUP) && !(old_flags & STATUS_FLAG_PICKUP)) {
+                                ESP_LOGI(TAG, "底盘检测到【被抱起/悬空离地】！触发挣扎呼救");
+                                InteractionService::getInstance().handleHapticPickup(true);
+                            } else if (!(new_flags & STATUS_FLAG_PICKUP) && (old_flags & STATUS_FLAG_PICKUP)) {
+                                ESP_LOGI(TAG, "底盘检测到【平稳放回桌面】！恢复正常并舒畅呼吸");
+                                InteractionService::getInstance().handleHapticPickup(false);
+                            }
+
+                            // 3. 被动推车事件 (上升沿)
+                            if ((new_flags & STATUS_FLAG_PUSH) && !(old_flags & STATUS_FLAG_PUSH)) {
+                                ESP_LOGI(TAG, "底盘检测到【被外力推车滑行】！");
+                                InteractionService::getInstance().handleHapticPush();
+                            }
+
+                            // 4. 跌倒倾覆事件 (上升沿)
+                            if ((new_flags & STATUS_FLAG_FALL) && !(old_flags & STATUS_FLAG_FALL)) {
+                                ESP_LOGW(TAG, "底盘检测到【跌倒倾覆】！触发自保报警");
+                                InteractionService::getInstance().handleHapticFall();
+                            }
 
                             frame_buf.clear();
                         } else {
@@ -200,10 +235,9 @@ esp_err_t ChassisService::sendVelocityCommand(int16_t speed_mms, int16_t yaw_mra
     packet.cmd_id = cmd_seq_++;                 // 帧流水号自增
     packet.target_speed = speed_mms;            // 目标线速度
     packet.target_yaw = yaw_mrads;              // 目标角速度
-    packet.motion_mode = 1;                     // 运动模式: 1=自平衡使能运行
+    packet.motion_mode = MOTION_MODE_VELOCITY;  // 运动模式: 1=连续速度闭环
 
     // 2. 计算 16 位累加和校验码 (Checksum)
-    // 校验范围从 header 开始，到 checksum 字段之前的所有字节
     uint16_t sum = 0;
     const auto *ptr = reinterpret_cast<const uint8_t *>(&packet);
     size_t payload_len = sizeof(RobotCmdPacket_t) - sizeof(packet.checksum);
@@ -222,5 +256,34 @@ esp_err_t ChassisService::sendVelocityCommand(int16_t speed_mms, int16_t yaw_mra
 
     ESP_LOGI(TAG, "下发底盘指令 -> 速度: %d mm/s | 转向: %d mrad/s (流水号: %u)", speed_mms,
              yaw_mrads, packet.cmd_id);
+    return ESP_OK;
+}
+
+esp_err_t ChassisService::sendStepMoveCommand(int16_t dist_mm, int16_t angle_deci_deg) {
+    // 实例化精准定距/定角闭环控制帧
+    RobotCmdPacket_t packet = {};
+    packet.header = PROTOCOL_FRAME_HEADER_CMD;  // 固定帧头: 0xAA
+    packet.cmd_id = cmd_seq_++;                 // 帧流水号自增
+    packet.target_speed = dist_mm;              // 目标位移距离 (mm)
+    packet.target_yaw = angle_deci_deg;         // 目标自转角度 (0.1度)
+    packet.motion_mode = MOTION_MODE_STEP_MOVE; // 运动模式: 3=精准闭环走位
+
+    uint16_t sum = 0;
+    const auto *ptr = reinterpret_cast<const uint8_t *>(&packet);
+    size_t payload_len = sizeof(RobotCmdPacket_t) - sizeof(packet.checksum);
+
+    for (size_t i = 0; i < payload_len; i++) {
+        sum += ptr[i];
+    }
+    packet.checksum = sum;
+
+    int written = uart_.write(reinterpret_cast<const uint8_t *>(&packet), sizeof(packet));
+    if (written != sizeof(packet)) {
+        ESP_LOGE(TAG, "底盘定距走位指令发送失败 (期望 %u, 实际 %d)", sizeof(packet), written);
+        return ESP_FAIL;
+    }
+
+    ESP_LOGI(TAG, "下发闭环走位指令 -> 位移: %d mm | 自转: %.1f 度 (流水号: %u)",
+             dist_mm, (float)angle_deci_deg * 0.1f, packet.cmd_id);
     return ESP_OK;
 }

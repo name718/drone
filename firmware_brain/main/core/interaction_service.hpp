@@ -40,7 +40,11 @@ enum class RobotBehavior {
     ANGRY,     // 生气戒备连招 (红光怒火眼 + 警惕摆头 + 快速警示音)
     CONFUSED,  // 疑惑好奇连招 (不对称挑眉 + 歪头探脑 + 问号音)
     DIZZY,     // 眩晕打转连招 (动态旋转蚊香圈 + 晃晃悠悠 + 摇晃音)
-    DANCE      // 赛博特技跳舞秀 (电子节拍 + 连环变脸 + 节拍卡点律动)
+    DANCE,     // 赛博特技跳舞秀 (电子节拍 + 连环变脸 + 节拍卡点律动)
+    CURIOUS,   // 好奇探头连招 (不对称歪头 + 微微环视 + 灵动挑眉音)
+    SHY,       // 害羞娇憨连招 (娇羞低头侧偏 + 眨眼粉红 + 柔和双音)
+    PATROL,    // 警惕巡视连招 (左右缓缓环视扫描 + 居中回正)
+    EXCITED    // 兴奋雀跃连招 (连续欢快点头 + 欢快多音大调音阶)
 };
 
 class InteractionService {
@@ -87,6 +91,14 @@ public:
      * @brief 启动一套完整的赛博跳舞特技表演秀
      */
     void triggerDance();
+
+    /**
+     * @brief 底盘 6 轴 IMU 与编码器物理体感感知接口
+     */
+    void handleHapticTap();
+    void handleHapticPickup(bool is_picked_up);
+    void handleHapticPush();
+    void handleHapticFall();
 
 private:
     InteractionService();

@@ -181,6 +181,53 @@ void InteractionService::triggerBehavior(RobotBehavior behavior) {
         case RobotBehavior::DANCE:
             triggerDance();
             break;
+
+        case RobotBehavior::CURIOUS:
+            ESP_LOGI(TAG, "触发【好奇探头】联动！(不对称歪头 + 微微环视 + 灵动挑眉音)");
+            display.setEmotion(EmotionState::CONFUSED);
+            gimbal.lookAt(Config::Gimbal::DEFAULT_PAN_ANGLE + 14.0f, 15.0f);
+            audio.playTone(659.25f, 60);
+            vTaskDelay(pdMS_TO_TICKS(70));
+            audio.playTone(880.00f, 90);
+            break;
+
+        case RobotBehavior::SHY:
+            ESP_LOGI(TAG, "触发【害羞娇憨】联动！(低头侧偏 + 爱心眼神 + 柔和双音)");
+            display.setEmotion(EmotionState::LOVE);
+            gimbal.lookAt(Config::Gimbal::DEFAULT_PAN_ANGLE - 10.0f, -4.0f);
+            audio.playTone(523.25f, 70);
+            vTaskDelay(pdMS_TO_TICKS(80));
+            audio.playTone(659.25f, 100);
+            break;
+
+        case RobotBehavior::PATROL:
+            ESP_LOGI(TAG, "触发【警惕巡视】联动！(左右缓缓环视扫描)");
+            xTaskCreatePinnedToCore(
+                [](void *) {
+                    auto &gimbal = GimbalService::getInstance();
+                    auto &display = DisplayService::getInstance();
+                    display.setEmotion(EmotionState::NORMAL);
+                    gimbal.lookAt(Config::Gimbal::DEFAULT_PAN_ANGLE - 22.0f, 5.0f);
+                    vTaskDelay(pdMS_TO_TICKS(400));
+                    gimbal.lookAt(Config::Gimbal::DEFAULT_PAN_ANGLE + 22.0f, 5.0f);
+                    vTaskDelay(pdMS_TO_TICKS(400));
+                    gimbal.reset();
+                    vTaskDelete(nullptr);
+                }, "PatrolTask", 2048, nullptr, 3, nullptr, 0);
+            break;
+
+        case RobotBehavior::EXCITED:
+            ESP_LOGI(TAG, "触发【兴奋雀跃】联动！(快速欢快点头 + 大调音阶)");
+            display.setEmotion(EmotionState::HAPPY);
+            gimbal.nod();
+            audio.playTone(523.25f, 60);   // C5
+            vTaskDelay(pdMS_TO_TICKS(65));
+            audio.playTone(659.25f, 60);   // E5
+            vTaskDelay(pdMS_TO_TICKS(65));
+            audio.playTone(783.99f, 60);   // G5
+            vTaskDelay(pdMS_TO_TICKS(65));
+            audio.playTone(1046.50f, 120); // C6
+            break;
     }
 }
 
@@ -242,13 +289,86 @@ void InteractionService::triggerDance() {
     );
 }
 
+void InteractionService::handleHapticTap() {
+    ESP_LOGI(TAG, "处理体感【敲击桌面/拍头】事件！");
+    notifyUserActivity();
+
+    auto &display = DisplayService::getInstance();
+    auto &gimbal = GimbalService::getInstance();
+    auto &audio = AudioService::getInstance();
+
+    if (is_sleeping_) {
+        // 从熟睡中被敲醒：震惊睁眼 + 抬头看天
+        is_sleeping_ = false;
+        triggerBehavior(RobotBehavior::WAKE_UP);
+    } else {
+        // 常态下被敲击：惊吓/好奇挑眉 + 向上微微仰望 + 灵动双音
+        display.setEmotion(EmotionState::SURPRISED);
+        gimbal.lookAt(Config::Gimbal::DEFAULT_PAN_ANGLE, 12.0f);
+        audio.playTone(880.00f, 60);
+        vTaskDelay(pdMS_TO_TICKS(70));
+        audio.playTone(1174.66f, 100);
+    }
+}
+
+void InteractionService::handleHapticPickup(bool is_picked_up) {
+    auto &display = DisplayService::getInstance();
+    auto &gimbal = GimbalService::getInstance();
+    auto &audio = AudioService::getInstance();
+
+    notifyUserActivity();
+
+    if (is_picked_up) {
+        ESP_LOGI(TAG, "处理体感【悬空抱起/失重】事件 -> 触发悬空挣扎与求救");
+        is_sleeping_ = false;
+        display.setEmotion(EmotionState::DIZZY);
+        // 低头俯瞰地面，四顾慌张
+        gimbal.lookAt(Config::Gimbal::DEFAULT_PAN_ANGLE, -12.0f);
+        audio.playTone(493.88f, 70);
+        vTaskDelay(pdMS_TO_TICKS(80));
+        audio.playTone(369.99f, 100);
+    } else {
+        ESP_LOGI(TAG, "处理体感【平稳放回桌面】事件 -> 舒缓获救与开心常态");
+        triggerBehavior(RobotBehavior::HAPPY);
+        audio.playTone(523.25f, 70);
+        vTaskDelay(pdMS_TO_TICKS(80));
+        audio.playTone(659.25f, 110);
+    }
+}
+
+void InteractionService::handleHapticPush() {
+    ESP_LOGI(TAG, "处理体感【被动推车滑行】事件！");
+    notifyUserActivity();
+
+    auto &display = DisplayService::getInstance();
+    auto &audio = AudioService::getInstance();
+
+    display.setEmotion(EmotionState::HAPPY);
+    audio.playTone(783.99f, 60);
+}
+
+void InteractionService::handleHapticFall() {
+    ESP_LOGW(TAG, "处理体感【摔倒倾覆】事件 -> 触发呼救警报");
+    auto &display = DisplayService::getInstance();
+    auto &audio = AudioService::getInstance();
+
+    display.setEmotion(EmotionState::DIZZY);
+    audio.playTone(329.63f, 120);
+    vTaskDelay(pdMS_TO_TICKS(130));
+    audio.playTone(261.63f, 160);
+}
+
 void InteractionService::interactionTask(void *param) {
     auto *self = static_cast<InteractionService *>(param);
     ESP_LOGI(TAG, "拟人交互后台行为决策任务已在 Core 0 启动 (10Hz)");
 
-    constexpr float SOUND_WAKEUP_THRESHOLD = 0.065f; // 声音唤醒阈值 (100% 连续采样下，正常说话音量约 0.07~0.15)
+    constexpr float SOUND_WAKEUP_THRESHOLD = 0.065f; // 声音唤醒阈值
     constexpr uint64_t SOUND_COOLDOWN_MS = 1500;     // 唤醒保护冷却 (1.5 秒)
-    constexpr uint64_t SLEEP_TIMEOUT_MS = 30000;     // 30 秒无操作进入打盹休眠
+
+    // 桌宠自主生命周期阶段定义
+    constexpr uint64_t PET_BORED_MS   = 30000;       // 30 秒无操作: 进入无聊探望阶段
+    constexpr uint64_t PET_DROWSY_MS  = 90000;       // 90 秒无操作: 进入困倦打瞌睡阶段
+    constexpr uint64_t PET_SLEEP_MS   = 180000;      // 180 秒无操作: 进入深睡打鼾休眠
 
     while (self->is_running_) {
         uint64_t now = esp_timer_get_time() / 1000ULL;  // 当前系统开机毫秒数
@@ -289,27 +409,51 @@ void InteractionService::interactionTask(void *param) {
                 }
             }
 
-            // 3. 空闲挂机与困倦打盹状态机
+            // 3. 桌宠四阶段生命周期状态机 (探索 -> 无聊巡视 -> 困倦点头 -> 熟睡打鼾)
             if (!self->is_in_sound_reaction_) {
                 uint64_t idle_time = now - self->last_activity_time_ms_;
 
-                // 超过 30 秒无人理会，进入打盹
-                if (idle_time > SLEEP_TIMEOUT_MS && !self->is_sleeping_) {
-                    self->is_sleeping_ = true;
-                    self->triggerBehavior(RobotBehavior::SLEEP);
-                }
+                if (idle_time >= PET_SLEEP_MS) {
+                    // 【阶段 4: 深睡打鼾休眠】
+                    if (!self->is_sleeping_) {
+                        self->is_sleeping_ = true;
+                        self->triggerBehavior(RobotBehavior::SLEEP);
+                    }
+                } else if (idle_time >= PET_DROWSY_MS) {
+                    // 【阶段 3: 困倦打瞌睡】半闭大眼 + 垂头轻微打盹
+                    if (!self->is_sleeping_ && now >= self->next_micro_action_ms_) {
+                        DisplayService::getInstance().setEmotion(EmotionState::SLEEPY);
+                        GimbalService::getInstance().lookAt(Config::Gimbal::DEFAULT_PAN_ANGLE, -4.0f);
+                        self->next_micro_action_ms_ = now + 12000ULL + (esp_random() % 6000);
+                    }
+                } else if (idle_time >= PET_BORED_MS) {
+                    // 【阶段 2: 无聊巡视】左右缓缓四顾
+                    if (now >= self->next_micro_action_ms_) {
+                        self->triggerBehavior(RobotBehavior::PATROL);
+                        self->next_micro_action_ms_ = now + 15000ULL + (esp_random() % 8000);
+                    }
+                } else {
+                    // 【阶段 1: 活跃探索】每隔 7~12 秒做自发生命微动作
+                    if (now >= self->next_micro_action_ms_) {
+                        uint32_t act_type = esp_random() % 10;
+                        if (act_type < 6) {
+                            // 随机微调水平角度 (-6° ~ +6°) 与俯仰角度 (0° ~ 8°)
+                            int pan_offset = static_cast<int>(esp_random() % 13) - 6;
+                            float micro_pan = Config::Gimbal::DEFAULT_PAN_ANGLE + static_cast<float>(pan_offset);
+                            float micro_tilt = static_cast<float>(esp_random() % 9);
+                            GimbalService::getInstance().lookAt(micro_pan, micro_tilt);
+                        } else if (act_type < 8) {
+                            // 好奇微探头
+                            GimbalService::getInstance().lookAt(Config::Gimbal::DEFAULT_PAN_ANGLE + 10.0f, 10.0f);
+                            DisplayService::getInstance().setEmotion(EmotionState::CONFUSED);
+                        } else {
+                            // 柔和回正与大眼常态
+                            GimbalService::getInstance().reset();
+                            DisplayService::getInstance().setEmotion(EmotionState::NORMAL);
+                        }
 
-                // 未睡着时，每隔 8~14 秒做一次拟人自发生命微动作 (微微探望左右)
-                if (!self->is_sleeping_ && idle_time > 8000 && now >= self->next_micro_action_ms_) {
-                    // 随机微调水平角度 (-6° ~ +6°) 与俯仰角度 (0° ~ 8°)
-                    int pan_offset = static_cast<int>(esp_random() % 13) - 6;
-                    float micro_pan = Config::Gimbal::DEFAULT_PAN_ANGLE + static_cast<float>(pan_offset);
-                    float micro_tilt = static_cast<float>(esp_random() % 9);
-
-                    GimbalService::getInstance().lookAt(micro_pan, micro_tilt);
-
-                    // 安排下一次微动作时间 (8 ~ 14 秒后)
-                    self->next_micro_action_ms_ = now + 8000ULL + (esp_random() % 6000);
+                        self->next_micro_action_ms_ = now + 7000ULL + (esp_random() % 5000);
+                    }
                 }
             }
         }

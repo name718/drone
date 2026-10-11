@@ -57,6 +57,16 @@ public:
      */
     bool isBusy() const { return is_busy_.load(); }
 
+    /**
+     * @brief 语音打断 (Barge-in): 强制终止当前正在进行的 TTS 语音播报
+     */
+    void abortTts();
+
+    /**
+     * @brief 查询当前是否正在语音播报朗读中
+     */
+    bool isSpeaking() const { return is_speaking_.load(); }
+
 private:
     AiService();
     ~AiService();
@@ -100,6 +110,8 @@ private:
 
     int64_t last_interaction_time_ms_{0};  // 上次有效交互时间戳 (用于多轮免唤醒会话管理)
     std::atomic<bool> is_busy_{false};
+    std::atomic<bool> is_speaking_{false};
+    std::atomic<bool> is_tts_abort_requested_{false};
     QueueHandle_t command_queue_{nullptr};
     TaskHandle_t task_handle_{nullptr};
 };

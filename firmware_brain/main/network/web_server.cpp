@@ -106,6 +106,17 @@ esp_err_t WebServer::wsHandler(httpd_req_t *req) {
             if (p_yaw) yaw = std::atoi(p_yaw + 6);
 
             chassis.sendVelocityCommand(static_cast<int16_t>(speed), static_cast<int16_t>(yaw));
+        } else if (payload.find("\"step_move\"") != std::string::npos) {
+            // 手机端闭环定距走位: {"type":"step_move","dist":150,"angle":0}
+            int dist = 0;
+            int angle = 0;
+            const char *p_dist = std::strstr(buf, "\"dist\":");
+            const char *p_angle = std::strstr(buf, "\"angle\":");
+            if (p_dist) dist = std::atoi(p_dist + 7);
+            if (p_angle) angle = std::atoi(p_angle + 8);
+            chassis.sendStepMoveCommand(static_cast<int16_t>(dist), static_cast<int16_t>(angle));
+        } else if (payload.find("\"abort_tts\"") != std::string::npos) {
+            AiService::getInstance().abortTts();
         } else if (payload.find("\"emotion\"") != std::string::npos || payload.find("\"EMOTION\"") != std::string::npos) {
             // 表情与拟人行为联动通道
             auto &interact = InteractionService::getInstance();

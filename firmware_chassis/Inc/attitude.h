@@ -18,13 +18,18 @@ extern "C" {
  * @brief 姿态解算核心数据结构体
  */
 typedef struct {
-    float pitch;         // 核心俯仰角 (单位: 度 deg，小车直立为 0，前倾为正，后仰为负)
-    float pitch_rate;    // 俯仰角速度 (单位: deg/s，扣除零漂后的纯净角速度)
+    float pitch;         // 核心俯仰角 (单位: 度 deg，小车水平为 0)
+    float pitch_rate;    // 俯仰角速度 (单位: deg/s，扣除零偏)
     float roll;          // 横滚角 (单位: deg)
-    float acc_pitch;     // 加速度计纯静态角度 (供对比观测滤波效果)
+    float acc_pitch;     // 加速度计纯静态角度
+    float acc_mag;       // 三轴加速度矢量模长 (单位: g, 静止时约为 1.0g)
+    float yaw;           // 航向角积分 (单位: 度 deg, 扣除 Z 轴零偏连续积分)
     float gyro_bias_x;   // X 轴陀螺仪静态零偏
     float gyro_bias_y;   // Y 轴陀螺仪静态零偏
+    float gyro_bias_z;   // Z 轴陀螺仪静态零偏
     bool is_calibrated;  // 零偏校准是否完成
+    bool is_tapped;      // 敲击/拍打桌面突发事件 (保持 150ms 脉冲)
+    bool is_picked_up;   // 被抱起/离地悬空状态
 } Attitude_t;
 
 /**

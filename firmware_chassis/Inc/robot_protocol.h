@@ -16,14 +16,34 @@ extern "C" {
 #define PROTOCOL_FRAME_HEADER_STATE 0x55  // 底盘发往大脑
 
 /**
+ * @brief 控制模式 motion_mode 定义
+ */
+#define MOTION_MODE_BRAKE       0  // 0: 待机/刹车制动
+#define MOTION_MODE_VELOCITY    1  // 1: 连续差速速度闭环模式 (target_speed: mm/s, target_yaw: mrad/s)
+#define MOTION_MODE_EMERGENCY   2  // 2: 紧急停机/断电
+#define MOTION_MODE_STEP_MOVE   3  // 3: 精准闭环定距/定角走位 (target_speed: 距离 mm, target_yaw: 角度 0.1 deg)
+
+/**
+ * @brief 状态标志位 status_flags 定义 (位掩码)
+ */
+#define STATUS_FLAG_ONLINE      (1 << 0)  // bit0 (0x01): 正常在线
+#define STATUS_FLAG_FALL        (1 << 1)  // bit1 (0x02): 跌倒/倾覆报警 (倾角 > 35度)
+#define STATUS_FLAG_CALIBRATED  (1 << 2)  // bit2 (0x04): IMU零偏校准就绪
+#define STATUS_FLAG_MOTOR_RUN   (1 << 3)  // bit3 (0x08): 电机当前运转中
+#define STATUS_FLAG_TAP         (1 << 4)  // bit4 (0x10): 敲击桌面/拍头事件 (高频冲击触发)
+#define STATUS_FLAG_PICKUP      (1 << 5)  // bit5 (0x20): 悬空离地/抱起事件 (失重与异常倾覆)
+#define STATUS_FLAG_PUSH        (1 << 6)  // bit6 (0x40): 外力推车/被动滑行事件 (电机静止但轮速突增)
+#define STATUS_FLAG_POS_REACHED (1 << 7)  // bit7 (0x80): 闭环定距/定角走位已到达目标
+
+/**
  * @brief 大脑 -> 底盘 控制指令帧 (Control Command, 8字节)
  */
 typedef struct {
     uint8_t header;        // 0xAA 固定帧头
     uint8_t cmd_id;        // 指令流水号/计数器 (0~255)
-    int16_t target_speed;  // 目标线速度 (mm/s, 前正后负)
-    int16_t target_yaw;    // 目标角速度 (mrad/s, 左正右负)
-    uint8_t motion_mode;   // 0:待机/刹车, 1:使能运行, 2:紧急停机
+    int16_t target_speed;  // 目标线速度 (mm/s, 前正后负) 或 定距走位毫米数 (mm)
+    int16_t target_yaw;    // 目标角速度 (mrad/s, 左正右负) 或 目标旋转角度 (0.1度)
+    uint8_t motion_mode;   // MOTION_MODE_xxx
     uint16_t checksum;     // 累加和校验 (从 header 到 checksum 前所有字节之和)
 } RobotCmdPacket_t;
 
@@ -35,7 +55,7 @@ typedef struct {
  *  1. STM32 芯片级档案：96-bit 硬件 UID、Flash 存储容量及固件占用、SRAM 内存容量及可用堆空间；
  *  2. 六轴姿态动力学全量物理量 (Pitch, Roll, Rate, Acc)；
  *  3. 双轮差速正交编码器测速与电机实际 PWM 输出；
- *  4. 动力电池电压及系统运行安全健康位。
+ *  4. 动力电池电压及系统运行安全健康位与体感触发标志。
  */
 typedef struct {
     uint8_t header;          // 0x55 固定帧头
@@ -64,7 +84,7 @@ typedef struct {
 
     // --- 动力电源与机体健康 ---
     uint16_t battery_mv;     // 动力电池实时电压 (单位: mV)
-    uint8_t status_flags;    // 状态标志位: bit0=正常在线, bit1=跌倒报警, bit2=IMU零偏已就绪, bit3=电机运转中
+    uint8_t status_flags;    // 状态标志位: STATUS_FLAG_xxx 位掩码合成
     uint16_t checksum;       // 16位累加和校验 (从 header 开始至 checksum 前所有字节之和)
 } RobotStatePacket_t;
 

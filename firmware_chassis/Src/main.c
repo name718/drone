@@ -13,13 +13,17 @@
 #include "log.h"
 #include "motor.h"
 
+#include <stdlib.h>
+
 // 引入 FreeRTOS 核心头文件
 #include "FreeRTOS.h"
 #include "task.h"
 
-// --- 全局变量区增加轮速缓存 ---
+// --- 全局变量区增加轮速与体感走位状态缓存 ---
 static volatile int16_t s_speed_left = 0;
 static volatile int16_t s_speed_right = 0;
+static volatile bool s_pos_reached = false;
+static volatile uint8_t s_push_hold = 0;
 
 // 全局姿态数据缓存
 static Icm42605Data_t s_imu_data;
@@ -47,44 +51,62 @@ static void Task_Control(void *pvParameters) {
         // 3. 100Hz 采样左右轮正交编码器增量 (脉冲数/10ms)
         encoder_get_speed((int16_t *)&s_speed_left, (int16_t *)&s_speed_right);
 
-        // 4. 【控制模式】：自平衡已停止，完全由上位机接管差速控制与安全防冲
+        // 4. 【控制模式】：双轮差速闭环速度 PID / 定距定角走位 / 安全急停
         int16_t cmd_speed = 0;
         int16_t cmd_yaw = 0;
         uint8_t cmd_mode = 0;
         bool is_online = bsp_usart2_get_cmd(&cmd_speed, &cmd_yaw, &cmd_mode);
+        const Attitude_t *att = attitude_get();
 
-        if (!is_online || cmd_mode == 0 || cmd_mode == 2 || (cmd_speed == 0 && cmd_yaw == 0)) {
-            // 上位机离线 (>500ms)、处于待机/急停模式或发送速度为 0 -> 电机完全刹车停机
+        static uint8_t s_last_step_mode = 0;
+        static int16_t s_last_cmd_speed = 0;
+        static int16_t s_last_cmd_yaw = 0;
+
+        // 外力推车感知：在电机无驱动指令时，车轮出现明显旋转脉冲
+        if ((!is_online || cmd_mode == MOTION_MODE_BRAKE || (cmd_speed == 0 && cmd_yaw == 0)) &&
+            (abs(s_speed_left) >= 3 || abs(s_speed_right) >= 3)) {
+            s_push_hold = 20; // 维持 200ms
+        } else if (s_push_hold > 0) {
+            s_push_hold--;
+        }
+
+        if (!is_online || cmd_mode == MOTION_MODE_BRAKE || cmd_mode == MOTION_MODE_EMERGENCY ||
+            (cmd_mode == MOTION_MODE_VELOCITY && cmd_speed == 0 && cmd_yaw == 0)) {
+            // 上位机离线、待机或急停 -> 电机刹车，重置积分器
             motor_stop();
             s_current_pwm_left = 0;
             s_current_pwm_right = 0;
-        } else if (cmd_mode == 1) {
-            // 上位机使能运行模式：两轮差速驱动运动学转换
-            // 目标线速度 (mm/s, e.g. 200) 乘以 1.5 得到基准 PWM (~300)
-            // 目标角速度 (mrad/s, e.g. 500) 乘以 0.4 得到转向差值 PWM (~200)
-            float base = (float)cmd_speed * 1.5f;
-            float diff = (float)cmd_yaw * 0.4f;
-
-            float left_pwm = base - diff;
-            float right_pwm = base + diff;
-
-            // 死区补偿：克服 TB6612 驱动芯片与 N20 减速箱静摩擦阻力 (75 点)
-            if (left_pwm > 5.0f) {
-                left_pwm += 75.0f;
-            } else if (left_pwm < -5.0f) {
-                left_pwm -= 75.0f;
+            control_diff_reset();
+            s_pos_reached = false;
+        } else if (cmd_mode == MOTION_MODE_VELOCITY) {
+            // 模式 1: 双轮差速速度闭环 PID 巡航 (直行不跑偏，阻力自适应补偿)
+            int16_t out_l = 0;
+            int16_t out_r = 0;
+            control_diff_pid_step(cmd_speed, cmd_yaw, s_speed_left, s_speed_right, &out_l, &out_r);
+            s_current_pwm_left = out_l;
+            s_current_pwm_right = out_r;
+            motor_set_speed(s_current_pwm_left, s_current_pwm_right);
+            s_pos_reached = false;
+        } else if (cmd_mode == MOTION_MODE_STEP_MOVE) {
+            // 模式 3: 精准闭环定距/定角走位 (前进 X mm，旋转 θ 0.1°)
+            if (s_last_step_mode != MOTION_MODE_STEP_MOVE ||
+                s_last_cmd_speed != cmd_speed || s_last_cmd_yaw != cmd_yaw) {
+                // 收到新的定距走位指令，以当前航向角启动梯形规划
+                control_step_move_start(cmd_speed, cmd_yaw, att->yaw);
+                s_pos_reached = false;
             }
 
-            if (right_pwm > 5.0f) {
-                right_pwm += 75.0f;
-            } else if (right_pwm < -5.0f) {
-                right_pwm -= 75.0f;
-            }
-
-            s_current_pwm_left = (int16_t)left_pwm;
-            s_current_pwm_right = (int16_t)right_pwm;
+            int16_t out_l = 0;
+            int16_t out_r = 0;
+            s_pos_reached = control_step_move_update(s_speed_left, s_speed_right, att->yaw, &out_l, &out_r);
+            s_current_pwm_left = out_l;
+            s_current_pwm_right = out_r;
             motor_set_speed(s_current_pwm_left, s_current_pwm_right);
         }
+
+        s_last_step_mode = cmd_mode;
+        s_last_cmd_speed = cmd_speed;
+        s_last_cmd_yaw = cmd_yaw;
     }
 }
 
@@ -143,16 +165,28 @@ static void Task_Telemetry(void *pvParameters) {
         state_pkt.right_pwm = s_current_pwm_right;
         state_pkt.battery_mv = 12100;  // 标称 12.1V 动力电池 (后续支持 ADC 采样)
         
-        // 状态位：bit0=正常在线, bit1=跌倒报警(倾角>±35°), bit2=IMU零偏已就绪, bit3=电机运转中
-        uint8_t flags = 0x01;
-        if (att->pitch > 35.0f || att->pitch < -35.0f) {
-            flags |= 0x02;  // 跌倒/倾覆报警标志
+        // 状态位：全量体感状态合成
+        uint8_t flags = STATUS_FLAG_ONLINE;
+        if (att->pitch > 35.0f || att->pitch < -35.0f || att->roll > 35.0f || att->roll < -35.0f) {
+            flags |= STATUS_FLAG_FALL;       // 跌倒/倾覆报警标志
         }
         if (att->is_calibrated) {
-            flags |= 0x04;  // IMU 静态零偏已校准就绪
+            flags |= STATUS_FLAG_CALIBRATED; // IMU 静态零偏已就绪
         }
         if (s_current_pwm_left != 0 || s_current_pwm_right != 0) {
-            flags |= 0x08;  // 电机当前正在驱动运转
+            flags |= STATUS_FLAG_MOTOR_RUN;  // 电机运转中
+        }
+        if (att->is_tapped) {
+            flags |= STATUS_FLAG_TAP;        // 敲击桌面/拍头事件
+        }
+        if (att->is_picked_up) {
+            flags |= STATUS_FLAG_PICKUP;     // 悬空离地/抱起事件
+        }
+        if (s_push_hold > 0) {
+            flags |= STATUS_FLAG_PUSH;       // 外力推车事件
+        }
+        if (s_pos_reached) {
+            flags |= STATUS_FLAG_POS_REACHED;// 闭环走位到达
         }
         state_pkt.status_flags = flags;
 
@@ -198,8 +232,8 @@ int main(void) {
     encoder_init();
     LOG_I("编码器", "TIM2(左) 与 TIM1(右) 硬件正交编码器初始化完成！");
 
-    // 自平衡模式已停用，切换为上位机全权直控差速模式
-    LOG_I("控制", "自平衡功能已停止，底盘已进入【上位机全权差速直控模式】！");
+    control_init();
+    LOG_I("控制", "自平衡功能已休眠备用，底盘已进入【上位机全权差速直控模式】！");
 
     // 3. 创建 FreeRTOS 任务
     // 任务1: 控制任务 (栈大小 256 字 = 1024 字节，优先级 5)

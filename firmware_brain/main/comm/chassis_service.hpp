@@ -15,6 +15,7 @@
 
 #include <atomic>
 
+#include "comm/robot_protocol.h"
 #include "comm/uart_comm.hpp"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -53,6 +54,23 @@ public:
      * @return esp_err_t ESP_OK 表示发送成功
      */
     esp_err_t sendVelocityCommand(int16_t speed_mms, int16_t yaw_mrads);
+
+    /**
+     * @brief 向 STM32 底盘下发闭环定距/定角走位指令
+     * @param dist_mm 目标位移距离 (单位: mm，正前负后，0 表示纯自转)
+     * @param angle_deci_deg 目标自转角度 (单位: 0.1度，正左负右，例如 900 表示自转 +90.0度)
+     * @return esp_err_t ESP_OK 表示发送成功
+     */
+    esp_err_t sendStepMoveCommand(int16_t dist_mm, int16_t angle_deci_deg);
+
+    /**
+     * @brief 底盘体感事件与状态快捷查询
+     */
+    bool isTapped() const { return (latest_status_flags_.load() & STATUS_FLAG_TAP) != 0; }
+    bool isPickedUp() const { return (latest_status_flags_.load() & STATUS_FLAG_PICKUP) != 0; }
+    bool isPushed() const { return (latest_status_flags_.load() & STATUS_FLAG_PUSH) != 0; }
+    bool isFallen() const { return (latest_status_flags_.load() & STATUS_FLAG_FALL) != 0; }
+    bool isPositionReached() const { return (latest_status_flags_.load() & STATUS_FLAG_POS_REACHED) != 0; }
 
     /**
      * @brief 获取底盘实时姿态角与动力学指标 (全维度)
