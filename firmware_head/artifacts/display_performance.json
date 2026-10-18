@@ -1,0 +1,95 @@
+{
+  "measurement": "real C8 frame counter; sampled frame time and SPI bytes",
+  "spi_hz": 1125000,
+  "mechanical_servo_motion_verified": false,
+  "emotions": {
+    "NORMAL": {
+      "fps": 19.61,
+      "frames": 60,
+      "seconds": 3.06,
+      "samples": 49,
+      "sampled_frame_ms_median": 15,
+      "sampled_frame_ms_max": 59,
+      "sampled_spi_bytes_mean": 652,
+      "sampled_spi_bytes_max": 5728
+    },
+    "HAPPY": {
+      "fps": 19.98,
+      "frames": 61,
+      "seconds": 3.053,
+      "samples": 51,
+      "sampled_frame_ms_median": 12,
+      "sampled_frame_ms_max": 13,
+      "sampled_spi_bytes_mean": 57,
+      "sampled_spi_bytes_max": 150
+    },
+    "SURPRISED": {
+      "fps": 19.86,
+      "frames": 60,
+      "seconds": 3.021,
+      "samples": 51,
+      "sampled_frame_ms_median": 15,
+      "sampled_frame_ms_max": 15,
+      "sampled_spi_bytes_mean": 56,
+      "sampled_spi_bytes_max": 150
+    },
+    "SLEEPY": {
+      "fps": 19.95,
+      "frames": 61,
+      "seconds": 3.057,
+      "samples": 51,
+      "sampled_frame_ms_median": 10,
+      "sampled_frame_ms_max": 11,
+      "sampled_spi_bytes_mean": 71,
+      "sampled_spi_bytes_max": 225
+    },
+    "LOVE": {
+      "fps": 19.96,
+      "frames": 61,
+      "seconds": 3.056,
+      "samples": 50,
+      "sampled_frame_ms_median": 10,
+      "sampled_frame_ms_max": 33,
+      "sampled_spi_bytes_mean": 109,
+      "sampled_spi_bytes_max": 2804
+    },
+    "ANGRY": {
+      "fps": 19.98,
+      "frames": 61,
+      "seconds": 3.053,
+      "samples": 52,
+      "sampled_frame_ms_median": 17,
+      "sampled_frame_ms_max": 19,
+      "sampled_spi_bytes_mean": 62,
+      "sampled_spi_bytes_max": 267
+    },
+    "CONFUSED": {
+      "fps": 19.99,
+      "frames": 61,
+      "seconds": 3.052,
+      "samples": 51,
+      "sampled_frame_ms_median": 18,
+      "sampled_frame_ms_max": 19,
+      "sampled_spi_bytes_mean": 56,
+      "sampled_spi_bytes_max": 150
+    },
+    "DIZZY": {
+      "fps": 10.28,
+      "frames": 31,
+      "seconds": 3.015,
+      "samples": 31,
+      "sampled_frame_ms_median": 95,
+      "sampled_frame_ms_max": 100,
+      "sampled_spi_bytes_mean": 8464,
+      "sampled_spi_bytes_max": 8965
+    }
+  },
+  "result": "pass",
+  "c8_firmware_sha256": "fc97ad078165b47c28af77e1d70c84a99025bd7837060dd7fda23abf715fb55a",
+  "implementation": "4x4 tiles, exact bounded cache, integer spiral rotation",
+  "visual_result": "user confirmed normal and noticeably smoother after final firmware",
+  "flash_bytes": 18232,
+  "static_ram_bytes": 14856,
+  "reserved_stack_bytes": 4096,
+  "flash_readback_matches_image": true
+}

@@ -1,0 +1,94 @@
+{
+  "date": "2026-10-18",
+  "board": "Luckfox Pico Mini B (user confirmed)",
+  "usb_before": {
+    "vid": "2207",
+    "pid": "110c",
+    "mode": "Maskrom",
+    "count": 1
+  },
+  "archive_test": "unzip -t: no errors",
+  "image_model": "Luckfox Pico Mini",
+  "storage": "SPI NAND, tool reports 127MB",
+  "image_file": "firmware_head/build/luckfox_setup/Luckfox_Pico_Mini_Flash_250607/update.img",
+  "image_sha256": "2ae7597d0fd203493b9cb42c7dacf24668f76446b21abbe795be129af3b388bf",
+  "image_build_time": "2025-06-26 10:27:17",
+  "tool": "official upgrade_tool macOS v2.44 arm64",
+  "flash_command": "./upgrade_tool uf ../Luckfox_Pico_Mini_Flash_250607/update.img (PTY required)",
+  "flash_result": [
+    "Check Chip Success",
+    "Download IDB Success",
+    "Download Firmware Success",
+    "Upgrade firmware ok."
+  ],
+  "initial_tool_issue": "Non-PTY launch crashed; PTY boot download succeeded but initial USB re-enumeration wait timed out; second PTY invocation completed flash.",
+  "deployment": "completed",
+  "physical_uart_test": {
+    "uart4_to_c8": "pass, 33 checks",
+    "pty_to_bridge_to_uart4_to_c8": "pass, 33 checks",
+    "esp32_uart3": "passed real bidirectional three-board test",
+    "post_reboot_uart4_rx_bytes_per_second": 220,
+    "post_reboot_uart3_tx_bytes_per_second": 220
+  },
+  "runtime": {
+    "adb_serial": "720ec8b012a74867",
+    "usb_vid": "2207",
+    "usb_pid": "0019",
+    "model": "Luckfox Pico Mini",
+    "kernel": "Linux 5.10.160 armv7l",
+    "os": "Buildroot 2023.02.6",
+    "python": "3.11.6",
+    "uart3": "/dev/ttyS3 UART3_M1 115200 8N1",
+    "uart4": "/dev/ttyS4 UART4_M1 115200 8N1",
+    "service": "/etc/init.d/S99zheadbridge",
+    "directory": "/userdata/head_bridge",
+    "service_reboot_test": "pass",
+    "service_boot_id": "d3494425-3204-45c8-8424-0efdb3757492",
+    "service_supervisor_pid": 840,
+    "service_bridge_pid": 851
+  },
+  "deployed_sha256": {
+    "tools/luckfox/head_protocol.py": "9cc94b51bb11ce7fa99226217881861d020e03e4a6775f8694a6780550e28a00",
+    "tools/luckfox/head_bridge.py": "eee67e9649f4eed8341de6440de9cf37221ecf59cc2eb1ef0a159dcb8cdf597a",
+    "tools/luckfox/head_supervisor.py": "f65b28294c60c29b30ceda823f14ef33b5d1c9818444f37d77eae49e47746135",
+    "tools/luckfox/S99zheadbridge": "0954d407052726c50cf57de8eb4883921a00ecafeafd0e1fff58bfd797b2f900"
+  },
+  "c8_firmware_sha256": "fc97ad078165b47c28af77e1d70c84a99025bd7837060dd7fda23abf715fb55a",
+  "additional_service_test": "start succeeds while unrelated Python program is running",
+  "esp32": {
+    "firmware_flashed": true,
+    "flash_result": "flash_pass",
+    "flashed_app_sha256": "c4c17366b0e9d76a4812175e5ffb596ed3dd345bb388dbae4b3597511057ec89",
+    "bidirectional_online_detection": true,
+    "end_to_end": "pass, 13 checks including one-way failure injection and automatic recovery",
+    "ip": "192.168.1.169",
+    "startup_errors": []
+  },
+  "final_state": {
+    "emotion": "NORMAL",
+    "pan_degrees": 29,
+    "tilt_degrees": 0,
+    "autonomous_mode": false,
+    "software_servo_pwm_enabled": true,
+    "mechanical_servo_motion_verified": false,
+    "bridge_service": "running"
+  },
+  "display": {
+    "hardware_spi_hz": 1125000,
+    "refresh": "4x4 incremental; exact cache",
+    "persistent_default_verified_after_reset": true,
+    "visual_result": "user confirmed normal and noticeably smoother after final firmware",
+    "fps": {
+      "NORMAL": 19.61,
+      "HAPPY": 19.98,
+      "SURPRISED": 19.86,
+      "SLEEPY": 19.95,
+      "LOVE": 19.96,
+      "ANGRY": 19.98,
+      "CONFUSED": 19.99,
+      "DIZZY": 10.28
+    },
+    "performance_report": "display_performance.json",
+    "flash_readback_matches_image": true
+  }
+}

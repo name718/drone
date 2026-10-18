@@ -1,0 +1,18 @@
+{
+  "transport": "ADB lifecycle control; no servo commands",
+  "checks": [
+    "目标板型为Mini",
+    "重复start不新增服务",
+    "子进程异常退出后重新启动",
+    "stop清理本服务PID文件",
+    "真实重启后服务自动启动",
+    "两路UART节点存在",
+    "最终桥进程已打开UART3和UART4"
+  ],
+  "boot_before": "da1b7346-a736-422a-9a90-424fc889d4dd",
+  "boot_after": "d3494425-3204-45c8-8424-0efdb3757492",
+  "supervisor_pid": 840,
+  "bridge_pid": 851,
+  "memory": "MemTotal:          33652 kB\nMemFree:            1188 kB\nMemAvailable:       7792 kB\nBuffers:               0 kB\nCached:             6704 kB",
+  "result": "pass"
+}

@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-18",
+  "chip": "ESP32-S3 rev0.2",
+  "flash_bytes": 16777216,
+  "psram_bytes": 8388608,
+  "port": "/dev/cu.usbserial-1130",
+  "baud": 115200,
+  "result": "flash_pass",
+  "remote_head_enabled": true,
+  "bidirectional_online_detection": true,
+  "app_sha256": "c4c17366b0e9d76a4812175e5ffb596ed3dd345bb388dbae4b3597511057ec89",
+  "backup": "/Users/mjt/Desktop/workplace/drone/firmware_brain/artifacts/esp32_before_head_migration_written_range_20261018.bin",
+  "backup_range_start": 0,
+  "backup_range_bytes": 1445888,
+  "backup_sha256": "5b498b758099dfee90014c17b487904ade150ac3d6eba92ee8670e1ebb8f34b6",
+  "backup_note": "Covers all flash ranges overwritten by this write, not the full 16MB chip.",
+  "ip": "192.168.1.169",
+  "boot_errors": []
+}

@@ -1,0 +1,90 @@
+{
+  "measurement": "real C8 frame counter; sampled frame time and SPI bytes",
+  "spi_hz": 1125000,
+  "mechanical_servo_motion_verified": false,
+  "emotions": {
+    "NORMAL": {
+      "fps": 19.66,
+      "frames": 60,
+      "seconds": 3.052,
+      "samples": 49,
+      "sampled_frame_ms_median": 17,
+      "sampled_frame_ms_max": 67,
+      "sampled_spi_bytes_mean": 587,
+      "sampled_spi_bytes_max": 6854
+    },
+    "HAPPY": {
+      "fps": 20.09,
+      "frames": 61,
+      "seconds": 3.036,
+      "samples": 51,
+      "sampled_frame_ms_median": 15,
+      "sampled_frame_ms_max": 17,
+      "sampled_spi_bytes_mean": 198,
+      "sampled_spi_bytes_max": 534
+    },
+    "SURPRISED": {
+      "fps": 20.17,
+      "frames": 61,
+      "seconds": 3.025,
+      "samples": 52,
+      "sampled_frame_ms_median": 17,
+      "sampled_frame_ms_max": 19,
+      "sampled_spi_bytes_mean": 195,
+      "sampled_spi_bytes_max": 534
+    },
+    "SLEEPY": {
+      "fps": 20.09,
+      "frames": 61,
+      "seconds": 3.036,
+      "samples": 51,
+      "sampled_frame_ms_median": 12,
+      "sampled_frame_ms_max": 14,
+      "sampled_spi_bytes_mean": 214,
+      "sampled_spi_bytes_max": 534
+    },
+    "LOVE": {
+      "fps": 20.47,
+      "frames": 62,
+      "seconds": 3.029,
+      "samples": 49,
+      "sampled_frame_ms_median": 12,
+      "sampled_frame_ms_max": 42,
+      "sampled_spi_bytes_mean": 261,
+      "sampled_spi_bytes_max": 3994
+    },
+    "ANGRY": {
+      "fps": 19.82,
+      "frames": 60,
+      "seconds": 3.028,
+      "samples": 51,
+      "sampled_frame_ms_median": 16,
+      "sampled_frame_ms_max": 18,
+      "sampled_spi_bytes_mean": 178,
+      "sampled_spi_bytes_max": 534
+    },
+    "CONFUSED": {
+      "fps": 20.05,
+      "frames": 61,
+      "seconds": 3.042,
+      "samples": 51,
+      "sampled_frame_ms_median": 16,
+      "sampled_frame_ms_max": 19,
+      "sampled_spi_bytes_mean": 183,
+      "sampled_spi_bytes_max": 534
+    },
+    "DIZZY": {
+      "fps": 3.62,
+      "frames": 11,
+      "seconds": 3.036,
+      "samples": 11,
+      "sampled_frame_ms_median": 265,
+      "sampled_frame_ms_max": 268,
+      "sampled_spi_bytes_mean": 14375,
+      "sampled_spi_bytes_max": 14783
+    }
+  },
+  "result": "pass",
+  "c8_firmware_sha256": "1e2af3be5ee150c8af8736c270478df80000bc4f1e04653b8ab503f506bdb9ab",
+  "implementation": "intermediate 8x8 tiles; original per-point trigonometry"
+}
