@@ -40,3 +40,7 @@ docs/计划/*.blend2
 # Python venv
 .venv*/
 __pycache__/
+
+# Head-controller local test executables
+/firmware_head/build_host/
+/firmware_head/artifacts/*.log
