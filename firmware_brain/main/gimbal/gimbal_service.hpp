@@ -3,10 +3,8 @@
  * @brief 机器人二自由度头部云台业务服务头文件
  *
  * 【架构职责】：
- *  1. 单例纳管舵机硬件驱动与平滑插值滤波算法；
- *  2. 托管专属于 Core 1 的 50Hz (20ms 周期) 独立运动学解算线程；
- *  3. 提供低冲击平滑加减速算法，彻底避免舵机瞬间大电流拉垮电源及塑料齿轮打齿；
- *  4. 提供丰富的拟人化肢体语言接口：点头 (Nod)、摇头 (Shake)、回正 (Reset)、指定凝视 (LookAt)。
+ *  默认远程模式保留lookAt/nod/shake/reset业务接口，把硬件PWM、平滑和手势交给C8。
+ *  旧接线兼容分支仅用于恢复历史硬件；新接线下不初始化ESP LEDC。
  */
 #pragma once
 
@@ -36,14 +34,14 @@ public:
     esp_err_t init();
 
     /**
-     * @brief 启动 Core 1 上的 50Hz 平滑插值计算任务
+     * @brief 启动头部通信并请求使能舵机；C8本地执行50Hz控制
      */
     esp_err_t start();
 
     /**
      * @brief 设置头部平滑凝视目标角度 (由后台任务负责平滑逼近)
-     * @param pan 水平偏航角 (0~180度)
-     * @param tilt 俯仰角 (0~180度)
+     * @param pan 水平角，单位度；远程模式按HeadLimits裁剪，默认9~52度
+     * @param tilt 俯仰角，单位度；远程模式默认0~25度
      */
     void lookAt(float pan, float tilt);
 
@@ -63,24 +61,24 @@ public:
     void reset();
 
     /**
-     * @brief 获取云台当前物理输出的实时水平角度 (Pan, 单位: 度)
+     * @brief 获取C8报告的PWM平滑输出角度(Pan)，不是带传感器的实测角度；须同时检查链路在线
      */
-    float getCurrentPan() const { return current_pan_.load(); }
+    float getCurrentPan() const;
 
     /**
-     * @brief 获取云台当前物理输出的实时俯仰角度 (Tilt, 单位: 度)
+     * @brief 获取C8报告的PWM平滑输出角度(Tilt)，不是舵机位置反馈
      */
-    float getCurrentTilt() const { return current_tilt_.load(); }
+    float getCurrentTilt() const;
 
     /**
      * @brief 获取云台当前目标设定水平角度 (Pan, 单位: 度)
      */
-    float getTargetPan() const { return target_pan_.load(); }
+    float getTargetPan() const;
 
     /**
      * @brief 获取云台当前目标设定俯仰角度 (Tilt, 单位: 度)
      */
-    float getTargetTilt() const { return target_tilt_.load(); }
+    float getTargetTilt() const;
 
 private:
     GimbalService();

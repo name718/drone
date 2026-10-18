@@ -5,8 +5,12 @@
 #include "display/display_service.hpp"
 
 #include "esp_log.h"
+#include "sdkconfig.h"
+#include "comm/head_link.hpp"
+#include "audio/audio_service.hpp"
+#include "esp_timer.h"
 
-static const char *TAG = "视觉服务";
+[[maybe_unused]] static const char *TAG = "视觉服务";
 
 DisplayService &DisplayService::getInstance() {
     static DisplayService instance;
@@ -16,6 +20,9 @@ DisplayService &DisplayService::getInstance() {
 DisplayService::DisplayService() : engine_(driver_) {}
 
 esp_err_t DisplayService::init() {
+#if CONFIG_ROBOT_HEAD_REMOTE
+    return HeadLink::getInstance().init();
+#else
     ESP_LOGI(TAG, "正在初始化屏幕底层外设...");
     esp_err_t ret = driver_.init();
     if (ret != ESP_OK) {
@@ -24,9 +31,13 @@ esp_err_t DisplayService::init() {
     }
     ESP_LOGI(TAG, "屏幕硬件就绪，准备拉起渲染任务。");
     return ESP_OK;
+#endif
 }
 
 esp_err_t DisplayService::start() {
+#if CONFIG_ROBOT_HEAD_REMOTE
+    return HeadLink::getInstance().start();
+#else
     if (is_running_)
         return ESP_OK;
     is_running_ = true;
@@ -47,10 +58,15 @@ esp_err_t DisplayService::start() {
 
     ESP_LOGI(TAG, "视觉服务已在 Core 1 启动 (33 FPS 高帧率渲染)！");
     return ESP_OK;
+#endif
 }
 
 void DisplayService::setEmotion(EmotionState emotion) {
+#if CONFIG_ROBOT_HEAD_REMOTE
+    HeadLink::getInstance().setEmotion(static_cast<uint8_t>(emotion));
+#else
     engine_.setEmotion(emotion);
+#endif
 }
 
 void DisplayService::renderTask(void *param) {
@@ -58,7 +74,8 @@ void DisplayService::renderTask(void *param) {
 
     while (self->is_running_) {
         // 执行单帧数学计算与推流
-        self->engine_.update();
+        self->engine_.update(static_cast<uint32_t>(esp_timer_get_time()/1000), AudioService::getInstance().getMicEnergy());
+        self->driver_.flush();
 
         // 保证让出 CPU 1 算力，防止饿死 IDLE1 引发看门狗超时
         vTaskDelay(pdMS_TO_TICKS(30));

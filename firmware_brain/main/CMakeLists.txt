@@ -11,7 +11,10 @@
 
 idf_component_register(
         SRCS
-            "main.cpp"			 # 系统主入口 (负责点火启动)
+            "main.cpp"
+            "comm/head_link.cpp"
+            "../../shared/ui/canvas.cpp"
+            "../../shared/ui/face_engine.cpp"			 # 系统主入口 (负责点火启动)
             "core/robot_brain.cpp"       # 大脑中枢 (单例外观模式，总管全局调度)
             "comm/uart_comm.cpp"         # 串口底层通信实现 (硬件 UART 收发)
             "comm/chassis_service.cpp"   # 底盘通信服务 (跨芯片高速协议交互)
@@ -29,6 +32,8 @@ idf_component_register(
             "ai/ai_service.cpp"          # 云端大模型与 CosyVoice 语音中枢服务
 
         INCLUDE_DIRS
+            "../../shared"
+            "../../protocol"
             "."                          # 当前 main 根目录
             "config"			 # board_config.hpp (所有引脚唯一信任源)
             "core"			 # robot_brain.hpp

@@ -1,0 +1,9 @@
+menu "Robot head controller"
+config ROBOT_HEAD_REMOTE
+    bool "Control display and gimbal through Luckfox / STM32F103"
+    default y
+    help
+        Enable for the new wiring. Never disable this while the camera is
+        connected to the former display/servo GPIOs: legacy drivers would
+        drive camera data pins. Remote UART uses GPIO9 TX / GPIO18 RX.
+endmenu

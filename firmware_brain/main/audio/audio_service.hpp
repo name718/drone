@@ -154,7 +154,7 @@ private:
 
     TaskHandle_t task_handle_{nullptr};
     bool is_running_{false};
-    float current_energy_{0.0f};  // 实时环境连续均方根声压能量 (0.0f ~ 1.0f)
+    std::atomic<float> current_energy_{0.0f};  // 音频任务写入、头部通信任务读取，避免数据竞争。
 
     // ========================================================================
     // SPSC 全时态音频环形预缓冲区参数 (分配在 8MB 外部 PSRAM)

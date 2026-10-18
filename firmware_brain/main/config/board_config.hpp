@@ -13,6 +13,7 @@
 
 #include "driver/spi_master.h"  // 提供 spi_host_device_t 与 SPI2_HOST 定义
 #include "driver/uart.h"        // 提供 uart_port_t 与 UART_NUM_1 定义
+#include "ui/head_controller.hpp"  // 两端共用云台基准与机械软件限位。
 
 namespace Config {
 
@@ -70,8 +71,8 @@ constexpr uint32_t MIN_PULSE_US = 500;  // 0 度对应高电平脉宽 500 微秒
 constexpr uint32_t MAX_PULSE_US = 2500; // 180 度对应高电平脉宽 2500 微秒 (2.5ms)
 
 // 用户实机装配校准中位角度：
-constexpr float DEFAULT_PAN_ANGLE = 29.0f;  // 水平基准归中回正角度：29度
-constexpr float DEFAULT_TILT_ANGLE = 0.0f;  // 垂直基准归中回正角度：0度
+constexpr float DEFAULT_PAN_ANGLE = HeadLimits::PAN_HOME / 100.0f;
+constexpr float DEFAULT_TILT_ANGLE = HeadLimits::TILT_HOME / 100.0f;
 }  // namespace Gimbal
 
 // ============================================================================
@@ -94,6 +95,15 @@ constexpr uint32_t MIC_SAMPLE_RATE = 16000;  // 默认拾音采样率 16kHz
 // ============================================================================
 // 5. FreeRTOS 任务调度参数与核心分配策略
 // ============================================================================
+// 新接线：通过 Luckfox UART3 转发到 C8T6。UART1 的 GPIO7/8仍留给底盘。
+namespace HeadCom {
+constexpr int PIN_TX = 9;
+constexpr int PIN_RX = 18;
+constexpr uint32_t BAUD_RATE = 115200;
+}
+
+
+
 namespace Tasks {
 // 底盘串口数据监听与透传任务 (运行在 Core 1)
 constexpr const char *CHASSIS_TASK_NAME = "ChassisSvc";

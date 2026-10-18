@@ -8,8 +8,32 @@
 #include "config/board_config.hpp"
 #include "esp_log.h"
 
-static const char *TAG = "云台服务";
+[[maybe_unused]] static const char *TAG = "云台服务";
 
+#include "sdkconfig.h"
+#include "comm/head_link.hpp"
+
+#if CONFIG_ROBOT_HEAD_REMOTE
+// 保留业务API，硬件PWM和平滑/手势状态机由C8T6执行。
+GimbalService &GimbalService::getInstance() { static GimbalService instance; return instance; }
+GimbalService::GimbalService()=default;
+esp_err_t GimbalService::init() { return HeadLink::getInstance().init(); }
+esp_err_t GimbalService::start() {
+    auto &link=HeadLink::getInstance();
+    esp_err_t err=link.start();
+    if(err==ESP_OK) link.enableServos(true);
+    return err;
+}
+void GimbalService::lookAt(float pan,float tilt) { HeadLink::getInstance().lookAt(pan,tilt); }
+void GimbalService::nod() { HeadLink::getInstance().gesture(HP_GESTURE_NOD); }
+void GimbalService::shake() { HeadLink::getInstance().gesture(HP_GESTURE_SHAKE); }
+void GimbalService::reset() { HeadLink::getInstance().gesture(HP_GESTURE_RESET); }
+float GimbalService::getCurrentPan() const { return HeadLink::getInstance().status().pan_cdeg/100.0f; }
+float GimbalService::getCurrentTilt() const { return HeadLink::getInstance().status().tilt_cdeg/100.0f; }
+float GimbalService::getTargetPan() const { return HeadLink::getInstance().desired().pan_cdeg/100.0f; }
+float GimbalService::getTargetTilt() const { return HeadLink::getInstance().desired().tilt_cdeg/100.0f; }
+
+#else
 GimbalService &GimbalService::getInstance() {
     static GimbalService instance;
     return instance;
@@ -175,3 +199,10 @@ esp_err_t GimbalService::start() {
     ESP_LOGI(TAG, "云台服务启动成功！");
     return ESP_OK;
 }
+
+float GimbalService::getCurrentPan() const { return current_pan_.load(); }
+float GimbalService::getCurrentTilt() const { return current_tilt_.load(); }
+float GimbalService::getTargetPan() const { return target_pan_.load(); }
+float GimbalService::getTargetTilt() const { return target_tilt_.load(); }
+
+#endif

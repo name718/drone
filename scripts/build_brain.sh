@@ -19,7 +19,8 @@ echo "  ESP32-S3 大脑固件 Docker 极速构建"
 echo "================================================="
 
 docker run --rm -u $(id -u):$(id -g) -e HOME=/tmp -e IDF_TOOLS_PATH=/opt/esp-idf-tools \
-    -v "$BRAIN_DIR:/workspace" -w /workspace esp32-builder:latest \
+    -v "$BRAIN_DIR:/workspace" -v "$PROJECT_ROOT/shared:/shared:ro" \
+    -v "$PROJECT_ROOT/protocol:/protocol:ro" -w /workspace esp32-builder:latest \
     bash -c "git config --global --add safe.directory '*' && . /opt/esp-idf/export.sh && idf.py build"
 
 if [ -f "$BIN_FILE" ]; then

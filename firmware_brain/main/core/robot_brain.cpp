@@ -74,10 +74,12 @@ esp_err_t RobotBrain::init() {
     }
 
     // 4. 初始化视觉表情服务 (Core 1)
-    DisplayService::getInstance().init();
+    err = DisplayService::getInstance().init();
+    if (err != ESP_OK) return err;
 
     // 5. 初始化二自由度头部云台硬件 (Core 1)
-    GimbalService::getInstance().init();
+    err = GimbalService::getInstance().init();
+    if (err != ESP_OK) return err;
 
     // 6. 初始化音频声学子系统 (MAX98357A 功放与 INMP441 麦克风)
     AudioService::getInstance().init();
@@ -107,10 +109,12 @@ esp_err_t RobotBrain::start() {
     );
 
     // 3. 启动视觉服务独立渲染线程 (Core 1 @ 33 FPS)
-    DisplayService::getInstance().start();
+    esp_err_t head_err = DisplayService::getInstance().start();
+    if (head_err != ESP_OK) return head_err;
 
     // 4. 启动头部云台 50Hz 独立控制线程 (Core 1)
-    GimbalService::getInstance().start();
+    head_err = GimbalService::getInstance().start();
+    if (head_err != ESP_OK) return head_err;
 
     // 5. 启动音频环境监测服务 (Core 0)
     AudioService::getInstance().start();

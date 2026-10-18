@@ -11,24 +11,9 @@
 #include "driver/spi_master.h"
 #include "esp_err.h"
 
-namespace Colors {
-constexpr uint16_t BLACK = 0x0000;
-constexpr uint16_t WHITE = 0xFFFF;
-constexpr uint16_t RED = 0xF800;
-constexpr uint16_t GREEN = 0x07E0;
-constexpr uint16_t BLUE = 0x001F;
-constexpr uint16_t CYAN = 0x07FF;       // 经典赛博朋克青光
-constexpr uint16_t NEON_BLUE = 0x05BF;  // 霓虹冷蓝光
-constexpr uint16_t DARK_GRAY = 0x18C3;
-constexpr uint16_t DARK_CYAN = 0x0250;
-constexpr uint16_t MAGENTA = 0xF81F;    // 赛博品红
-constexpr uint16_t YELLOW = 0xFFE0;     // 亮黄
-constexpr uint16_t ORANGE = 0xFD20;     // 暖橙
-constexpr uint16_t PINK = 0xFE19;       // 少女粉红
-constexpr uint16_t PURPLE = 0x8010;     // 霓虹紫
-}  // namespace Colors
+#include "ui/canvas.hpp"
 
-class ST7735Driver {
+class ST7735Driver : public Canvas {
 public:
     ST7735Driver();
     ~ST7735Driver();

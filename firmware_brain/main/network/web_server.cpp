@@ -3,6 +3,8 @@
  * @brief Web 管理后台与 WebSocket 全双工流式服务实现文件
  */
 #include "network/web_server.hpp"
+#include "comm/head_link.hpp"
+#include "sdkconfig.h"
 
 #include <cstdio>
 #include <cstring>
@@ -265,13 +267,14 @@ void WebServer::broadcastTelemetry() {
     uint32_t rx_pkts = chassis.getRxPackets();
 
     // 打包为轻量高效 JSON 字符串 (单帧包含双芯片底层硬件全景参数)
-    char json_buf[768];
+    char json_buf[1024];
     int len = std::snprintf(
         json_buf, sizeof(json_buf),
         "{\"type\":\"telemetry\","
         "\"uptime\":%lu,\"sram_free\":%lu,\"sram_min\":%lu,\"psram_free\":%lu,\"psram_total\":%lu,"
         "\"mic_energy\":%.2f,\"spk_vol\":%.2f,\"auto_mode\":%s,"
         "\"g_pan\":%.1f,\"g_tilt\":%.1f,\"g_tgt_p\":%.1f,\"g_tgt_t\":%.1f,"
+        "\"head_online\":%s,\"head_age_ms\":%lu,"
         "\"chassis_online\":%s,\"stm_flash_tot\":%u,\"stm_flash_used\":%u,\"stm_sram_tot\":%u,\"stm_sram_free\":%u,\"stm_uid\":\"%s\","
         "\"pitch\":%.2f,\"roll\":%.2f,\"pitch_rate\":%.2f,\"acc_pitch\":%.2f,"
         "\"speed\":%d,\"l_spd\":%d,\"r_spd\":%d,\"l_pulse\":%d,\"r_pulse\":%d,"
@@ -282,13 +285,21 @@ void WebServer::broadcastTelemetry() {
         static_cast<double>(spk_vol), auto_mode ? "true" : "false",
         static_cast<double>(g_pan), static_cast<double>(g_tilt),
         static_cast<double>(g_tgt_p), static_cast<double>(g_tgt_t),
+#if CONFIG_ROBOT_HEAD_REMOTE
+        HeadLink::getInstance().online() ? "true" : "false",
+        static_cast<unsigned long>(HeadLink::getInstance().statusAgeMs()),
+#else
+        "true", 0UL,
+#endif
         chassis_online ? "true" : "false", stm_flash_tot, stm_flash_used, stm_sram_tot, stm_sram_free, uid_str,
         static_cast<double>(pitch), static_cast<double>(roll), static_cast<double>(pitch_rate), static_cast<double>(acc_pitch),
         speed, l_spd, r_spd, l_pulse, r_pulse, l_pwm, r_pwm, bat_mv, flags,
         static_cast<unsigned long long>(rx_bytes), static_cast<unsigned long>(rx_pkts));
 
     // 广播遥测帧
-    broadcastText(json_buf, len);
+    if (len > 0 && static_cast<size_t>(len) < sizeof(json_buf)) {
+        broadcastText(json_buf, static_cast<size_t>(len));
+    }
 }
 
 void WebServer::broadcastText(const char *text, size_t len) {
