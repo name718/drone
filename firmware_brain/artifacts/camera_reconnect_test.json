@@ -1,0 +1,191 @@
+{
+  "checks": [
+    "SCCB实读芯片ID为0x5640",
+    "后台DVP采集已运行",
+    "6张JPEG均可完整解码为320x240",
+    "实际采集帧号持续递增",
+    "MJPEG响应类型正确",
+    "3帧MJPEG解码且并发控制HTTP正常",
+    "采集期间无新增失败帧"
+  ],
+  "frames": [
+    {
+      "sequence": 278,
+      "bytes": 4297,
+      "sha256": "6857ceeff7ca5b0d68f1adcda521fccc6cd9f658ca90bcbd80d0f12e05929442",
+      "size": [
+        320,
+        240
+      ],
+      "extrema": [
+        [
+          0,
+          255
+        ],
+        [
+          11,
+          255
+        ],
+        [
+          0,
+          247
+        ]
+      ]
+    },
+    {
+      "sequence": 281,
+      "bytes": 3920,
+      "sha256": "7d5eaf34c09b763e27910cb8f59745167b6ef47fcb45286bff042393c51fbc84",
+      "size": [
+        320,
+        240
+      ],
+      "extrema": [
+        [
+          56,
+          255
+        ],
+        [
+          63,
+          255
+        ],
+        [
+          51,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 282,
+      "bytes": 3434,
+      "sha256": "258ce8ac01e0f61b09ff7a0088134d6b4b2682c37a745c790cdce0a0b72194d4",
+      "size": [
+        320,
+        240
+      ],
+      "extrema": [
+        [
+          208,
+          255
+        ],
+        [
+          177,
+          254
+        ],
+        [
+          208,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 284,
+      "bytes": 6547,
+      "sha256": "0ed2b92e1632374f7757e417c5b58a3b77f41230b866f09b99c44d3ad8aae39b",
+      "size": [
+        320,
+        240
+      ],
+      "extrema": [
+        [
+          88,
+          218
+        ],
+        [
+          56,
+          215
+        ],
+        [
+          51,
+          209
+        ]
+      ]
+    },
+    {
+      "sequence": 285,
+      "bytes": 22567,
+      "sha256": "e5bbca7cf3ef40d81de2cfee8c9db7df743f8c2a2095501fcafe5d2c7094307b",
+      "size": [
+        320,
+        240
+      ],
+      "extrema": [
+        [
+          32,
+          203
+        ],
+        [
+          29,
+          212
+        ],
+        [
+          10,
+          197
+        ]
+      ]
+    },
+    {
+      "sequence": 287,
+      "bytes": 6352,
+      "sha256": "9bbd8a3d8814b4a996bd23ce855825191744fd72f2fe50f707e9a4350613cafc",
+      "size": [
+        320,
+        240
+      ],
+      "extrema": [
+        [
+          50,
+          210
+        ],
+        [
+          38,
+          212
+        ],
+        [
+          32,
+          199
+        ]
+      ]
+    }
+  ],
+  "physical_camera": "OV5640 DVP",
+  "transport": "ESP32-S3 LCD_CAM -> JPEG -> HTTP on existing WiFi",
+  "luckfox_image_inference_verified": false,
+  "initial_status": {
+    "stage": "capturing",
+    "error": "ESP_OK",
+    "sensor_id": 22080,
+    "frames": 278,
+    "failures": 0,
+    "jpeg_bytes": 4297,
+    "capture_ms": 64,
+    "width": 320,
+    "height": 240,
+    "autofocus_ready": false,
+    "profile": 3,
+    "frame_age_ms": 43,
+    "recent_frame": true
+  },
+  "final_status": {
+    "stage": "capturing",
+    "error": "ESP_OK",
+    "sensor_id": 22080,
+    "frames": 291,
+    "failures": 0,
+    "jpeg_bytes": 37357,
+    "capture_ms": 402,
+    "width": 320,
+    "height": 240,
+    "autofocus_ready": false,
+    "profile": 3,
+    "frame_age_ms": 246,
+    "recent_frame": true
+  },
+  "capture_fps_estimate": 6.54,
+  "snapshot_test_seconds": 1.266,
+  "result": "pass",
+  "esp_firmware_sha256": "bc177a8f194dd8103e29ea6a7506296f21e0655aafbbe7803f4b4276daee87f4",
+  "validation_scope": "JPEG decoding and HTTP transport only",
+  "visual_quality_verified": false,
+  "visual_inspection": "Visible vertical stripes recur after firmware reboot; overall camera acceptance remains incomplete"
+}

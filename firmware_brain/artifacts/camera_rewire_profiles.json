@@ -1,0 +1,130 @@
+[
+  {
+    "profile": 4,
+    "decoded": 0,
+    "errors": [
+      "HTTP Error 503: Service Unavailable",
+      "HTTP Error 503: Service Unavailable",
+      "HTTP Error 503: Service Unavailable",
+      "HTTP Error 503: Service Unavailable",
+      "HTTP Error 503: Service Unavailable",
+      "HTTP Error 503: Service Unavailable",
+      "HTTP Error 503: Service Unavailable",
+      "HTTP Error 503: Service Unavailable",
+      "HTTP Error 503: Service Unavailable",
+      "HTTP Error 503: Service Unavailable"
+    ],
+    "sequences": [],
+    "status": {
+      "stage": "capturing",
+      "error": "ESP_OK",
+      "sensor_id": 22080,
+      "frames": 276,
+      "failures": 2,
+      "jpeg_bytes": 4664,
+      "capture_ms": 66,
+      "width": 320,
+      "height": 240,
+      "autofocus_ready": true,
+      "profile": 4,
+      "frame_age_ms": 6176,
+      "recent_frame": false
+    }
+  },
+  {
+    "profile": 5,
+    "decoded": 0,
+    "errors": [
+      "HTTP Error 503: Service Unavailable",
+      "HTTP Error 503: Service Unavailable",
+      "HTTP Error 503: Service Unavailable",
+      "HTTP Error 503: Service Unavailable",
+      "HTTP Error 503: Service Unavailable",
+      "HTTP Error 503: Service Unavailable",
+      "HTTP Error 503: Service Unavailable",
+      "HTTP Error 503: Service Unavailable",
+      "HTTP Error 503: Service Unavailable",
+      "HTTP Error 503: Service Unavailable"
+    ],
+    "sequences": [],
+    "status": {
+      "stage": "capturing",
+      "error": "ESP_OK",
+      "sensor_id": 22080,
+      "frames": 276,
+      "failures": 3,
+      "jpeg_bytes": 4664,
+      "capture_ms": 66,
+      "width": 320,
+      "height": 240,
+      "autofocus_ready": true,
+      "profile": 5,
+      "frame_age_ms": 12420,
+      "recent_frame": false
+    }
+  },
+  {
+    "profile": 1,
+    "decoded": 10,
+    "errors": [],
+    "sequences": [
+      "330",
+      "334",
+      "338",
+      "344",
+      "350",
+      "356",
+      "361",
+      "365",
+      "370",
+      "377"
+    ],
+    "status": {
+      "stage": "capturing",
+      "error": "ESP_OK",
+      "sensor_id": 22080,
+      "frames": 382,
+      "failures": 5,
+      "jpeg_bytes": 5335,
+      "capture_ms": 20,
+      "width": 320,
+      "height": 240,
+      "autofocus_ready": true,
+      "profile": 1,
+      "frame_age_ms": 53,
+      "recent_frame": true
+    }
+  },
+  {
+    "profile": 0,
+    "decoded": 10,
+    "errors": [],
+    "sequences": [
+      "454",
+      "459",
+      "467",
+      "474",
+      "481",
+      "489",
+      "497",
+      "507",
+      "514",
+      "522"
+    ],
+    "status": {
+      "stage": "capturing",
+      "error": "ESP_OK",
+      "sensor_id": 22080,
+      "frames": 529,
+      "failures": 6,
+      "jpeg_bytes": 6499,
+      "capture_ms": 21,
+      "width": 320,
+      "height": 240,
+      "autofocus_ready": true,
+      "profile": 0,
+      "frame_age_ms": 18,
+      "recent_frame": true
+    }
+  }
+]

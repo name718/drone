@@ -1,0 +1,6 @@
+{
+  "samples": 87,
+  "all_head_online": true,
+  "max_head_age_ms": 199,
+  "command_sent": false
+}

@@ -8,6 +8,7 @@
 
 #include "ai/ai_service.hpp"
 #include "audio/audio_service.hpp"
+#include "camera/camera_service.hpp"
 #include "comm/chassis_service.hpp"
 #include "config/board_config.hpp"
 #include "core/interaction_service.hpp"
@@ -127,6 +128,12 @@ esp_err_t RobotBrain::start() {
 
     // 8. 播放标志性开机赛博和弦哨音，标志大脑全面苏醒就绪！
     AudioService::getInstance().playBootChime();
+
+    // HeadLink已启动：相机任务先等待C8唤醒确认，再探测型号并建立DVP采集。
+    // 失败只记录诊断，不影响表情、音频和控制网页继续运行。
+    esp_err_t camera_err = CameraService::start();
+    if (camera_err != ESP_OK)
+        ESP_LOGE(TAG, "摄像头任务启动失败: %s", esp_err_to_name(camera_err));
 
     ESP_LOGI(TAG, "大脑系统启动完毕，全面进入运行态！");
     return ESP_OK;

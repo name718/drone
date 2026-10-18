@@ -102,7 +102,17 @@ constexpr int PIN_RX = 18;
 constexpr uint32_t BAUD_RATE = 115200;
 }
 
-
+// OV5640蓝色DVP模组：恢复自本对话最终的8pin屏接线表。
+// 原屏幕/舵机驱动必须保持REMOTE；不能再驱动这些摄像头数据输入脚。
+namespace Camera {
+constexpr int D0 = 1, D1 = 2, D2 = 10, D3 = 11, D4 = 12, D5 = 13, D6 = 14, D7 = 21;
+constexpr int PCLK = 39, VSYNC = 40, HREF = 41;
+constexpr int SDA = 42, SCL = 47;
+constexpr int XCLK = -1;  // 模组板载24MHz晶振；NC留空，不作为XCLK。
+constexpr uint32_t XCLK_HZ = 24000000;
+// RESET/PWDN由远端C8的PB11/PB12控制，不能交给esp_camera再次驱动。
+constexpr int RESET = -1, PWDN = -1;
+}
 
 namespace Tasks {
 // 底盘串口数据监听与透传任务 (运行在 Core 1)

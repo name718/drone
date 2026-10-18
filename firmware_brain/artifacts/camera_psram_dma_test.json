@@ -1,0 +1,12 @@
+{
+  "checks": [],
+  "frames": [],
+  "physical_camera": "OV5640 DVP",
+  "transport": "ESP32-S3 LCD_CAM -> JPEG -> HTTP on existing WiFi",
+  "luckfox_image_inference_verified": false,
+  "validation_scope": "JPEG decoding and HTTP transport only; visual quality requires separate inspection",
+  "visual_quality_verified": false,
+  "result": "fail",
+  "error": "Camera not ready: {'stage': 'capturing', 'error': 'ESP_OK', 'sensor_id': 22080, 'frames': 0, 'failures': 6, 'jpeg_bytes': 0, 'capture_ms': 0, 'width': 320, 'height': 240, 'autofocus_ready': True, 'af_raw': 16, 'af_ack': 0, 'focused': True, 'profile': 17, 'frame_age_ms': -1, 'recent_frame': False}",
+  "esp_firmware_sha256": "27055322cbbe4308aeae56d9a90c10326f4b260f7ec7224b7f2267b63abe32d1"
+}

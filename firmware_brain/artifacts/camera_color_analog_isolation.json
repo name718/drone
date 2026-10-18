@@ -1,0 +1,2175 @@
+{
+  "entries": [
+    {
+      "mode": 36,
+      "bars_rgb": [
+        [
+          255,
+          198,
+          69
+        ],
+        [
+          255,
+          188,
+          0
+        ],
+        [
+          141,
+          200,
+          34
+        ],
+        [
+          124,
+          201,
+          0
+        ],
+        [
+          224,
+          0,
+          46
+        ],
+        [
+          206,
+          0,
+          0
+        ],
+        [
+          66,
+          0,
+          0
+        ],
+        [
+          95,
+          0,
+          0
+        ]
+      ],
+      "checks": {
+        "white": false,
+        "yellow": true,
+        "cyan": false,
+        "green": true,
+        "magenta": true,
+        "red": true,
+        "blue": false,
+        "black": false
+      },
+      "result": "fail",
+      "registers": {
+        "4300": 48,
+        "501f": 0,
+        "5000": 167,
+        "5001": 163,
+        "5003": 8,
+        "503d": 192,
+        "5381": 30,
+        "5382": 91,
+        "5383": 8,
+        "5384": 10,
+        "5385": 126,
+        "5386": 136,
+        "5387": 124,
+        "5388": 108,
+        "5389": 16,
+        "538a": 1,
+        "538b": 152,
+        "5580": 6,
+        "5583": 64,
+        "5584": 16,
+        "5586": 32,
+        "5587": 0,
+        "5588": 0,
+        "3820": 1,
+        "3821": 33,
+        "4514": 170,
+        "3621": 96,
+        "3406": 0
+      },
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 16,
+        "failures": 0,
+        "jpeg_bytes": 12987,
+        "capture_ms": 149,
+        "width": 640,
+        "height": 480,
+        "color_mode": 36,
+        "awb_r": 1242,
+        "awb_g": 1024,
+        "awb_b": 1827,
+        "autofocus_ready": true,
+        "af_raw": 0,
+        "af_ack": 1,
+        "focused": false,
+        "profile": 19,
+        "frame_age_ms": 120,
+        "recent_frame": true
+      }
+    },
+    {
+      "mode": 15,
+      "bars_rgb": [
+        [
+          253,
+          253,
+          253
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          192,
+          0,
+          221
+        ],
+        [
+          67,
+          255,
+          37
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          6,
+          6,
+          6
+        ]
+      ],
+      "checks": {
+        "white": true,
+        "yellow": false,
+        "cyan": false,
+        "green": false,
+        "magenta": false,
+        "red": false,
+        "blue": false,
+        "black": true
+      },
+      "result": "fail",
+      "registers": {
+        "4300": 48,
+        "501f": 0,
+        "5000": 167,
+        "5001": 163,
+        "5003": 8,
+        "503d": 192,
+        "5381": 30,
+        "5382": 91,
+        "5383": 8,
+        "5384": 10,
+        "5385": 126,
+        "5386": 136,
+        "5387": 124,
+        "5388": 108,
+        "5389": 16,
+        "538a": 1,
+        "538b": 152,
+        "5580": 6,
+        "5583": 64,
+        "5584": 16,
+        "5586": 32,
+        "5587": 0,
+        "5588": 0,
+        "3820": 1,
+        "3821": 33,
+        "4514": 170,
+        "3621": 224,
+        "3406": 0
+      },
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 23,
+        "failures": 0,
+        "jpeg_bytes": 13126,
+        "capture_ms": 129,
+        "width": 640,
+        "height": 480,
+        "color_mode": 15,
+        "awb_r": 1242,
+        "awb_g": 1024,
+        "awb_b": 1827,
+        "autofocus_ready": true,
+        "af_raw": 16,
+        "af_ack": 0,
+        "focused": true,
+        "profile": 19,
+        "frame_age_ms": 56,
+        "recent_frame": true
+      }
+    },
+    {
+      "mode": 16,
+      "bars_rgb": [
+        [
+          253,
+          253,
+          253
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          192,
+          0,
+          221
+        ],
+        [
+          67,
+          255,
+          37
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          6,
+          6,
+          6
+        ]
+      ],
+      "checks": {
+        "white": true,
+        "yellow": false,
+        "cyan": false,
+        "green": false,
+        "magenta": false,
+        "red": false,
+        "blue": false,
+        "black": true
+      },
+      "result": "fail",
+      "registers": {
+        "4300": 48,
+        "501f": 0,
+        "5000": 167,
+        "5001": 163,
+        "5003": 8,
+        "503d": 192,
+        "5381": 30,
+        "5382": 91,
+        "5383": 8,
+        "5384": 10,
+        "5385": 126,
+        "5386": 136,
+        "5387": 124,
+        "5388": 108,
+        "5389": 16,
+        "538a": 1,
+        "538b": 152,
+        "5580": 6,
+        "5583": 64,
+        "5584": 16,
+        "5586": 32,
+        "5587": 0,
+        "5588": 0,
+        "3820": 1,
+        "3821": 33,
+        "4514": 170,
+        "3621": 224,
+        "3406": 0
+      },
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 30,
+        "failures": 0,
+        "jpeg_bytes": 13089,
+        "capture_ms": 148,
+        "width": 640,
+        "height": 480,
+        "color_mode": 16,
+        "awb_r": 1242,
+        "awb_g": 1024,
+        "awb_b": 1827,
+        "autofocus_ready": true,
+        "af_raw": 16,
+        "af_ack": 0,
+        "focused": true,
+        "profile": 19,
+        "frame_age_ms": 38,
+        "recent_frame": true
+      }
+    },
+    {
+      "mode": 17,
+      "bars_rgb": [
+        [
+          253,
+          253,
+          253
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          192,
+          0,
+          221
+        ],
+        [
+          67,
+          255,
+          37
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          6,
+          6,
+          6
+        ]
+      ],
+      "checks": {
+        "white": true,
+        "yellow": false,
+        "cyan": false,
+        "green": false,
+        "magenta": false,
+        "red": false,
+        "blue": false,
+        "black": true
+      },
+      "result": "fail",
+      "registers": {
+        "4300": 48,
+        "501f": 0,
+        "5000": 167,
+        "5001": 163,
+        "5003": 8,
+        "503d": 192,
+        "5381": 30,
+        "5382": 91,
+        "5383": 8,
+        "5384": 10,
+        "5385": 126,
+        "5386": 136,
+        "5387": 124,
+        "5388": 108,
+        "5389": 16,
+        "538a": 1,
+        "538b": 152,
+        "5580": 6,
+        "5583": 64,
+        "5584": 16,
+        "5586": 32,
+        "5587": 0,
+        "5588": 0,
+        "3820": 1,
+        "3821": 33,
+        "4514": 170,
+        "3621": 224,
+        "3406": 0
+      },
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 36,
+        "failures": 0,
+        "jpeg_bytes": 13100,
+        "capture_ms": 149,
+        "width": 640,
+        "height": 480,
+        "color_mode": 17,
+        "awb_r": 1242,
+        "awb_g": 1024,
+        "awb_b": 1827,
+        "autofocus_ready": true,
+        "af_raw": 16,
+        "af_ack": 0,
+        "focused": true,
+        "profile": 19,
+        "frame_age_ms": 99,
+        "recent_frame": true
+      }
+    },
+    {
+      "mode": 18,
+      "bars_rgb": [
+        [
+          253,
+          253,
+          253
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          192,
+          0,
+          221
+        ],
+        [
+          67,
+          255,
+          37
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          6,
+          6,
+          6
+        ]
+      ],
+      "checks": {
+        "white": true,
+        "yellow": false,
+        "cyan": false,
+        "green": false,
+        "magenta": false,
+        "red": false,
+        "blue": false,
+        "black": true
+      },
+      "result": "fail",
+      "registers": {
+        "4300": 48,
+        "501f": 0,
+        "5000": 167,
+        "5001": 163,
+        "5003": 8,
+        "503d": 192,
+        "5381": 30,
+        "5382": 91,
+        "5383": 8,
+        "5384": 10,
+        "5385": 126,
+        "5386": 136,
+        "5387": 124,
+        "5388": 108,
+        "5389": 16,
+        "538a": 1,
+        "538b": 152,
+        "5580": 6,
+        "5583": 64,
+        "5584": 16,
+        "5586": 32,
+        "5587": 0,
+        "5588": 0,
+        "3820": 1,
+        "3821": 33,
+        "4514": 170,
+        "3621": 224,
+        "3406": 0
+      },
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 43,
+        "failures": 0,
+        "jpeg_bytes": 13123,
+        "capture_ms": 149,
+        "width": 640,
+        "height": 480,
+        "color_mode": 18,
+        "awb_r": 1242,
+        "awb_g": 1024,
+        "awb_b": 1827,
+        "autofocus_ready": true,
+        "af_raw": 16,
+        "af_ack": 0,
+        "focused": true,
+        "profile": 19,
+        "frame_age_ms": 90,
+        "recent_frame": true
+      }
+    },
+    {
+      "mode": 19,
+      "bars_rgb": [
+        [
+          253,
+          253,
+          253
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          192,
+          0,
+          221
+        ],
+        [
+          67,
+          255,
+          37
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          6,
+          6,
+          6
+        ]
+      ],
+      "checks": {
+        "white": true,
+        "yellow": false,
+        "cyan": false,
+        "green": false,
+        "magenta": false,
+        "red": false,
+        "blue": false,
+        "black": true
+      },
+      "result": "fail",
+      "registers": {
+        "4300": 48,
+        "501f": 0,
+        "5000": 167,
+        "5001": 163,
+        "5003": 8,
+        "503d": 192,
+        "5381": 30,
+        "5382": 91,
+        "5383": 8,
+        "5384": 10,
+        "5385": 126,
+        "5386": 136,
+        "5387": 124,
+        "5388": 108,
+        "5389": 16,
+        "538a": 1,
+        "538b": 152,
+        "5580": 6,
+        "5583": 64,
+        "5584": 16,
+        "5586": 32,
+        "5587": 0,
+        "5588": 0,
+        "3820": 1,
+        "3821": 33,
+        "4514": 170,
+        "3621": 96,
+        "3406": 0
+      },
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 49,
+        "failures": 0,
+        "jpeg_bytes": 13096,
+        "capture_ms": 149,
+        "width": 640,
+        "height": 480,
+        "color_mode": 19,
+        "awb_r": 1242,
+        "awb_g": 1024,
+        "awb_b": 1827,
+        "autofocus_ready": true,
+        "af_raw": 16,
+        "af_ack": 0,
+        "focused": true,
+        "profile": 19,
+        "frame_age_ms": 146,
+        "recent_frame": true
+      }
+    },
+    {
+      "mode": 20,
+      "result": "error",
+      "error": "HTTP Error 503: Service Unavailable"
+    },
+    {
+      "mode": 21,
+      "result": "error",
+      "error": "{'stage': 'capturing', 'error': 'ESP_OK', 'sensor_id': 22080, 'frames': 50, 'failures': 2, 'jpeg_bytes': 13090, 'capture_ms': 150, 'width': 640, 'height': 480, 'color_mode': 21, 'awb_r': 1242, 'awb_g': 1024, 'awb_b': 1827, 'autofocus_ready': True, 'af_raw': 16, 'af_ack': 0, 'focused': True, 'profile': 19, 'frame_age_ms': 11521, 'recent_frame': False}"
+    },
+    {
+      "mode": 22,
+      "bars_rgb": [
+        [
+          253,
+          253,
+          253
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          192,
+          0,
+          221
+        ],
+        [
+          67,
+          255,
+          37
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          6,
+          6,
+          6
+        ]
+      ],
+      "checks": {
+        "white": true,
+        "yellow": false,
+        "cyan": false,
+        "green": false,
+        "magenta": false,
+        "red": false,
+        "blue": false,
+        "black": true
+      },
+      "result": "fail",
+      "registers": {
+        "4300": 48,
+        "501f": 0,
+        "5000": 167,
+        "5001": 163,
+        "5003": 8,
+        "503d": 192,
+        "5381": 30,
+        "5382": 91,
+        "5383": 8,
+        "5384": 10,
+        "5385": 126,
+        "5386": 136,
+        "5387": 124,
+        "5388": 108,
+        "5389": 16,
+        "538a": 1,
+        "538b": 152,
+        "5580": 6,
+        "5583": 64,
+        "5584": 16,
+        "5586": 32,
+        "5587": 0,
+        "5588": 0,
+        "3820": 1,
+        "3821": 33,
+        "4514": 170,
+        "3621": 224,
+        "3406": 0
+      },
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 59,
+        "failures": 3,
+        "jpeg_bytes": 15004,
+        "capture_ms": 148,
+        "width": 640,
+        "height": 480,
+        "color_mode": 22,
+        "awb_r": 1242,
+        "awb_g": 1024,
+        "awb_b": 1827,
+        "autofocus_ready": true,
+        "af_raw": 16,
+        "af_ack": 0,
+        "focused": true,
+        "profile": 19,
+        "frame_age_ms": 13,
+        "recent_frame": true
+      }
+    },
+    {
+      "mode": 23,
+      "bars_rgb": [
+        [
+          253,
+          253,
+          253
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          192,
+          0,
+          221
+        ],
+        [
+          67,
+          255,
+          37
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          6,
+          6,
+          6
+        ]
+      ],
+      "checks": {
+        "white": true,
+        "yellow": false,
+        "cyan": false,
+        "green": false,
+        "magenta": false,
+        "red": false,
+        "blue": false,
+        "black": true
+      },
+      "result": "fail",
+      "registers": {
+        "4300": 48,
+        "501f": 0,
+        "5000": 167,
+        "5001": 163,
+        "5003": 8,
+        "503d": 192,
+        "5381": 30,
+        "5382": 91,
+        "5383": 8,
+        "5384": 10,
+        "5385": 126,
+        "5386": 136,
+        "5387": 124,
+        "5388": 108,
+        "5389": 16,
+        "538a": 1,
+        "538b": 152,
+        "5580": 6,
+        "5583": 64,
+        "5584": 16,
+        "5586": 32,
+        "5587": 0,
+        "5588": 0,
+        "3820": 1,
+        "3821": 33,
+        "4514": 170,
+        "3621": 224,
+        "3406": 0
+      },
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 65,
+        "failures": 3,
+        "jpeg_bytes": 15004,
+        "capture_ms": 128,
+        "width": 640,
+        "height": 480,
+        "color_mode": 23,
+        "awb_r": 1242,
+        "awb_g": 1024,
+        "awb_b": 1827,
+        "autofocus_ready": true,
+        "af_raw": 16,
+        "af_ack": 0,
+        "focused": true,
+        "profile": 19,
+        "frame_age_ms": 160,
+        "recent_frame": true
+      }
+    },
+    {
+      "mode": 24,
+      "bars_rgb": [
+        [
+          253,
+          253,
+          253
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          192,
+          0,
+          221
+        ],
+        [
+          67,
+          255,
+          37
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          6,
+          6,
+          6
+        ]
+      ],
+      "checks": {
+        "white": true,
+        "yellow": false,
+        "cyan": false,
+        "green": false,
+        "magenta": false,
+        "red": false,
+        "blue": false,
+        "black": true
+      },
+      "result": "fail",
+      "registers": {
+        "4300": 48,
+        "501f": 0,
+        "5000": 167,
+        "5001": 163,
+        "5003": 8,
+        "503d": 192,
+        "5381": 30,
+        "5382": 91,
+        "5383": 8,
+        "5384": 10,
+        "5385": 126,
+        "5386": 136,
+        "5387": 124,
+        "5388": 108,
+        "5389": 16,
+        "538a": 1,
+        "538b": 152,
+        "5580": 6,
+        "5583": 64,
+        "5584": 16,
+        "5586": 32,
+        "5587": 0,
+        "5588": 0,
+        "3820": 1,
+        "3821": 33,
+        "4514": 170,
+        "3621": 224,
+        "3406": 0
+      },
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 72,
+        "failures": 3,
+        "jpeg_bytes": 15004,
+        "capture_ms": 149,
+        "width": 640,
+        "height": 480,
+        "color_mode": 24,
+        "awb_r": 1242,
+        "awb_g": 1024,
+        "awb_b": 1827,
+        "autofocus_ready": true,
+        "af_raw": 16,
+        "af_ack": 0,
+        "focused": true,
+        "profile": 19,
+        "frame_age_ms": 134,
+        "recent_frame": true
+      }
+    },
+    {
+      "mode": 25,
+      "bars_rgb": [
+        [
+          253,
+          253,
+          253
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          192,
+          0,
+          221
+        ],
+        [
+          67,
+          255,
+          37
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          6,
+          6,
+          6
+        ]
+      ],
+      "checks": {
+        "white": true,
+        "yellow": false,
+        "cyan": false,
+        "green": false,
+        "magenta": false,
+        "red": false,
+        "blue": false,
+        "black": true
+      },
+      "result": "fail",
+      "registers": {
+        "4300": 48,
+        "501f": 0,
+        "5000": 167,
+        "5001": 163,
+        "5003": 8,
+        "503d": 192,
+        "5381": 30,
+        "5382": 91,
+        "5383": 8,
+        "5384": 10,
+        "5385": 126,
+        "5386": 136,
+        "5387": 124,
+        "5388": 108,
+        "5389": 16,
+        "538a": 1,
+        "538b": 152,
+        "5580": 6,
+        "5583": 64,
+        "5584": 16,
+        "5586": 32,
+        "5587": 0,
+        "5588": 0,
+        "3820": 1,
+        "3821": 33,
+        "4514": 170,
+        "3621": 224,
+        "3406": 0
+      },
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 79,
+        "failures": 3,
+        "jpeg_bytes": 15004,
+        "capture_ms": 150,
+        "width": 640,
+        "height": 480,
+        "color_mode": 25,
+        "awb_r": 1242,
+        "awb_g": 1024,
+        "awb_b": 1827,
+        "autofocus_ready": true,
+        "af_raw": 16,
+        "af_ack": 0,
+        "focused": true,
+        "profile": 19,
+        "frame_age_ms": 112,
+        "recent_frame": true
+      }
+    },
+    {
+      "mode": 26,
+      "bars_rgb": [
+        [
+          253,
+          253,
+          253
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          192,
+          0,
+          221
+        ],
+        [
+          67,
+          255,
+          37
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          6,
+          6,
+          6
+        ]
+      ],
+      "checks": {
+        "white": true,
+        "yellow": false,
+        "cyan": false,
+        "green": false,
+        "magenta": false,
+        "red": false,
+        "blue": false,
+        "black": true
+      },
+      "result": "fail",
+      "registers": {
+        "4300": 48,
+        "501f": 0,
+        "5000": 167,
+        "5001": 163,
+        "5003": 8,
+        "503d": 192,
+        "5381": 30,
+        "5382": 91,
+        "5383": 8,
+        "5384": 10,
+        "5385": 126,
+        "5386": 136,
+        "5387": 124,
+        "5388": 108,
+        "5389": 16,
+        "538a": 1,
+        "538b": 152,
+        "5580": 6,
+        "5583": 64,
+        "5584": 16,
+        "5586": 32,
+        "5587": 0,
+        "5588": 0,
+        "3820": 1,
+        "3821": 33,
+        "4514": 170,
+        "3621": 224,
+        "3406": 0
+      },
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 83,
+        "failures": 3,
+        "jpeg_bytes": 15004,
+        "capture_ms": 148,
+        "width": 640,
+        "height": 480,
+        "color_mode": 26,
+        "awb_r": 1242,
+        "awb_g": 1024,
+        "awb_b": 1827,
+        "autofocus_ready": true,
+        "af_raw": 16,
+        "af_ack": 0,
+        "focused": true,
+        "profile": 19,
+        "frame_age_ms": 547,
+        "recent_frame": true
+      }
+    },
+    {
+      "mode": 27,
+      "bars_rgb": [
+        [
+          253,
+          253,
+          253
+        ],
+        [
+          255,
+          255,
+          97
+        ],
+        [
+          84,
+          252,
+          217
+        ],
+        [
+          67,
+          255,
+          37
+        ],
+        [
+          192,
+          0,
+          221
+        ],
+        [
+          174,
+          11,
+          40
+        ],
+        [
+          0,
+          7,
+          161
+        ],
+        [
+          6,
+          6,
+          6
+        ]
+      ],
+      "checks": {
+        "white": true,
+        "yellow": true,
+        "cyan": true,
+        "green": true,
+        "magenta": true,
+        "red": true,
+        "blue": true,
+        "black": true
+      },
+      "result": "pass",
+      "registers": {
+        "4300": 48,
+        "501f": 0,
+        "5000": 167,
+        "5001": 163,
+        "5003": 8,
+        "503d": 192,
+        "5381": 30,
+        "5382": 91,
+        "5383": 8,
+        "5384": 10,
+        "5385": 126,
+        "5386": 136,
+        "5387": 124,
+        "5388": 108,
+        "5389": 16,
+        "538a": 1,
+        "538b": 152,
+        "5580": 6,
+        "5583": 64,
+        "5584": 16,
+        "5586": 32,
+        "5587": 0,
+        "5588": 0,
+        "3820": 1,
+        "3821": 33,
+        "4514": 170,
+        "3621": 224,
+        "3406": 0
+      },
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 86,
+        "failures": 3,
+        "jpeg_bytes": 26722,
+        "capture_ms": 318,
+        "width": 640,
+        "height": 480,
+        "color_mode": 27,
+        "awb_r": 1242,
+        "awb_g": 1024,
+        "awb_b": 1827,
+        "autofocus_ready": true,
+        "af_raw": 16,
+        "af_ack": 0,
+        "focused": true,
+        "profile": 19,
+        "frame_age_ms": 247,
+        "recent_frame": true
+      }
+    },
+    {
+      "mode": 28,
+      "bars_rgb": [
+        [
+          253,
+          253,
+          253
+        ],
+        [
+          255,
+          90,
+          255
+        ],
+        [
+          255,
+          90,
+          255
+        ],
+        [
+          199,
+          0,
+          230
+        ],
+        [
+          63,
+          255,
+          32
+        ],
+        [
+          0,
+          173,
+          0
+        ],
+        [
+          0,
+          173,
+          0
+        ],
+        [
+          6,
+          6,
+          6
+        ]
+      ],
+      "checks": {
+        "white": true,
+        "yellow": false,
+        "cyan": false,
+        "green": false,
+        "magenta": false,
+        "red": false,
+        "blue": false,
+        "black": true
+      },
+      "result": "fail",
+      "registers": {
+        "4300": 48,
+        "501f": 0,
+        "5000": 167,
+        "5001": 163,
+        "5003": 8,
+        "503d": 192,
+        "5381": 30,
+        "5382": 91,
+        "5383": 8,
+        "5384": 10,
+        "5385": 126,
+        "5386": 136,
+        "5387": 124,
+        "5388": 108,
+        "5389": 16,
+        "538a": 1,
+        "538b": 152,
+        "5580": 6,
+        "5583": 64,
+        "5584": 16,
+        "5586": 32,
+        "5587": 0,
+        "5588": 0,
+        "3820": 1,
+        "3821": 33,
+        "4514": 170,
+        "3621": 224,
+        "3406": 0
+      },
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 89,
+        "failures": 3,
+        "jpeg_bytes": 13204,
+        "capture_ms": 148,
+        "width": 640,
+        "height": 480,
+        "color_mode": 28,
+        "awb_r": 1242,
+        "awb_g": 1024,
+        "awb_b": 1827,
+        "autofocus_ready": true,
+        "af_raw": 16,
+        "af_ack": 0,
+        "focused": true,
+        "profile": 19,
+        "frame_age_ms": 153,
+        "recent_frame": true
+      }
+    },
+    {
+      "mode": 29,
+      "bars_rgb": [
+        [
+          253,
+          253,
+          253
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          192,
+          0,
+          221
+        ],
+        [
+          67,
+          255,
+          37
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          6,
+          6,
+          6
+        ]
+      ],
+      "checks": {
+        "white": true,
+        "yellow": false,
+        "cyan": false,
+        "green": false,
+        "magenta": false,
+        "red": false,
+        "blue": false,
+        "black": true
+      },
+      "result": "fail",
+      "registers": {
+        "4300": 48,
+        "501f": 0,
+        "5000": 167,
+        "5001": 163,
+        "5003": 8,
+        "503d": 192,
+        "5381": 30,
+        "5382": 91,
+        "5383": 8,
+        "5384": 10,
+        "5385": 126,
+        "5386": 136,
+        "5387": 124,
+        "5388": 108,
+        "5389": 16,
+        "538a": 1,
+        "538b": 152,
+        "5580": 6,
+        "5583": 64,
+        "5584": 16,
+        "5586": 32,
+        "5587": 0,
+        "5588": 0,
+        "3820": 1,
+        "3821": 33,
+        "4514": 170,
+        "3621": 224,
+        "3406": 0
+      },
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 96,
+        "failures": 3,
+        "jpeg_bytes": 13094,
+        "capture_ms": 128,
+        "width": 640,
+        "height": 480,
+        "color_mode": 29,
+        "awb_r": 1242,
+        "awb_g": 1024,
+        "awb_b": 1827,
+        "autofocus_ready": true,
+        "af_raw": 16,
+        "af_ack": 0,
+        "focused": true,
+        "profile": 19,
+        "frame_age_ms": 100,
+        "recent_frame": true
+      }
+    },
+    {
+      "mode": 30,
+      "bars_rgb": [
+        [
+          253,
+          253,
+          253
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          192,
+          0,
+          221
+        ],
+        [
+          67,
+          255,
+          37
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          6,
+          6,
+          6
+        ]
+      ],
+      "checks": {
+        "white": true,
+        "yellow": false,
+        "cyan": false,
+        "green": false,
+        "magenta": false,
+        "red": false,
+        "blue": false,
+        "black": true
+      },
+      "result": "fail",
+      "registers": {
+        "4300": 48,
+        "501f": 0,
+        "5000": 167,
+        "5001": 163,
+        "5003": 8,
+        "503d": 192,
+        "5381": 30,
+        "5382": 91,
+        "5383": 8,
+        "5384": 10,
+        "5385": 126,
+        "5386": 136,
+        "5387": 124,
+        "5388": 108,
+        "5389": 16,
+        "538a": 1,
+        "538b": 152,
+        "5580": 6,
+        "5583": 64,
+        "5584": 16,
+        "5586": 32,
+        "5587": 0,
+        "5588": 0,
+        "3820": 1,
+        "3821": 33,
+        "4514": 170,
+        "3621": 224,
+        "3406": 0
+      },
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 103,
+        "failures": 3,
+        "jpeg_bytes": 13108,
+        "capture_ms": 148,
+        "width": 640,
+        "height": 480,
+        "color_mode": 30,
+        "awb_r": 1242,
+        "awb_g": 1024,
+        "awb_b": 1827,
+        "autofocus_ready": true,
+        "af_raw": 16,
+        "af_ack": 0,
+        "focused": true,
+        "profile": 19,
+        "frame_age_ms": 68,
+        "recent_frame": true
+      }
+    },
+    {
+      "mode": 31,
+      "bars_rgb": [
+        [
+          253,
+          253,
+          253
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          192,
+          0,
+          221
+        ],
+        [
+          67,
+          255,
+          37
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          6,
+          6,
+          6
+        ]
+      ],
+      "checks": {
+        "white": true,
+        "yellow": false,
+        "cyan": false,
+        "green": false,
+        "magenta": false,
+        "red": false,
+        "blue": false,
+        "black": true
+      },
+      "result": "fail",
+      "registers": {
+        "4300": 48,
+        "501f": 0,
+        "5000": 167,
+        "5001": 163,
+        "5003": 8,
+        "503d": 192,
+        "5381": 30,
+        "5382": 91,
+        "5383": 8,
+        "5384": 10,
+        "5385": 126,
+        "5386": 136,
+        "5387": 124,
+        "5388": 108,
+        "5389": 16,
+        "538a": 1,
+        "538b": 152,
+        "5580": 6,
+        "5583": 64,
+        "5584": 16,
+        "5586": 32,
+        "5587": 0,
+        "5588": 0,
+        "3820": 1,
+        "3821": 33,
+        "4514": 170,
+        "3621": 224,
+        "3406": 0
+      },
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 110,
+        "failures": 3,
+        "jpeg_bytes": 13098,
+        "capture_ms": 128,
+        "width": 640,
+        "height": 480,
+        "color_mode": 31,
+        "awb_r": 1242,
+        "awb_g": 1024,
+        "awb_b": 1827,
+        "autofocus_ready": true,
+        "af_raw": 16,
+        "af_ack": 0,
+        "focused": true,
+        "profile": 19,
+        "frame_age_ms": 66,
+        "recent_frame": true
+      }
+    },
+    {
+      "mode": 32,
+      "bars_rgb": [
+        [
+          253,
+          253,
+          253
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          192,
+          0,
+          221
+        ],
+        [
+          67,
+          255,
+          37
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          6,
+          6,
+          6
+        ]
+      ],
+      "checks": {
+        "white": true,
+        "yellow": false,
+        "cyan": false,
+        "green": false,
+        "magenta": false,
+        "red": false,
+        "blue": false,
+        "black": true
+      },
+      "result": "fail",
+      "registers": {
+        "4300": 48,
+        "501f": 0,
+        "5000": 167,
+        "5001": 163,
+        "5003": 8,
+        "503d": 192,
+        "5381": 30,
+        "5382": 91,
+        "5383": 8,
+        "5384": 10,
+        "5385": 126,
+        "5386": 136,
+        "5387": 124,
+        "5388": 108,
+        "5389": 16,
+        "538a": 1,
+        "538b": 152,
+        "5580": 6,
+        "5583": 64,
+        "5584": 16,
+        "5586": 32,
+        "5587": 0,
+        "5588": 0,
+        "3820": 1,
+        "3821": 33,
+        "4514": 170,
+        "3621": 224,
+        "3406": 0
+      },
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 116,
+        "failures": 3,
+        "jpeg_bytes": 13094,
+        "capture_ms": 149,
+        "width": 640,
+        "height": 480,
+        "color_mode": 32,
+        "awb_r": 1242,
+        "awb_g": 1024,
+        "awb_b": 1827,
+        "autofocus_ready": true,
+        "af_raw": 16,
+        "af_ack": 0,
+        "focused": true,
+        "profile": 19,
+        "frame_age_ms": 158,
+        "recent_frame": true
+      }
+    },
+    {
+      "mode": 33,
+      "bars_rgb": [
+        [
+          253,
+          253,
+          253
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          192,
+          0,
+          221
+        ],
+        [
+          67,
+          255,
+          37
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          6,
+          6,
+          6
+        ]
+      ],
+      "checks": {
+        "white": true,
+        "yellow": false,
+        "cyan": false,
+        "green": false,
+        "magenta": false,
+        "red": false,
+        "blue": false,
+        "black": true
+      },
+      "result": "fail",
+      "registers": {
+        "4300": 48,
+        "501f": 0,
+        "5000": 167,
+        "5001": 163,
+        "5003": 8,
+        "503d": 192,
+        "5381": 30,
+        "5382": 91,
+        "5383": 8,
+        "5384": 10,
+        "5385": 126,
+        "5386": 136,
+        "5387": 124,
+        "5388": 108,
+        "5389": 16,
+        "538a": 1,
+        "538b": 152,
+        "5580": 6,
+        "5583": 64,
+        "5584": 16,
+        "5586": 32,
+        "5587": 0,
+        "5588": 0,
+        "3820": 1,
+        "3821": 33,
+        "4514": 170,
+        "3621": 224,
+        "3406": 0
+      },
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 124,
+        "failures": 3,
+        "jpeg_bytes": 13116,
+        "capture_ms": 129,
+        "width": 640,
+        "height": 480,
+        "color_mode": 33,
+        "awb_r": 1242,
+        "awb_g": 1024,
+        "awb_b": 1827,
+        "autofocus_ready": true,
+        "af_raw": 16,
+        "af_ack": 0,
+        "focused": true,
+        "profile": 19,
+        "frame_age_ms": 42,
+        "recent_frame": true
+      }
+    },
+    {
+      "mode": 34,
+      "bars_rgb": [
+        [
+          253,
+          253,
+          253
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          192,
+          0,
+          221
+        ],
+        [
+          67,
+          255,
+          37
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          6,
+          6,
+          6
+        ]
+      ],
+      "checks": {
+        "white": true,
+        "yellow": false,
+        "cyan": false,
+        "green": false,
+        "magenta": false,
+        "red": false,
+        "blue": false,
+        "black": true
+      },
+      "result": "fail",
+      "registers": {
+        "4300": 48,
+        "501f": 0,
+        "5000": 167,
+        "5001": 163,
+        "5003": 8,
+        "503d": 192,
+        "5381": 30,
+        "5382": 91,
+        "5383": 8,
+        "5384": 10,
+        "5385": 126,
+        "5386": 136,
+        "5387": 124,
+        "5388": 108,
+        "5389": 16,
+        "538a": 1,
+        "538b": 152,
+        "5580": 6,
+        "5583": 64,
+        "5584": 16,
+        "5586": 32,
+        "5587": 0,
+        "5588": 0,
+        "3820": 1,
+        "3821": 33,
+        "4514": 170,
+        "3621": 224,
+        "3406": 0
+      },
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 130,
+        "failures": 3,
+        "jpeg_bytes": 13100,
+        "capture_ms": 148,
+        "width": 640,
+        "height": 480,
+        "color_mode": 34,
+        "awb_r": 1242,
+        "awb_g": 1024,
+        "awb_b": 1827,
+        "autofocus_ready": true,
+        "af_raw": 16,
+        "af_ack": 0,
+        "focused": true,
+        "profile": 19,
+        "frame_age_ms": 107,
+        "recent_frame": true
+      }
+    },
+    {
+      "mode": 35,
+      "bars_rgb": [
+        [
+          253,
+          253,
+          253
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          255,
+          93,
+          255
+        ],
+        [
+          192,
+          0,
+          221
+        ],
+        [
+          67,
+          255,
+          37
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          0,
+          169,
+          0
+        ],
+        [
+          6,
+          6,
+          6
+        ]
+      ],
+      "checks": {
+        "white": true,
+        "yellow": false,
+        "cyan": false,
+        "green": false,
+        "magenta": false,
+        "red": false,
+        "blue": false,
+        "black": true
+      },
+      "result": "fail",
+      "registers": {
+        "4300": 48,
+        "501f": 0,
+        "5000": 167,
+        "5001": 163,
+        "5003": 8,
+        "503d": 192,
+        "5381": 30,
+        "5382": 91,
+        "5383": 8,
+        "5384": 10,
+        "5385": 126,
+        "5386": 136,
+        "5387": 124,
+        "5388": 108,
+        "5389": 16,
+        "538a": 1,
+        "538b": 152,
+        "5580": 6,
+        "5583": 64,
+        "5584": 16,
+        "5586": 32,
+        "5587": 0,
+        "5588": 0,
+        "3820": 1,
+        "3821": 33,
+        "4514": 170,
+        "3621": 224,
+        "3406": 0
+      },
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 136,
+        "failures": 3,
+        "jpeg_bytes": 13087,
+        "capture_ms": 148,
+        "width": 640,
+        "height": 480,
+        "color_mode": 35,
+        "awb_r": 1242,
+        "awb_g": 1024,
+        "awb_b": 1827,
+        "autofocus_ready": true,
+        "af_raw": 16,
+        "af_ack": 0,
+        "focused": true,
+        "profile": 19,
+        "frame_age_ms": 163,
+        "recent_frame": true
+      }
+    }
+  ],
+  "scope": "sensor-generated color bars; real-object accuracy requires separate check"
+}

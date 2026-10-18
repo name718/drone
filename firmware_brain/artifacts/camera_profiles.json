@@ -1,0 +1,70 @@
+{
+  "profiles": [
+    {
+      "profile": 1,
+      "sequences": [],
+      "result": "fail",
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 0,
+        "failures": 5,
+        "jpeg_bytes": 0,
+        "capture_ms": 0,
+        "width": 320,
+        "height": 240,
+        "autofocus_ready": true,
+        "profile": 1
+      },
+      "last_error": "HTTP Error 503: Service Unavailable"
+    },
+    {
+      "profile": 0,
+      "sequences": [],
+      "result": "fail",
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 0,
+        "failures": 10,
+        "jpeg_bytes": 0,
+        "capture_ms": 0,
+        "width": 320,
+        "height": 240,
+        "autofocus_ready": true,
+        "profile": 0
+      },
+      "last_error": "HTTP Error 503: Service Unavailable"
+    },
+    {
+      "profile": 3,
+      "sequences": [
+        1,
+        2,
+        3
+      ],
+      "result": "pass",
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 3,
+        "failures": 45,
+        "jpeg_bytes": 2944,
+        "capture_ms": 0,
+        "width": 320,
+        "height": 240,
+        "autofocus_ready": true,
+        "profile": 3
+      },
+      "last_error": "HTTP Error 503: Service Unavailable",
+      "last_frame_sha256": "03100814eeebd4be20fcd3d3053fd500cd8442976a3ca819df995629865c51b5"
+    }
+  ],
+  "result": "pass",
+  "selected_profile": 3,
+  "scope": "three individually decodable snapshots only; not sustained capture acceptance",
+  "subsequent_stability_test": "failed: frame sequence did not advance sufficiently and visible image bands"
+}

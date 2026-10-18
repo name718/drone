@@ -1,0 +1,748 @@
+{
+  "checks": [
+    "SCCB实读芯片ID为0x5640",
+    "后台DVP采集已运行",
+    "30张JPEG均可完整解码为640x480",
+    "实际采集帧号持续递增",
+    "MJPEG响应类型正确",
+    "3帧MJPEG解码且并发控制HTTP正常"
+  ],
+  "frames": [
+    {
+      "sequence": 1,
+      "bytes": 9016,
+      "sha256": "bce58a6308f8d405a188c0770b913d5fa811b7f2447af07be9281b6d99eb0ba6",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          10,
+          124
+        ],
+        [
+          2,
+          136
+        ],
+        [
+          10,
+          123
+        ]
+      ]
+    },
+    {
+      "sequence": 2,
+      "bytes": 9116,
+      "sha256": "e5b8b88d0624d92572a46c4017938cd9afa358f343fb6ca7a4cbba22b1f217a6",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          7,
+          127
+        ],
+        [
+          3,
+          138
+        ],
+        [
+          7,
+          124
+        ]
+      ]
+    },
+    {
+      "sequence": 4,
+      "bytes": 9164,
+      "sha256": "f10de92a28f61ec5571b82073293b527138887ebc3978e280db7179f2f3c8dff",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          7,
+          132
+        ],
+        [
+          0,
+          145
+        ],
+        [
+          7,
+          125
+        ]
+      ]
+    },
+    {
+      "sequence": 5,
+      "bytes": 9132,
+      "sha256": "c48f8776fb1647be2f84eaf27618cc3efa6f872879438a24752942a0f774d098",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          9,
+          131
+        ],
+        [
+          3,
+          144
+        ],
+        [
+          10,
+          124
+        ]
+      ]
+    },
+    {
+      "sequence": 6,
+      "bytes": 9070,
+      "sha256": "c057ce0d8854c06c5c9d7af4f8bb8bee092d12e9a2b0223c71289d24876856a0",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          11,
+          128
+        ],
+        [
+          0,
+          138
+        ],
+        [
+          11,
+          128
+        ]
+      ]
+    },
+    {
+      "sequence": 7,
+      "bytes": 8817,
+      "sha256": "31b468db009c53ff24c3023f5d8b200496304e62a72ed8137105a1f5519a171e",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          17,
+          136
+        ],
+        [
+          3,
+          143
+        ],
+        [
+          21,
+          136
+        ]
+      ]
+    },
+    {
+      "sequence": 9,
+      "bytes": 8449,
+      "sha256": "c28ae533dad5af0896f239df2c45b33d3d70a27d8a84fbab1f164342e5f908d4",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          3,
+          163
+        ],
+        [
+          0,
+          175
+        ],
+        [
+          14,
+          165
+        ]
+      ]
+    },
+    {
+      "sequence": 10,
+      "bytes": 8315,
+      "sha256": "6ede56f685c12ed60e83e530d117824fd6018e645da092571aa76d3407fa4e40",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          27,
+          153
+        ],
+        [
+          7,
+          153
+        ],
+        [
+          33,
+          153
+        ]
+      ]
+    },
+    {
+      "sequence": 11,
+      "bytes": 8214,
+      "sha256": "4abc5172030a8d4e3d6d35803e5a0b8e3f18fd28f0ee57de1dbd76cb1eb4583f",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          28,
+          158
+        ],
+        [
+          17,
+          158
+        ],
+        [
+          33,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 13,
+      "bytes": 8057,
+      "sha256": "d81d0425f625b15ce8e75c7750eb5c29b1bcfb08000caaa32238ab27f1c6dd39",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          7,
+          231
+        ],
+        [
+          0,
+          218
+        ],
+        [
+          14,
+          238
+        ]
+      ]
+    },
+    {
+      "sequence": 15,
+      "bytes": 8128,
+      "sha256": "e33bb033e8220d4d925321fdd1e73e10bff831e613f8eb21b62185fc9a46e8bb",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          31,
+          161
+        ],
+        [
+          12,
+          161
+        ],
+        [
+          34,
+          161
+        ]
+      ]
+    },
+    {
+      "sequence": 17,
+      "bytes": 8212,
+      "sha256": "ad9a1f3035ff53afd385911759fe1d6aef551d1bb8edfc11b6557455622d5731",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          7,
+          255
+        ],
+        [
+          0,
+          255
+        ],
+        [
+          5,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 18,
+      "bytes": 8203,
+      "sha256": "f6720523c777d3a41730e27495e88ff2d120ceba66e7f62870c6f2dc9f4a082c",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          4,
+          159
+        ],
+        [
+          0,
+          159
+        ],
+        [
+          0,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 20,
+      "bytes": 8149,
+      "sha256": "1c211a8ef79dea5667553056e08e93d7686ef898979d26557860a951691f4a96",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          33,
+          158
+        ],
+        [
+          19,
+          158
+        ],
+        [
+          40,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 21,
+      "bytes": 8173,
+      "sha256": "4e7b66cf0fb02c14ff6ceb751851af227ae4f88e073f47ca1a26b6864e059f4f",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          35,
+          158
+        ],
+        [
+          20,
+          163
+        ],
+        [
+          40,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 23,
+      "bytes": 8144,
+      "sha256": "5149d0860ba087487bba0e3498052f833ac36d5c4db75b72906ab4181d55a2be",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          28,
+          158
+        ],
+        [
+          15,
+          158
+        ],
+        [
+          35,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 24,
+      "bytes": 8204,
+      "sha256": "94e2a052dcf39bdd55321c351e53118dc65995ef30ac719b5dddeb4dd4dbe0f6",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          4,
+          255
+        ],
+        [
+          0,
+          244
+        ],
+        [
+          0,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 26,
+      "bytes": 8228,
+      "sha256": "541d7cb772a5cfeab7b6d6eb8ea4f979d35780a43dee8f13e632dbe60130e1bc",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          32,
+          158
+        ],
+        [
+          15,
+          158
+        ],
+        [
+          39,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 27,
+      "bytes": 8201,
+      "sha256": "6ed22e49a34a95238fa2526b73753abb8347ee9767239cc4987840a0927706f5",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          34,
+          158
+        ],
+        [
+          18,
+          158
+        ],
+        [
+          36,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 28,
+      "bytes": 8232,
+      "sha256": "a86d0756d4ed9a9ca5d24d52c5aeeafa3e1c2ee751d8be2167b7d06a6326cb35",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          35,
+          158
+        ],
+        [
+          17,
+          159
+        ],
+        [
+          37,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 30,
+      "bytes": 8248,
+      "sha256": "20c889562edaf9d21f07e0859b32847c85a1722788e963c7a0426987275f6b6d",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          7,
+          228
+        ],
+        [
+          0,
+          215
+        ],
+        [
+          14,
+          235
+        ]
+      ]
+    },
+    {
+      "sequence": 32,
+      "bytes": 8226,
+      "sha256": "9f9b3d9fff51be0f12341226b0c149e52e95d4f1679f08d99619de2b1b8606ff",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          33,
+          160
+        ],
+        [
+          13,
+          160
+        ],
+        [
+          35,
+          160
+        ]
+      ]
+    },
+    {
+      "sequence": 34,
+      "bytes": 8244,
+      "sha256": "a4fc672581f321b81fccbbb76ea940a2f11e7a3d8225bc25b159ee31a86630ab",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          6,
+          255
+        ],
+        [
+          0,
+          249
+        ],
+        [
+          11,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 35,
+      "bytes": 8248,
+      "sha256": "b47b4f51e38056674628183beb862dd8e447f119cc041d94042ced0ae8acd0ce",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 37,
+      "bytes": 8205,
+      "sha256": "e9e58a1a54b8bd5cb2a1e053fdf13093f2cda6a5c1451da6dd567dd0e72c4810",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          15,
+          241
+        ],
+        [
+          0,
+          215
+        ],
+        [
+          14,
+          240
+        ]
+      ]
+    },
+    {
+      "sequence": 39,
+      "bytes": 8253,
+      "sha256": "08027e510101b77ce0d776ed977f7df4d777e918fa98060fbd2e4b7fabef097c",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          4,
+          255
+        ],
+        [
+          0,
+          241
+        ],
+        [
+          0,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 40,
+      "bytes": 8203,
+      "sha256": "698e7f4230063ab62859c4d419fe07cd9486ad56898c97dd0591f09a98efad60",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          38,
+          168
+        ],
+        [
+          11,
+          156
+        ],
+        [
+          34,
+          160
+        ]
+      ]
+    },
+    {
+      "sequence": 42,
+      "bytes": 8262,
+      "sha256": "0c58470ca03317e5d69328bd00aaea3de7b5f7bdd68ab3ca66c3b7e98534b8b3",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          27,
+          152
+        ],
+        [
+          9,
+          151
+        ],
+        [
+          28,
+          151
+        ]
+      ]
+    },
+    {
+      "sequence": 44,
+      "bytes": 8233,
+      "sha256": "c170c7a9eec32744348e69a5fd7160adfa14ed5f567fa548455c93c39ffe9f53",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          31,
+          158
+        ],
+        [
+          17,
+          158
+        ],
+        [
+          38,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 46,
+      "bytes": 8237,
+      "sha256": "49e895525bbb3989c8b4b237b098b9e523270d25825097cf9b550f9d421459d6",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          182
+        ],
+        [
+          0,
+          155
+        ]
+      ]
+    }
+  ],
+  "physical_camera": "OV5640 DVP",
+  "transport": "ESP32-S3 LCD_CAM -> JPEG -> HTTP on existing WiFi",
+  "luckfox_image_inference_verified": false,
+  "validation_scope": "JPEG decoding and HTTP transport only; visual quality requires separate inspection",
+  "visual_quality_verified": false,
+  "initial_status": {
+    "stage": "capturing",
+    "error": "ESP_OK",
+    "sensor_id": 22080,
+    "frames": 1,
+    "failures": 0,
+    "jpeg_bytes": 9016,
+    "capture_ms": 148,
+    "width": 640,
+    "height": 480,
+    "autofocus_ready": true,
+    "af_raw": 0,
+    "af_ack": 1,
+    "focused": false,
+    "profile": 17,
+    "frame_age_ms": 78,
+    "recent_frame": true
+  },
+  "final_status": {
+    "stage": "capturing",
+    "error": "ESP_OK",
+    "sensor_id": 22080,
+    "frames": 49,
+    "failures": 1,
+    "jpeg_bytes": 8255,
+    "capture_ms": 146,
+    "width": 640,
+    "height": 480,
+    "autofocus_ready": true,
+    "af_raw": 16,
+    "af_ack": 0,
+    "focused": true,
+    "profile": 17,
+    "frame_age_ms": 116,
+    "recent_frame": true
+  },
+  "capture_fps_estimate": 5.77,
+  "snapshot_test_seconds": 7.923,
+  "result": "fail",
+  "error": "采集期间无新增失败帧",
+  "esp_firmware_sha256": "5ca0152944853e8d57797d1d791c22f2a1bc05b1a07dd0035a19f0d4b7cd59a7"
+}

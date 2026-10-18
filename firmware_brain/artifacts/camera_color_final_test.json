@@ -1,0 +1,119 @@
+{
+  "entries": [
+    {
+      "mode": 5,
+      "bars_rgb": [
+        [
+          253,
+          253,
+          253
+        ],
+        [
+          255,
+          255,
+          57
+        ],
+        [
+          47,
+          255,
+          230
+        ],
+        [
+          40,
+          255,
+          0
+        ],
+        [
+          215,
+          0,
+          254
+        ],
+        [
+          208,
+          0,
+          29
+        ],
+        [
+          0,
+          0,
+          197
+        ],
+        [
+          6,
+          6,
+          6
+        ]
+      ],
+      "checks": {
+        "white": true,
+        "yellow": true,
+        "cyan": true,
+        "green": true,
+        "magenta": true,
+        "red": true,
+        "blue": true,
+        "black": true
+      },
+      "result": "pass",
+      "registers": {
+        "4300": 48,
+        "501f": 0,
+        "5000": 167,
+        "5001": 163,
+        "5003": 8,
+        "503d": 128,
+        "5381": 29,
+        "5382": 96,
+        "5383": 3,
+        "5384": 12,
+        "5385": 120,
+        "5386": 132,
+        "5387": 125,
+        "5388": 107,
+        "5389": 18,
+        "538a": 1,
+        "538b": 152,
+        "5580": 6,
+        "5583": 64,
+        "5584": 44,
+        "5586": 32,
+        "5587": 0,
+        "5588": 0,
+        "3820": 1,
+        "3821": 33,
+        "4514": 170,
+        "3621": 224,
+        "3906": 120,
+        "3901": 10,
+        "3406": 0
+      },
+      "status": {
+        "stage": "capturing",
+        "error": "ESP_OK",
+        "sensor_id": 22080,
+        "frames": 10,
+        "failures": 0,
+        "jpeg_bytes": 10859,
+        "capture_ms": 149,
+        "width": 640,
+        "height": 480,
+        "color_mode": 5,
+        "awb_r": 1303,
+        "awb_g": 1024,
+        "awb_b": 1748,
+        "autofocus_ready": true,
+        "af_raw": 0,
+        "af_ack": 1,
+        "focused": false,
+        "profile": 17,
+        "frame_age_ms": 51,
+        "recent_frame": true
+      }
+    }
+  ],
+  "scope": "sensor-generated color bars; real-object accuracy requires separate check",
+  "esp_firmware_sha256": "fb3beb43dbf04a6ae8702b2966f4d2fad3fb2e107e660d193fbd0631fb105734",
+  "real_object_confirmation": "pending",
+  "temporal_color_stability_verified": false,
+  "later_limitation": "User reported alternating normal/purple frames. Double-buffer automatic/fixed-WB real-scene sequences each had49 large transitions in50 frames. Superseded by single-buffer stable firmware."
+}

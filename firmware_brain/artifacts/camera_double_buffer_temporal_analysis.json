@@ -1,0 +1,18 @@
+{
+  "firmware_sha256": "fb3beb43dbf04a6ae8702b2966f4d2fad3fb2e107e660d193fbd0631fb105734",
+  "scope": "MJPEG consecutive frames; fixed ceiling ROI",
+  "modes": {
+    "0": {
+      "frames": 50,
+      "large_color_transitions": 49,
+      "max_color_step": 0.6563591911237514,
+      "awb_fixed": false
+    },
+    "2": {
+      "frames": 50,
+      "large_color_transitions": 49,
+      "max_color_step": 0.6503898113906146,
+      "awb_fixed": true
+    }
+  }
+}

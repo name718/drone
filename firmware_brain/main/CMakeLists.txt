@@ -13,6 +13,7 @@ idf_component_register(
         SRCS
             "main.cpp"
             "comm/head_link.cpp"
+            "camera/camera_service.cpp"
             "../../shared/ui/canvas.cpp"
             "../../shared/ui/face_engine.cpp"			 # 系统主入口 (负责点火启动)
             "core/robot_brain.cpp"       # 大脑中枢 (单例外观模式，总管全局调度)
@@ -51,6 +52,7 @@ idf_component_register(
             esp_driver_spi		 # 控制 SPI2 高速硬件总线 (GPIO 11/12/14 刷屏推流)
             esp_driver_ledc		 # 控制硬件 LEDC PWM 输出 (GPIO 1/2 控制 SG90 舵机)
             esp_driver_i2s		 # 控制硬件 I2S 音频接口 (I2S0 麦克风 / I2S1 功放)
+            esp_driver_i2c             # OV5640 SCCB型号探测；随后将总线交回官方摄像头驱动
             freertos			 # FreeRTOS 实时多任务操作系统内核 (任务调度/队列)
             log                          # 提供 ESP_LOGI / ESP_LOGE 等彩色串口日志输出
             esp_system			 # 提供系统启动、芯片重启、硬件自检信息接口

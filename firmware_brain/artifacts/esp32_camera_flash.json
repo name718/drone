@@ -1,0 +1,123 @@
+{
+  "backup": "firmware_brain/artifacts/esp32_before_camera_20261018.bin",
+  "backup_bytes": 1572864,
+  "backup_sha256": "8836481d409386ce4f621e3bfc3db1621ddcc660a5985e1465919c96e46e7149",
+  "app_bytes": 1493984,
+  "app_sha256": "cb2b06f670f5c55cbe1d6ead41878c3738bf14bc376b3c708d41f64e12f47a34",
+  "board_mac": "e0:72:a1:f7:1d:18",
+  "baud": 115200,
+  "flash_result": "pass; esptool verified bootloader, partition table and app hashes",
+  "initial_probe": {
+    "sensor_id": "0x5640",
+    "autofocus": "ESP_OK",
+    "jpeg": "invalid: repeated bytes in header"
+  },
+  "attempts": [
+    {
+      "purpose": "PLL public API correction and timing profiles",
+      "app_bytes": 1495104,
+      "app_sha256": "10ea9f2534438112b243c17341cabac8349cd86bbb607a11a4e34602720c6ec2",
+      "result": "pass; esptool application hash verified"
+    },
+    {
+      "purpose": "after user PCLK/ground rewire: profile3 and stale-frame rejection",
+      "app_bytes": 1495360,
+      "app_sha256": "43e7a38634f8d1ad728b3acbd02ac0e666defd8e6bf9dce4cc05819c40975b05",
+      "result": "pass; esptool application hash verified"
+    },
+    {
+      "purpose": "HTTP concurrency socket budget 16",
+      "app_bytes": 1495360,
+      "app_sha256": "bc177a8f194dd8103e29ea6a7506296f21e0655aafbbe7803f4b4276daee87f4",
+      "result": "pass; esptool hash verified"
+    },
+    {
+      "purpose": "Explicit C8 camera sleep/wake, AF async handshake, PLL root comparison",
+      "app_bytes": 1495856,
+      "app_sha256": "5cf56abfbeafe9800620fdbbb900205849876bcfbe0295ff5e0c58e2ac54403b",
+      "result": "esptool hash verified",
+      "log": "camera_focus_flash.log"
+    },
+    {
+      "purpose": "VGA and AF release/single command; raw AF 0x10 confirmed",
+      "app_bytes": 1496080,
+      "app_sha256": "bb9fe996b2c0b77074e8eeb9a4f323a2094d7d74d858787cd684e6593061f45a",
+      "result": "esptool hash verified",
+      "log": "camera_focus_vga_flash.log"
+    },
+    {
+      "purpose": "Low internal clock VGA and sensor colorbar diagnostics",
+      "app_bytes": 1496160,
+      "app_sha256": "f34c3cd2f766488107e451ec8cdcd2554c683820e7a7c268293f1efc2c7385fd",
+      "result": "esptool hash verified",
+      "log": "camera_low_vga_flash.log"
+    },
+    {
+      "purpose": "Analog frontend initial values and gain comparison; fixed stripes substantially improved, residual corrupted frames",
+      "app_bytes": 1496528,
+      "app_sha256": "5ca0152944853e8d57797d1d791c22f2a1bc05b1a07dd0035a19f0d4b7cd59a7",
+      "result": "esptool hash verified",
+      "log": "camera_analog_flash.log"
+    },
+    {
+      "purpose": "PSRAM direct DMA comparison: no valid JPEG, reverted",
+      "app_bytes": 1496560,
+      "app_sha256": "27055322cbbe4308aeae56d9a90c10326f4b260f7ec7224b7f2267b63abe32d1",
+      "result": "esptool hash verified",
+      "log": "camera_psram_dma_flash.log"
+    },
+    {
+      "purpose": "Final: analog frontend + AF single handshake + 1.5MHz DVP + SRAM DMA",
+      "app_bytes": 1496560,
+      "app_sha256": "28f76e6d15f38c5f757faa147ebf728234e08e38ce67f1ae1940e3b290eaeb77",
+      "result": "esptool hash verified",
+      "log": "camera_slow_output_flash.log"
+    },
+    {
+      "purpose": "Color normalization and bounded WB/readout orientation comparison, AWB readback",
+      "app_bytes": 1497680,
+      "app_sha256": "0c665c5f3125c7dcd3e57f66c7ebe7e7c5bffc218499c3b8d92a0885868ef7b3",
+      "result": "esptool hash verified"
+    },
+    {
+      "purpose": "Read-only color register snapshots and bounded color restoration diagnostics",
+      "app_bytes": 1498448,
+      "app_sha256": "23430f4c4c749323fb8c50e818c343364f56ab3e6e7ae17ebb45912148dc36a2",
+      "result": "esptool hash verified",
+      "log": "camera_color_regs_flash.log"
+    },
+    {
+      "purpose": "Per-register color isolation; 0x3906 override identified",
+      "app_bytes": 1498592,
+      "app_sha256": "e8a61964b8ac1dfb97882ee07b6c9fc730a1efbb867edfc14965d92effe4dac4",
+      "result": "esptool hash verified",
+      "log": "camera_color_isolation_flash.log"
+    },
+    {
+      "purpose": "Final color fix: preserve module 0x3906=0x78; default VGA profile17; temporary per-register modes removed",
+      "app_bytes": 1498160,
+      "app_sha256": "fb3beb43dbf04a6ae8702b2966f4d2fad3fb2e107e660d193fbd0631fb105734",
+      "result": "esptool hash verified",
+      "log": "camera_color_final_flash.log"
+    },
+    {
+      "purpose": "Single frame buffer: suppress observed alternating normal/purple real-scene frames; preserve0x3906 reset value",
+      "app_bytes": 1498160,
+      "app_sha256": "3eead7c4506a513a8d4fdd002fc73a171489f72da49077cbc09721bd2c3b0940",
+      "result": "esptool hash verified",
+      "log": "camera_single_buffer_flash.log"
+    }
+  ],
+  "running_app_sha256": "3eead7c4506a513a8d4fdd002fc73a171489f72da49077cbc09721bd2c3b0940",
+  "prepared_app_sha256": "3eead7c4506a513a8d4fdd002fc73a171489f72da49077cbc09721bd2c3b0940",
+  "prepared_status": "single-buffer stable-color firmware flashed and verified",
+  "camera_result": "User confirms colors stable and no flicker. Single-buffer60 consecutive real-scene frames and40 after restart show0 large color jumps;20 consecutive color bars pass;AF0x10/ACK0;HTTP+MJPEG and87 head telemetry samples pass.640x480 about3fps.",
+  "next_hardware_action": "None required for demonstrated stable-color preview; long-duration and other illumination conditions unverified.",
+  "color_culprit": {
+    "register": "0x3906",
+    "module_reset_value": "0x78",
+    "incorrect_override": "0x10"
+  },
+  "real_object_user_confirmation": "颜色稳定，不再闪变",
+  "startup_observations": "First post-flash initialization failed with generic error; ESP reset recovered. Subsequent restart and40-frame stability test pass; not an exhaustive cold-start test."
+}

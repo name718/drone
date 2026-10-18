@@ -1,0 +1,110 @@
+{
+  "firmware_sha256": "e8a61964b8ac1dfb97882ee07b6c9fc730a1efbb867edfc14965d92effe4dac4",
+  "initial": {
+    "stage": "capturing",
+    "error": "ESP_OK",
+    "sensor_id": 22080,
+    "frames": 576,
+    "failures": 3,
+    "jpeg_bytes": 9613,
+    "capture_ms": 126,
+    "width": 640,
+    "height": 480,
+    "color_mode": 50,
+    "awb_r": 1200,
+    "awb_g": 1024,
+    "awb_b": 1895,
+    "autofocus_ready": true,
+    "af_raw": 16,
+    "af_ack": 0,
+    "focused": true,
+    "profile": 17,
+    "frame_age_ms": 92,
+    "recent_frame": true
+  },
+  "final": {
+    "stage": "capturing",
+    "error": "ESP_OK",
+    "sensor_id": 22080,
+    "frames": 601,
+    "failures": 3,
+    "jpeg_bytes": 10198,
+    "capture_ms": 70,
+    "width": 640,
+    "height": 480,
+    "color_mode": 50,
+    "awb_r": 1211,
+    "awb_g": 1024,
+    "awb_b": 1896,
+    "autofocus_ready": true,
+    "af_raw": 16,
+    "af_ack": 0,
+    "focused": true,
+    "profile": 17,
+    "frame_age_ms": 132,
+    "recent_frame": true
+  },
+  "frames": [
+    {
+      "sequence": "576",
+      "bytes": 9613
+    },
+    {
+      "sequence": "578",
+      "bytes": 9604
+    },
+    {
+      "sequence": "579",
+      "bytes": 10181
+    },
+    {
+      "sequence": "581",
+      "bytes": 10159
+    },
+    {
+      "sequence": "583",
+      "bytes": 10187
+    },
+    {
+      "sequence": "584",
+      "bytes": 9609
+    },
+    {
+      "sequence": "586",
+      "bytes": 9590
+    },
+    {
+      "sequence": "588",
+      "bytes": 9571
+    },
+    {
+      "sequence": "589",
+      "bytes": 10151
+    },
+    {
+      "sequence": "591",
+      "bytes": 10165
+    },
+    {
+      "sequence": "593",
+      "bytes": 10165
+    },
+    {
+      "sequence": "595",
+      "bytes": 10145
+    },
+    {
+      "sequence": "596",
+      "bytes": 9580
+    },
+    {
+      "sequence": "598",
+      "bytes": 9593
+    },
+    {
+      "sequence": "599",
+      "bytes": 10181
+    }
+  ],
+  "fps": 5.8671452426848845
+}

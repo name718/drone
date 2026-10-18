@@ -1,0 +1,1438 @@
+{
+  "checks": [
+    "SCCB实读芯片ID为0x5640",
+    "后台DVP采集已运行",
+    "60张JPEG均可完整解码为640x480",
+    "实际采集帧号持续递增",
+    "MJPEG响应类型正确",
+    "3帧MJPEG解码且并发控制HTTP正常"
+  ],
+  "frames": [
+    {
+      "sequence": 132,
+      "bytes": 8174,
+      "sha256": "32b1604361f5739279b63a75f69bb3f2d1cdd6c3cb4ac384a3810276817e81e2",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          0,
+          233
+        ],
+        [
+          13,
+          255
+        ],
+        [
+          0,
+          253
+        ]
+      ]
+    },
+    {
+      "sequence": 133,
+      "bytes": 8203,
+      "sha256": "122ba5833ce654a10653f4a335b58bedd5b2ddc6eb9ddf05e2bd2a09947ae5c9",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          35,
+          157
+        ],
+        [
+          9,
+          157
+        ],
+        [
+          39,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 135,
+      "bytes": 8217,
+      "sha256": "0c6764c1052fd53d5db6a7d8a7db23115cbb60127f4c76868bd1f98de79005dc",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          33,
+          158
+        ],
+        [
+          14,
+          158
+        ],
+        [
+          31,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 137,
+      "bytes": 8256,
+      "sha256": "f8375546f415620679a25b232e052a8add863fe4c36ae8003c7f705bb7752f8f",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          34,
+          160
+        ],
+        [
+          14,
+          160
+        ],
+        [
+          40,
+          160
+        ]
+      ]
+    },
+    {
+      "sequence": 138,
+      "bytes": 8189,
+      "sha256": "ed7bba224d958621007868d8f3eb09e3715a2bb666027b82f9b369f63df7fc6f",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          4,
+          255
+        ],
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 140,
+      "bytes": 8196,
+      "sha256": "1a5b172a720145b098a113adbe6077d9b0001460bd73fda3f87a04e95ea5139a",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          36,
+          158
+        ],
+        [
+          19,
+          158
+        ],
+        [
+          38,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 142,
+      "bytes": 8246,
+      "sha256": "48b43fc5da66e96131db5e1478ad26f2e7b479a248ea05b7869b3d677d1d9429",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          242
+        ],
+        [
+          7,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 143,
+      "bytes": 8177,
+      "sha256": "6d09e9f8d2bfc4ff155ba4d9b847722fb4c02bcef85c2e5a57efeb050f5ee87b",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          26,
+          155
+        ],
+        [
+          10,
+          155
+        ],
+        [
+          32,
+          156
+        ]
+      ]
+    },
+    {
+      "sequence": 145,
+      "bytes": 8230,
+      "sha256": "9d9d407967935ae52b91608718d45dcd57386b84d7138818d6c8622e420624e7",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          7,
+          255
+        ],
+        [
+          0,
+          248
+        ],
+        [
+          19,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 147,
+      "bytes": 8191,
+      "sha256": "9951bb33e1acd4bb85568dbc0561f86a75f672022c098b417e08c46fdce5f839",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          7,
+          161
+        ],
+        [
+          0,
+          161
+        ],
+        [
+          14,
+          161
+        ]
+      ]
+    },
+    {
+      "sequence": 149,
+      "bytes": 8222,
+      "sha256": "35eefc96d50ba8086d0ca56e956eb803a61c10a1941bc00d710a98d02b81bc27",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          35,
+          163
+        ],
+        [
+          17,
+          163
+        ],
+        [
+          36,
+          163
+        ]
+      ]
+    },
+    {
+      "sequence": 151,
+      "bytes": 8254,
+      "sha256": "1616fad7181242d932072dffbefc67b07a525ad8561e53944fc9d014893af17f",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          0,
+          179
+        ],
+        [
+          5,
+          215
+        ],
+        [
+          0,
+          190
+        ]
+      ]
+    },
+    {
+      "sequence": 153,
+      "bytes": 8193,
+      "sha256": "2dfffd560096a4f8f57dff66c5631a5aa6b5a26b23899a82a32c5fa2c3259fbd",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          15,
+          255
+        ],
+        [
+          0,
+          247
+        ],
+        [
+          0,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 153,
+      "bytes": 8193,
+      "sha256": "2dfffd560096a4f8f57dff66c5631a5aa6b5a26b23899a82a32c5fa2c3259fbd",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          15,
+          255
+        ],
+        [
+          0,
+          247
+        ],
+        [
+          0,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 155,
+      "bytes": 8184,
+      "sha256": "7436a48c10422f4bdac9130d7544b4538a70cf00dc890d8d689b328d2dcd9b7e",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          33,
+          159
+        ],
+        [
+          14,
+          158
+        ],
+        [
+          36,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 157,
+      "bytes": 8188,
+      "sha256": "d055c470669953310810816aedc61b153dce6260e39bc14fe329946c5b96d118",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          0,
+          251
+        ],
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 158,
+      "bytes": 8239,
+      "sha256": "cc23a8c8c1bb84c969f29cf34ff370ed580637147476825b92a07d14a4744d6f",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          6,
+          172
+        ],
+        [
+          0,
+          172
+        ],
+        [
+          11,
+          172
+        ]
+      ]
+    },
+    {
+      "sequence": 160,
+      "bytes": 8224,
+      "sha256": "9bfba13aebbf05617ce908dbac7ae40e77c6f131428a7f91e38966e9dc097b3b",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          33,
+          159
+        ],
+        [
+          18,
+          159
+        ],
+        [
+          41,
+          159
+        ]
+      ]
+    },
+    {
+      "sequence": 160,
+      "bytes": 8224,
+      "sha256": "9bfba13aebbf05617ce908dbac7ae40e77c6f131428a7f91e38966e9dc097b3b",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          33,
+          159
+        ],
+        [
+          18,
+          159
+        ],
+        [
+          41,
+          159
+        ]
+      ]
+    },
+    {
+      "sequence": 162,
+      "bytes": 8236,
+      "sha256": "242ba6effdb673af00c6d64e082c0f5a0f006a8d2e97ab3c192908e5a2f6a575",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          11,
+          172
+        ],
+        [
+          0,
+          161
+        ],
+        [
+          11,
+          165
+        ]
+      ]
+    },
+    {
+      "sequence": 163,
+      "bytes": 8204,
+      "sha256": "5670f92f6927aa81c73d9fcdd06a22a3cc69e6d5dd761ca75afd872e3479918b",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          4,
+          255
+        ],
+        [
+          0,
+          239
+        ],
+        [
+          5,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 165,
+      "bytes": 8206,
+      "sha256": "621f6701448a1afe082ce939a00da3ddeb962537d2bda3453f6d6778028a6e50",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          11,
+          255
+        ],
+        [
+          0,
+          248
+        ],
+        [
+          9,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 165,
+      "bytes": 8206,
+      "sha256": "621f6701448a1afe082ce939a00da3ddeb962537d2bda3453f6d6778028a6e50",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          11,
+          255
+        ],
+        [
+          0,
+          248
+        ],
+        [
+          9,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 167,
+      "bytes": 8236,
+      "sha256": "77cece33a05859bebe61676a784d649cbd9b963c58e9643cf5dbc1903d75b9ab",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          34,
+          158
+        ],
+        [
+          18,
+          158
+        ],
+        [
+          38,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 169,
+      "bytes": 8211,
+      "sha256": "c479cdb1d225f4fb95f277b0424b4ae7d487f56ff0444e1edb3974d82ff2ea42",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          213
+        ],
+        [
+          0,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 171,
+      "bytes": 8207,
+      "sha256": "2d1b520289ca8d519168986064e6407d91076848f50eee156e71165148796d05",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          7,
+          255
+        ],
+        [
+          0,
+          247
+        ],
+        [
+          0,
+          245
+        ]
+      ]
+    },
+    {
+      "sequence": 173,
+      "bytes": 8229,
+      "sha256": "8934ea21043589179dcff352466fe42230e7cd8669f03b74a8ef66ba3c88b0b2",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          32,
+          159
+        ],
+        [
+          12,
+          158
+        ],
+        [
+          36,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 175,
+      "bytes": 8182,
+      "sha256": "68d7fd4525c4720faa70553f021b298b38612ad5c1a9bdb4159e72473e98586d",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          3,
+          195
+        ],
+        [
+          0,
+          187
+        ],
+        [
+          7,
+          200
+        ]
+      ]
+    },
+    {
+      "sequence": 177,
+      "bytes": 8196,
+      "sha256": "5f2a305a786803876024c71cfcce4cadad36ed5a20d788cc4637d13d50cae7f0",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          31,
+          158
+        ],
+        [
+          12,
+          158
+        ],
+        [
+          34,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 178,
+      "bytes": 8156,
+      "sha256": "09a7ed10c3039506c072f43fd4cb708dabdea8365d05a3ddb566d3cfad8f820f",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          29,
+          158
+        ],
+        [
+          15,
+          158
+        ],
+        [
+          39,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 180,
+      "bytes": 8236,
+      "sha256": "6cf201cc2e565a2c18948ab740c13a2e31d90c419fe6137697678ef6f1174348",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          38,
+          159
+        ],
+        [
+          14,
+          159
+        ],
+        [
+          40,
+          159
+        ]
+      ]
+    },
+    {
+      "sequence": 182,
+      "bytes": 8221,
+      "sha256": "b004d65dd9dedfa920bf256c998256f805f44ae0c0d74708ba9a177721d1efa6",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          34,
+          158
+        ],
+        [
+          16,
+          158
+        ],
+        [
+          38,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 183,
+      "bytes": 8193,
+      "sha256": "489ca7c80e6b978bba2df2738826ed15b12a326e86c7be911f657a45a8c612dc",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          28,
+          158
+        ],
+        [
+          15,
+          158
+        ],
+        [
+          35,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 184,
+      "bytes": 8233,
+      "sha256": "3e5a51cd64b87b7f72ae7f320ebc03a79e2fcacc50bf2700336dcd87dda9e983",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          11,
+          255
+        ],
+        [
+          0,
+          230
+        ],
+        [
+          29,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 186,
+      "bytes": 8231,
+      "sha256": "a3b47f8d7913dd285598dd8203c02770f5e8d2fb6e342cf17c38de90cf5c828a",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          11,
+          255
+        ],
+        [
+          0,
+          247
+        ],
+        [
+          14,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 187,
+      "bytes": 8203,
+      "sha256": "c74b12f5d0f083835f18533fafe8ca0c077240109036c8a43b84ed7398a9ee8e",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 188,
+      "bytes": 8242,
+      "sha256": "59b80003cc38b786de6b5a328ed15c35dd7d859d08cd6045d5800aeb20a7cfb0",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          1,
+          248
+        ],
+        [
+          0,
+          248
+        ],
+        [
+          0,
+          238
+        ]
+      ]
+    },
+    {
+      "sequence": 189,
+      "bytes": 8207,
+      "sha256": "767c36b404e753ea4d3b429e1196bcadb3246a39fbe6f5898f1c4c71123a541b",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          43,
+          165
+        ],
+        [
+          14,
+          154
+        ],
+        [
+          42,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 191,
+      "bytes": 8213,
+      "sha256": "21074e17df78e0aa3dcb32b6ea254c56ce3f341143c1de9ab7a158381cb3457d",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          30,
+          158
+        ],
+        [
+          17,
+          158
+        ],
+        [
+          32,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 192,
+      "bytes": 8195,
+      "sha256": "f43ae81011d6326cd7b17fdf035966c77adca8d19dbbee99d2fa8a7c30559a6f",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          15,
+          146
+        ],
+        [
+          0,
+          156
+        ],
+        [
+          21,
+          146
+        ]
+      ]
+    },
+    {
+      "sequence": 193,
+      "bytes": 8269,
+      "sha256": "96dd8ecb3682741b813be53e441defc51a3bc0af0d0fa29cfc139e6d9d704c00",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          15,
+          255
+        ],
+        [
+          0,
+          245
+        ],
+        [
+          0,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 195,
+      "bytes": 8185,
+      "sha256": "e3e937e42521c5bb9a2ce144e2c112f1abd930e7d6ee4a2916983656f1ca10cf",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          32,
+          158
+        ],
+        [
+          16,
+          158
+        ],
+        [
+          38,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 196,
+      "bytes": 8228,
+      "sha256": "544560fa9f356f4f77279047f955b20409351569e3155d3433cfe795833b83f5",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          36,
+          158
+        ],
+        [
+          16,
+          158
+        ],
+        [
+          41,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 197,
+      "bytes": 8200,
+      "sha256": "7bfa4594e4ff2726d8aa7f17288c73523d733f6395ca8a4870af6e75aba549d3",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          34,
+          159
+        ],
+        [
+          21,
+          161
+        ],
+        [
+          41,
+          159
+        ]
+      ]
+    },
+    {
+      "sequence": 199,
+      "bytes": 8217,
+      "sha256": "59c496b3e73c0917d53bede407dc50d15a1c34ce59094594ac8c40af30dafce2",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          35,
+          158
+        ],
+        [
+          17,
+          158
+        ],
+        [
+          43,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 200,
+      "bytes": 8238,
+      "sha256": "591300712a31009c8eab135d5b815ae64eb223e46ca990ae4b2acc601a31ca9d",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          4,
+          255
+        ],
+        [
+          0,
+          254
+        ],
+        [
+          0,
+          218
+        ]
+      ]
+    },
+    {
+      "sequence": 201,
+      "bytes": 8231,
+      "sha256": "c726148f98da187a795de063fddcc98e5f4c5e4e920b5c7619d2e17837b7421c",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          37,
+          157
+        ],
+        [
+          16,
+          156
+        ],
+        [
+          45,
+          156
+        ]
+      ]
+    },
+    {
+      "sequence": 202,
+      "bytes": 8183,
+      "sha256": "e54ee699e1e951ccd0aa441f72c21b7b0c60697ab187901a983840f843443f0a",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          35,
+          158
+        ],
+        [
+          18,
+          158
+        ],
+        [
+          39,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 204,
+      "bytes": 8236,
+      "sha256": "790baee76eaea5aebe4db4bf79e12243b0a22f750cb7a93700c9773cdb6dd017",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          34,
+          158
+        ],
+        [
+          15,
+          158
+        ],
+        [
+          37,
+          158
+        ]
+      ]
+    },
+    {
+      "sequence": 205,
+      "bytes": 8223,
+      "sha256": "409e8574e73c897fff175b9e115c7e116cdde236b62b807c65258037c573abdf",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          255
+        ]
+      ]
+    },
+    {
+      "sequence": 207,
+      "bytes": 8201,
+      "sha256": "9afc4d02ee3ef33429e7bb1a2e5fc8c21f52ad968c5c138e16e2f6d0ce2478aa",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          35,
+          162
+        ],
+        [
+          17,
+          160
+        ],
+        [
+          39,
+          160
+        ]
+      ]
+    },
+    {
+      "sequence": 208,
+      "bytes": 8199,
+      "sha256": "2743dd5f6a6c59f1f881815421399ed9961c79d8753419ae9f7d6d4edeb784be",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          33,
+          162
+        ],
+        [
+          13,
+          160
+        ],
+        [
+          41,
+          163
+        ]
+      ]
+    },
+    {
+      "sequence": 210,
+      "bytes": 8167,
+      "sha256": "e27c471a4f45be2c2406886fc5347f4a79c43b478e6fc388890ecababd6bd048",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          30,
+          160
+        ],
+        [
+          15,
+          160
+        ],
+        [
+          35,
+          160
+        ]
+      ]
+    },
+    {
+      "sequence": 211,
+      "bytes": 8177,
+      "sha256": "c3b34d15a925ab5dd5caa2700772cb337c64f2afbf61cc453eda27fb9508b807",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          43,
+          166
+        ],
+        [
+          12,
+          158
+        ],
+        [
+          40,
+          159
+        ]
+      ]
+    },
+    {
+      "sequence": 213,
+      "bytes": 8201,
+      "sha256": "32b1a240ab5799b634e4e701440119e4d9a741635c58678183fd92a2d40a902b",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          32,
+          159
+        ],
+        [
+          12,
+          159
+        ],
+        [
+          37,
+          160
+        ]
+      ]
+    },
+    {
+      "sequence": 214,
+      "bytes": 8187,
+      "sha256": "a167bfd7bb9625bef6ea055d2d39d59456f4f09a05c77fc952d959b0ba9cfafc",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          38,
+          160
+        ],
+        [
+          18,
+          160
+        ],
+        [
+          42,
+          160
+        ]
+      ]
+    },
+    {
+      "sequence": 216,
+      "bytes": 8225,
+      "sha256": "c41b52753b1aac06972cc5b5654228d56452b3a3637fb3b17460f898e4eb6fda",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          30,
+          160
+        ],
+        [
+          14,
+          160
+        ],
+        [
+          35,
+          160
+        ]
+      ]
+    },
+    {
+      "sequence": 217,
+      "bytes": 8247,
+      "sha256": "f5b7b1778c649887398e624c865270b74252ce833092cce7fe5d2bd529072152",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          34,
+          157
+        ],
+        [
+          11,
+          157
+        ],
+        [
+          38,
+          157
+        ]
+      ]
+    },
+    {
+      "sequence": 218,
+      "bytes": 8196,
+      "sha256": "4ea909b07da730b3f567902ba459bbcf681026d1db44caeda5d276fca48908f5",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          35,
+          159
+        ],
+        [
+          21,
+          159
+        ],
+        [
+          37,
+          159
+        ]
+      ]
+    },
+    {
+      "sequence": 220,
+      "bytes": 8236,
+      "sha256": "6f95b3c080b4ca103300265c2b6d04b5b42cbfb2739d4ecea40832f2d1d03c6a",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          30,
+          158
+        ],
+        [
+          15,
+          158
+        ],
+        [
+          32,
+          158
+        ]
+      ]
+    }
+  ],
+  "physical_camera": "OV5640 DVP",
+  "transport": "ESP32-S3 LCD_CAM -> JPEG -> HTTP on existing WiFi",
+  "luckfox_image_inference_verified": false,
+  "validation_scope": "JPEG decoding and HTTP transport only; visual quality requires separate inspection",
+  "visual_quality_verified": false,
+  "initial_status": {
+    "stage": "capturing",
+    "error": "ESP_OK",
+    "sensor_id": 22080,
+    "frames": 131,
+    "failures": 12,
+    "jpeg_bytes": 8186,
+    "capture_ms": 148,
+    "width": 640,
+    "height": 480,
+    "autofocus_ready": true,
+    "af_raw": 16,
+    "af_ack": 0,
+    "focused": true,
+    "profile": 17,
+    "frame_age_ms": 132,
+    "recent_frame": true
+  },
+  "final_status": {
+    "stage": "capturing",
+    "error": "ESP_OK",
+    "sensor_id": 22080,
+    "frames": 224,
+    "failures": 21,
+    "jpeg_bytes": 8236,
+    "capture_ms": 147,
+    "width": 640,
+    "height": 480,
+    "autofocus_ready": true,
+    "af_raw": 16,
+    "af_ack": 0,
+    "focused": true,
+    "profile": 17,
+    "frame_age_ms": 132,
+    "recent_frame": true
+  },
+  "capture_fps_estimate": 5.4,
+  "snapshot_test_seconds": 16.66,
+  "result": "fail",
+  "error": "采集期间无新增失败帧",
+  "esp_firmware_sha256": "5ca0152944853e8d57797d1d791c22f2a1bc05b1a07dd0035a19f0d4b7cd59a7"
+}

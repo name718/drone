@@ -1,0 +1,292 @@
+{
+  "checks": [
+    "SCCB实读芯片ID为0x5640",
+    "后台DVP采集已运行",
+    "10张JPEG均可完整解码为640x480",
+    "实际采集帧号持续递增",
+    "MJPEG响应类型正确",
+    "3帧MJPEG解码且并发控制HTTP正常",
+    "采集期间无新增失败帧"
+  ],
+  "frames": [
+    {
+      "sequence": 244,
+      "bytes": 10678,
+      "sha256": "5eb7720ce8db3fdb6b7456de1f449d52b0179c6363f873c31260942fc22bc6ad",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          39,
+          172
+        ],
+        [
+          33,
+          172
+        ],
+        [
+          35,
+          172
+        ]
+      ]
+    },
+    {
+      "sequence": 246,
+      "bytes": 10678,
+      "sha256": "c371ad9980b1ab492d44cb8bebc350a41d1b5d1481f4286882fc339f20c7e3b4",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          39,
+          169
+        ],
+        [
+          39,
+          169
+        ],
+        [
+          39,
+          169
+        ]
+      ]
+    },
+    {
+      "sequence": 248,
+      "bytes": 10678,
+      "sha256": "b878a4b57657ee8129dc1faf5eafd7bab64dcb3901a3e539aa3d2c55a3536ba7",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          41,
+          170
+        ],
+        [
+          42,
+          170
+        ],
+        [
+          36,
+          170
+        ]
+      ]
+    },
+    {
+      "sequence": 250,
+      "bytes": 10678,
+      "sha256": "4067e958ae0e27907bd45a8c9b18d52627ea32956462854cfc66b77abefec177",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          39,
+          166
+        ],
+        [
+          36,
+          166
+        ],
+        [
+          38,
+          166
+        ]
+      ]
+    },
+    {
+      "sequence": 251,
+      "bytes": 10678,
+      "sha256": "21c29065b08ab2a9e9968c148d36dd39ae0672b2d0e3af8ba77e519be1f3e3ab",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          40,
+          168
+        ],
+        [
+          40,
+          168
+        ],
+        [
+          39,
+          168
+        ]
+      ]
+    },
+    {
+      "sequence": 253,
+      "bytes": 10678,
+      "sha256": "8cdf4cb471ff86ad63ff32f4e61919507121502c69dba82e2ad87eaed914997e",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          36,
+          170
+        ],
+        [
+          36,
+          170
+        ],
+        [
+          36,
+          170
+        ]
+      ]
+    },
+    {
+      "sequence": 255,
+      "bytes": 10678,
+      "sha256": "d8d6faffca0938e984233a897a8de2208862b84d36a19819f29cac2481748637",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          38,
+          169
+        ],
+        [
+          38,
+          169
+        ],
+        [
+          38,
+          169
+        ]
+      ]
+    },
+    {
+      "sequence": 257,
+      "bytes": 10678,
+      "sha256": "540eb90213025a0e5bbb35b4e86ef93f0b377413ea333a522543060a01640f1a",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          34,
+          169
+        ],
+        [
+          34,
+          169
+        ],
+        [
+          34,
+          169
+        ]
+      ]
+    },
+    {
+      "sequence": 259,
+      "bytes": 10678,
+      "sha256": "1056025088b55fc5016cefc998a82957093e77e3b73dfb136a90bca3eb5bdd4e",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          41,
+          166
+        ],
+        [
+          39,
+          166
+        ],
+        [
+          42,
+          166
+        ]
+      ]
+    },
+    {
+      "sequence": 261,
+      "bytes": 10678,
+      "sha256": "78aadacaeec67cccb2254edb0230b4ff9e8e7615b773f21f983b052eeddc5010",
+      "size": [
+        640,
+        480
+      ],
+      "extrema": [
+        [
+          39,
+          170
+        ],
+        [
+          41,
+          170
+        ],
+        [
+          34,
+          170
+        ]
+      ]
+    }
+  ],
+  "physical_camera": "OV5640 DVP",
+  "transport": "ESP32-S3 LCD_CAM -> JPEG -> HTTP on existing WiFi",
+  "luckfox_image_inference_verified": false,
+  "validation_scope": "JPEG decoding and HTTP transport only; visual quality requires separate inspection",
+  "visual_quality_verified": true,
+  "initial_status": {
+    "stage": "capturing",
+    "error": "ESP_OK",
+    "sensor_id": 22080,
+    "frames": 244,
+    "failures": 0,
+    "jpeg_bytes": 10678,
+    "capture_ms": 148,
+    "width": 640,
+    "height": 480,
+    "autofocus_ready": true,
+    "af_raw": 16,
+    "af_ack": 0,
+    "focused": true,
+    "profile": 19,
+    "frame_age_ms": 116,
+    "recent_frame": true
+  },
+  "final_status": {
+    "stage": "capturing",
+    "error": "ESP_OK",
+    "sensor_id": 22080,
+    "frames": 265,
+    "failures": 0,
+    "jpeg_bytes": 10678,
+    "capture_ms": 150,
+    "width": 640,
+    "height": 480,
+    "autofocus_ready": true,
+    "af_raw": 16,
+    "af_ack": 0,
+    "focused": true,
+    "profile": 19,
+    "frame_age_ms": 7,
+    "recent_frame": true
+  },
+  "capture_fps_estimate": 6.08,
+  "snapshot_test_seconds": 2.957,
+  "result": "pass",
+  "esp_firmware_sha256": "28f76e6d15f38c5f757faa147ebf728234e08e38ce67f1ae1940e3b290eaeb77",
+  "manual_sample_inspection": "Fixed vertical stripes and color blocks absent in inspected samples; ordinary low-light noise remains",
+  "long_duration_zero_drop_verified": false,
+  "color_accuracy_verified": false,
+  "color_limitation": "User later reported blue appears green; corrected in newer firmware by preserving0x3906 reset value"
+}

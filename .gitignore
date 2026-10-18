@@ -44,3 +44,7 @@ __pycache__/
 # Head-controller local test executables
 /firmware_head/build_host/
 /firmware_head/artifacts/*.log
+# Local camera test frames may contain the user's surroundings.
+/firmware_brain/artifacts/camera_*.jpg
+
+/firmware_brain/artifacts/camera_*.png

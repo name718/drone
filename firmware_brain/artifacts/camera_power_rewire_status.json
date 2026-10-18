@@ -1,0 +1,56 @@
+[
+  {
+    "monotonic": 346189.52140425,
+    "status": {
+      "stage": "capturing",
+      "error": "ESP_OK",
+      "sensor_id": 22080,
+      "frames": 484,
+      "failures": 0,
+      "jpeg_bytes": 3595,
+      "capture_ms": 64,
+      "width": 320,
+      "height": 240,
+      "autofocus_ready": true,
+      "profile": 3,
+      "frame_age_ms": 82,
+      "recent_frame": true
+    }
+  },
+  {
+    "monotonic": 346194.546236958,
+    "status": {
+      "stage": "capturing",
+      "error": "ESP_OK",
+      "sensor_id": 22080,
+      "frames": 544,
+      "failures": 0,
+      "jpeg_bytes": 3215,
+      "capture_ms": 64,
+      "width": 320,
+      "height": 240,
+      "autofocus_ready": true,
+      "profile": 3,
+      "frame_age_ms": 38,
+      "recent_frame": true
+    }
+  },
+  {
+    "monotonic": 346199.582607458,
+    "status": {
+      "stage": "capturing",
+      "error": "ESP_OK",
+      "sensor_id": 22080,
+      "frames": 603,
+      "failures": 0,
+      "jpeg_bytes": 3225,
+      "capture_ms": 64,
+      "width": 320,
+      "height": 240,
+      "autofocus_ready": true,
+      "profile": 3,
+      "frame_age_ms": 81,
+      "recent_frame": true
+    }
+  }
+]

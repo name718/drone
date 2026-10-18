@@ -1,0 +1,40 @@
+[
+  {
+    "profile": 1,
+    "bytes": 7094,
+    "status": {
+      "stage": "capturing",
+      "error": "ESP_OK",
+      "sensor_id": 22080,
+      "frames": 517,
+      "failures": 96,
+      "jpeg_bytes": 7054,
+      "capture_ms": 18,
+      "width": 320,
+      "height": 240,
+      "autofocus_ready": false,
+      "profile": 1,
+      "frame_age_ms": 27,
+      "recent_frame": true
+    }
+  },
+  {
+    "profile": 3,
+    "bytes": 5990,
+    "status": {
+      "stage": "capturing",
+      "error": "ESP_OK",
+      "sensor_id": 22080,
+      "frames": 562,
+      "failures": 96,
+      "jpeg_bytes": 5990,
+      "capture_ms": 65,
+      "width": 320,
+      "height": 240,
+      "autofocus_ready": false,
+      "profile": 3,
+      "frame_age_ms": 44,
+      "recent_frame": true
+    }
+  }
+]

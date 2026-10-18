@@ -12,6 +12,7 @@
 
 #include "ai/ai_service.hpp"
 #include "audio/audio_service.hpp"
+#include "camera/camera_service.hpp"
 #include "cJSON.h"
 #include "comm/chassis_service.hpp"
 #include "core/interaction_service.hpp"
@@ -363,6 +364,7 @@ esp_err_t WebServer::start() {
     config.server_port = 80;
     config.ctrl_port = 32768;
     config.max_open_sockets = 7;
+    config.max_uri_handlers = 12;  // 控制页、摄像头和只读诊断路由。
 
     ESP_LOGI(TAG, "正在启动 WebServer (端口 80)...");
     esp_err_t ret = httpd_start(&server_, &config);
@@ -388,6 +390,10 @@ esp_err_t WebServer::start() {
     uri_ws.user_ctx = nullptr;
     uri_ws.is_websocket = true;
     httpd_register_uri_handler(server_, &uri_ws);
+
+    esp_err_t camera_routes = CameraService::registerControlRoutes(server_);
+    if (camera_routes != ESP_OK)
+        ESP_LOGE(TAG, "摄像头页面注册失败: %s", esp_err_to_name(camera_routes));
 
     // 3. 启动后台每秒广播任务
     is_running_ = true;
