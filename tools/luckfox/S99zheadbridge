@@ -1,0 +1,57 @@
+#!/bin/sh
+# 排在S99luckfoxconfigload之后；先恢复UART复用，再启动桥接服务。
+# 只停止本服务的PID，不能killall python，否则会误停用户的其他程序。
+APP=/userdata/head_bridge/head_supervisor.py
+PIDFILE=/run/head-bridge/supervisor.pid
+export PYTHONDONTWRITEBYTECODE=1
+
+running() {
+    [ -r "$PIDFILE" ] || return 1
+    pid=$(cat "$PIDFILE")
+    case "$pid" in ''|*[!0-9]*) return 1 ;; esac
+    [ -r "/proc/$pid/cmdline" ] || return 1
+    tr '\000' ' ' < "/proc/$pid/cmdline" | grep -Fq "$APP"
+}
+
+start() {
+    if running; then
+        echo "Head bridge already running"
+        return 0
+    fi
+    [ -f "$APP" ] && [ -c /dev/ttyS3 ] && [ -c /dev/ttyS4 ] || {
+        echo "Head bridge: missing program/UART nodes"
+        return 1
+    }
+    mkdir -p /run/head-bridge
+    # PID条件必须保留，否则仅匹配python3会被用户的其他Python程序阻挡。
+    start-stop-daemon -S -b -p "$PIDFILE" -x /usr/bin/python3 -- "$APP"
+    count=0
+    while [ "$count" -lt 3 ]; do
+        sleep 1
+        running && { echo "Head bridge started"; return 0; }
+        count=$((count + 1))
+    done
+    echo "Head bridge failed to start"
+    return 1
+}
+
+stop() {
+    if running; then
+        kill -TERM "$pid"
+        count=0
+        while running && [ "$count" -lt 7 ]; do
+            sleep 1
+            count=$((count + 1))
+        done
+        running && { echo "Head bridge failed to stop"; return 1; }
+    fi
+    echo "Head bridge stopped"
+}
+
+case "$1" in
+    start) start ;;
+    stop) stop ;;
+    restart) stop && start ;;
+    status) running && echo "Head bridge supervisor pid=$pid" ;;
+    *) echo "Usage: $0 {start|stop|restart|status}"; exit 1 ;;
+esac
