@@ -1,0 +1,13 @@
+{
+  "README.md": "1ecfc03031e53b94262604eaa956168d47dc0e9682acf149bc76089213fc0bf9",
+  "cmsis-device-f1/License.md": "b645e89bbfb6accf914cf7adca011712bf90055391fdd55f2af6439d98aa36d4",
+  "cmsis-device-f1/system_stm32f1xx.h": "a54dfbb3480c672f532d472a6e84bcf34df6551771d2e9966c5a3503c676b6ab",
+  "cmsis-device-f1/startup_stm32f103xb.s": "a9a5fc7ed5ff617527dd98b3092830f4d17ed4bf57c99eac2c53bdb514ce138c",
+  "cmsis-device-f1/stm32f103xb.h": "d9c7c613d9fea74220892b4fbc3e80617493acad82a04bafadab2b4a7198399c",
+  "cmsis-core/core_cm3.h": "c9937781259a8897adf514445441c68570087d6a72a558d8a4afe75cdb62dbd2",
+  "cmsis-core/cmsis_compiler.h": "b51963d271c1571ca3463654c76aa7ea50c4eac5d0a2710df10414ac64d9e0f8",
+  "cmsis-core/mpu_armv7.h": "29206b52ee02290ed6f5a5415ebd4187de802cf176d9b3cb844390d8e5571372",
+  "cmsis-core/cmsis_gcc.h": "43bfd1fe69fbbc2ca70aaf7d43cc3e20f16e0c7f66e1bdef9b51af6dc14b2617",
+  "cmsis-core/cmsis_version.h": "184c19fd3ee73632edf35a0b4d49cd48be75fbf49e6ccb19d9db05fa83bea4b3",
+  "cmsis-core/LICENSE.txt": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1"
+}
