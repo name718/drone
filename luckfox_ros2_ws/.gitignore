@@ -1,0 +1,6 @@
+# colcon 的构建、安装和日志目录。
+/build/
+/install/
+/log/
+__pycache__/
+*.egg-info/

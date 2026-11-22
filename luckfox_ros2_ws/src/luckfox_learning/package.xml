@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="3">
+  <!-- colcon 通过这份清单识别包名、依赖和构建方式。 -->
+  <name>luckfox_learning</name>
+  <version>0.0.0</version>
+  <description>Luckfox 上的 ROS 2 Python 学习包。</description>
+  <maintainer email="1547996098@qq.com">name718</maintainer>
+  <!-- 发布前由项目作者选定许可证。 -->
+  <license>TODO</license>
+
+  <exec_depend>rclpy</exec_depend>
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

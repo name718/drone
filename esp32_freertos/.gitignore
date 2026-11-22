@@ -1,0 +1,4 @@
+# 本地构建产物和工具生成的配置。
+/build/
+/sdkconfig
+/sdkconfig.old
