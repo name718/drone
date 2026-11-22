@@ -1,0 +1,317 @@
+[
+  {
+    "file": "00_三款同台预览.png",
+    "bytes": 262186,
+    "sha256": "bba6930ee7b31a048ad5028d0d951a7fce5e66c17ea3e48f455f4091bfebe4f7"
+  },
+  {
+    "file": "00_先看三款.txt",
+    "bytes": 1161,
+    "sha256": "805ed701622e1bfd0c2938ebc28d7e1f5bd1ff6959ea845d7dbbf185321f081b"
+  },
+  {
+    "file": "A_潮汐_天气小站/00_先读我.txt",
+    "bytes": 2157,
+    "sha256": "6078ce1bee586a0f6011a8e8d3f6c9c311c4c7484f66de2ddc3803232edb5318"
+  },
+  {
+    "file": "A_潮汐_天气小站/01_完整装配_导入Shapr3D.step",
+    "bytes": 1746843,
+    "sha256": "7cf29738a95f34bc0d2d0a634f1bfe8424f09f79d078992c3ddec8a28b339246"
+  },
+  {
+    "file": "A_潮汐_天气小站/02_结构外壳.step",
+    "bytes": 393159,
+    "sha256": "d31db82acde7bbc084033a323b7e2cc8ce59a651e664452b316b83ed0defc300"
+  },
+  {
+    "file": "A_潮汐_天气小站/03_内部器件布局.step",
+    "bytes": 279147,
+    "sha256": "0a8639a8eb3fd7db6825e3034e850063026dbca7a2ada8acee696230378acf40"
+  },
+  {
+    "file": "A_潮汐_天气小站/04_爆炸装配.step",
+    "bytes": 1732666,
+    "sha256": "486286d112b734e595acca7669ac1b04207662b80a48f51eb35db608b63483f5"
+  },
+  {
+    "file": "A_潮汐_天气小站/05_彩色查看.glb",
+    "bytes": 592536,
+    "sha256": "d36412b75212c01ae2e4799f871dd58d8e3768e4961b45607fdbd32f442ef7a9"
+  },
+  {
+    "file": "A_潮汐_天气小站/06_外观预览.png",
+    "bytes": 190107,
+    "sha256": "d424283dde3de62d645ce46ff1884269d126de8ad250b0730a19ff25c0250ad4"
+  },
+  {
+    "file": "A_潮汐_天气小站/07_背面与接口.png",
+    "bytes": 149286,
+    "sha256": "a75d0b675afe7afa75c2f0c36acc2ca867a9acf2ac0a6592a043fbf6bde589aa"
+  },
+  {
+    "file": "A_潮汐_天气小站/08_内部器件布局.png",
+    "bytes": 74747,
+    "sha256": "0d6085c231b04a0d187f98de71202f2ce87bae5de705c977e6355303f39f293c"
+  },
+  {
+    "file": "A_潮汐_天气小站/09_拆解预览.png",
+    "bytes": 161377,
+    "sha256": "9bab1609ca6c79bdbadc39a028a18940c637c83a3bfa30e47a2abe75ec16c48d"
+  },
+  {
+    "file": "A_潮汐_天气小站/几何检查.json",
+    "bytes": 779,
+    "sha256": "2d506d374dcb7e0eb1e64cc8062b4f6ac65c11cf3a7fe254f0b93468ac0c6130"
+  },
+  {
+    "file": "A_潮汐_天气小站/参数与零件说明.json",
+    "bytes": 12629,
+    "sha256": "8d73def80b954c84ac0e878535b906f62d39287d681b400cea86697423ee85a6"
+  },
+  {
+    "file": "A_潮汐_天气小站/渲染数据.json",
+    "bytes": 953736,
+    "sha256": "267dcddec303f677369db591872e8facfe0650bbd20caca5d025be1fb8fbaa2e"
+  },
+  {
+    "file": "A_潮汐_天气小站/结构分件_STEP/Button0_前面切换按钮.step",
+    "bytes": 5649,
+    "sha256": "ff08b7b5a0a6fae808215f55c3776809561bc6df74c86be0d70d553ce2a711d5"
+  },
+  {
+    "file": "A_潮汐_天气小站/结构分件_STEP/Button1_前面切换按钮.step",
+    "bytes": 5643,
+    "sha256": "010b11b0d3532546b44acf57183e74a13e7a2440cc38fbf72a8ac4d68c2b16a0"
+  },
+  {
+    "file": "A_潮汐_天气小站/结构分件_STEP/DisplayBezel_屏幕面框.step",
+    "bytes": 60668,
+    "sha256": "955652b95e8d54131d841ae5239ffaa263874f064b073234f02749766bb706b2"
+  },
+  {
+    "file": "A_潮汐_天气小站/结构分件_STEP/FrontShell_拱形前壳与螺柱.step",
+    "bytes": 143821,
+    "sha256": "936db676c151c2c4081c596a17bdbf238d5623e0a4ab1404295abd8598cd9ce6"
+  },
+  {
+    "file": "A_潮汐_天气小站/结构分件_STEP/Plinth_低重心底座.step",
+    "bytes": 31779,
+    "sha256": "e8f196966b2ac9bc4f7612e5d2c1a46b8e3fad63f2a94e94ef45b312fc797fa5"
+  },
+  {
+    "file": "A_潮汐_天气小站/结构分件_STEP/RearShell_后壳与通风孔.step",
+    "bytes": 134663,
+    "sha256": "8248f2d875d69de5f698a307d0da67333ecbdd9b1b7733fec1347454012db6fa"
+  },
+  {
+    "file": "B_环光_旋钮呼吸灯/00_先读我.txt",
+    "bytes": 2191,
+    "sha256": "67833c5535cda9560bec8e56de263d2429d773bf3354a8df5ca715ee5eb4d12c"
+  },
+  {
+    "file": "B_环光_旋钮呼吸灯/01_完整装配_导入Shapr3D.step",
+    "bytes": 891602,
+    "sha256": "d7126b183b836728a99a1266ae1e5166610691563585ab6aeb00837ccce15b68"
+  },
+  {
+    "file": "B_环光_旋钮呼吸灯/02_结构外壳.step",
+    "bytes": 428028,
+    "sha256": "834e8e6e35f4cb92161ef0b1cec3126903ed0e4ca7bbeeaa73aa9d6dd122335b"
+  },
+  {
+    "file": "B_环光_旋钮呼吸灯/03_内部器件布局.step",
+    "bytes": 403811,
+    "sha256": "04432301fe1c298fd87894ba0532cb813e894b8d7e4da7103c046e6f126cd640"
+  },
+  {
+    "file": "B_环光_旋钮呼吸灯/04_爆炸装配.step",
+    "bytes": 886047,
+    "sha256": "c65286fa1cb1d58cb6122e546b0486c8bf0ed3954310dc89394564135a4f332f"
+  },
+  {
+    "file": "B_环光_旋钮呼吸灯/05_彩色查看.glb",
+    "bytes": 561040,
+    "sha256": "e2c57ba510cb122609bed93f75ac0090c25bb9738a9d2d9fc2ef92146d3ea65a"
+  },
+  {
+    "file": "B_环光_旋钮呼吸灯/06_外观预览.png",
+    "bytes": 192390,
+    "sha256": "68ad3f51c3ee5a1c832bc70d470bc72f127281c75e99c49eb65b4409a4c12c34"
+  },
+  {
+    "file": "B_环光_旋钮呼吸灯/07_背面与接口.png",
+    "bytes": 170165,
+    "sha256": "172520a0647f407f6fdda98cbd4dc1c865031a30cf6231baff7a3b13f52f502f"
+  },
+  {
+    "file": "B_环光_旋钮呼吸灯/08_内部器件布局.png",
+    "bytes": 78413,
+    "sha256": "aa49a1dc1605a1847b07e64f742e808e2485f8e7096fe76ae149c944367bd071"
+  },
+  {
+    "file": "B_环光_旋钮呼吸灯/09_拆解预览.png",
+    "bytes": 244699,
+    "sha256": "8abcb0655d0225cce03919294a3dbb5ae650b9f168886550a0ed463aedb872c0"
+  },
+  {
+    "file": "B_环光_旋钮呼吸灯/几何检查.json",
+    "bytes": 682,
+    "sha256": "46c9ced6c23afee69c586c1be860295b66998a22450ae1e90e87fd05f2de869a"
+  },
+  {
+    "file": "B_环光_旋钮呼吸灯/参数与零件说明.json",
+    "bytes": 14491,
+    "sha256": "af7f1037a3634b71bfcfaca321667eef0655405d6f0cd2cd9e7ad538a9f7de44"
+  },
+  {
+    "file": "B_环光_旋钮呼吸灯/渲染数据.json",
+    "bytes": 923068,
+    "sha256": "a1e5ea7b1adaa5804ac153f7b67c9f2b95cc96900cad684d307cdac5fe522c71"
+  },
+  {
+    "file": "B_环光_旋钮呼吸灯/结构分件_STEP/BaseLower_底座下壳与螺柱.step",
+    "bytes": 193299,
+    "sha256": "511e5079d1e736a2d23fe8947cb98aad9b5f9a71f01928f406f43637798e3368"
+  },
+  {
+    "file": "B_环光_旋钮呼吸灯/结构分件_STEP/Diffuser_前置暖光扩散环.step",
+    "bytes": 9437,
+    "sha256": "e659dab057d231185100caa7200f51628948221c6b8c8e5a3f881ddcd02b1ab7"
+  },
+  {
+    "file": "B_环光_旋钮呼吸灯/结构分件_STEP/Knob_顶部调光旋钮.step",
+    "bytes": 9495,
+    "sha256": "17b72affed290041eb36474c7f6ef39bf83a83cd07cc2079ffac58f260baef98"
+  },
+  {
+    "file": "B_环光_旋钮呼吸灯/结构分件_STEP/RingFrame_灯环骨架与中空支撑.step",
+    "bytes": 186158,
+    "sha256": "3df38ca1b0ecccf2264f15acf7cf39fb3dc3f189dd4e3ca88b884857667b379b"
+  },
+  {
+    "file": "B_环光_旋钮呼吸灯/结构分件_STEP/RingRear_灯环后盖.step",
+    "bytes": 21595,
+    "sha256": "403520e8478e0a2614a955eb86d9c19ac7b73753e22f81b6dfa0fb5d3dbbc012"
+  },
+  {
+    "file": "C_留白_电子留言相框/00_先读我.txt",
+    "bytes": 2227,
+    "sha256": "f54a2e067c6257211532b5478280484d36e6b80212b8b256289fe0884c04e2a7"
+  },
+  {
+    "file": "C_留白_电子留言相框/01_完整装配_导入Shapr3D.step",
+    "bytes": 3252106,
+    "sha256": "d949b4c77911a04e24eb03c4f35ae3b34413697e3c6f4e359f29689e9549fb93"
+  },
+  {
+    "file": "C_留白_电子留言相框/02_结构外壳.step",
+    "bytes": 591289,
+    "sha256": "68d79e28f6a85f234502b54c9b9e3b67d4032fd507d63b8c77df62933c4d9e53"
+  },
+  {
+    "file": "C_留白_电子留言相框/03_内部器件布局.step",
+    "bytes": 174278,
+    "sha256": "87b44787d91764d13b2a29f9ecdc4ee75e2f3406105a995611fd84ae930ad0cf"
+  },
+  {
+    "file": "C_留白_电子留言相框/04_爆炸装配.step",
+    "bytes": 3255912,
+    "sha256": "d5bded9de8cb64fe82a747c1b1fce659f4fae56b30c09c8ede40e2405d463359"
+  },
+  {
+    "file": "C_留白_电子留言相框/05_彩色查看.glb",
+    "bytes": 809900,
+    "sha256": "29afeab1f2956039c7eb21e355557fa7638ea47972906c85a2d9eb7e25345f90"
+  },
+  {
+    "file": "C_留白_电子留言相框/06_外观预览.png",
+    "bytes": 185171,
+    "sha256": "06c9cbd9cd8936b7dfb47744d165a832a23d79538c6e6b8caac7c1fb4e26660a"
+  },
+  {
+    "file": "C_留白_电子留言相框/07_背面与接口.png",
+    "bytes": 167158,
+    "sha256": "8432ebbba657862d8383e1020b519b5a4a31616687716ff716d73dc950e1b037"
+  },
+  {
+    "file": "C_留白_电子留言相框/08_内部器件布局.png",
+    "bytes": 41951,
+    "sha256": "7f124f8142a5917a1e7c5e32eb38f74ea622809b3b941d5815acceb7634b2da6"
+  },
+  {
+    "file": "C_留白_电子留言相框/09_拆解预览.png",
+    "bytes": 189210,
+    "sha256": "c61bebf6869ffce490a23b32d9f0a436611bb05002681cfe0cb86613c156457f"
+  },
+  {
+    "file": "C_留白_电子留言相框/几何检查.json",
+    "bytes": 712,
+    "sha256": "52da4311c68a4c4a2d5cb360b5036157a24491708186d2ff67f1ee6da4dfef6e"
+  },
+  {
+    "file": "C_留白_电子留言相框/参数与零件说明.json",
+    "bytes": 10077,
+    "sha256": "1ec49af5997ece081b13211cd5b8d59f06416c66c680089aa774811f80f94cfd"
+  },
+  {
+    "file": "C_留白_电子留言相框/渲染数据.json",
+    "bytes": 1556126,
+    "sha256": "9a158c7a0c92104248d817e9c12abf5d4c7f330281527a1e01a06a5266e1cd17"
+  },
+  {
+    "file": "C_留白_电子留言相框/结构分件_STEP/FrameFront_倾斜相框前壳.step",
+    "bytes": 229077,
+    "sha256": "bfceda245655c5f54b55ccc9a5d81d033d27c3c792180f2d5bcc01428bfc8c40"
+  },
+  {
+    "file": "C_留白_电子留言相框/结构分件_STEP/FrameRear_相框后壳与按键孔.step",
+    "bytes": 236267,
+    "sha256": "a3cb052ca1bbf41d3812b87c4e7f70b09e76af6e79a9803f893cc3d051d16abd"
+  },
+  {
+    "file": "C_留白_电子留言相框/结构分件_STEP/RearButton0_背面翻页或配对按钮.step",
+    "bytes": 6095,
+    "sha256": "4e66c43aa5841536913f8f0bd497284c3cb802483d47a83e918ed86014021644"
+  },
+  {
+    "file": "C_留白_电子留言相框/结构分件_STEP/RearButton1_背面翻页或配对按钮.step",
+    "bytes": 6087,
+    "sha256": "a6b8dd8da7b21b17fdc171304b4a70ad5a7be987ffcbf0569ca66449a641ade9"
+  },
+  {
+    "file": "C_留白_电子留言相框/结构分件_STEP/Stand_带相框定位槽的底座.step",
+    "bytes": 102722,
+    "sha256": "a03bca928729c86dfaacc760dc705cfc70ae51eb9bbe743e3814ded000db1f56"
+  },
+  {
+    "file": "build_objects.py",
+    "bytes": 15837,
+    "sha256": "1a52f896e364598d586c1b0c1efa9a6837d9d02c73a0a9e370d0965f067106e3"
+  },
+  {
+    "file": "prepare_models.py",
+    "bytes": 7339,
+    "sha256": "a3b6e9d1b5620d7a7514570d742297760badf404ca86db89ee3161b09b01d20f"
+  },
+  {
+    "file": "render_objects.py",
+    "bytes": 6531,
+    "sha256": "777d6131b667c412e5738c75e0b8bcce5f221cfb847f0690a33a634733d98f35"
+  },
+  {
+    "file": "三款方案与校验.json",
+    "bytes": 2050,
+    "sha256": "b84a474b1e69b6991d0d30d51a97533c4b1c5ca2966fbfffad43e1cc16437a00"
+  },
+  {
+    "file": "参考来源与尺寸边界.json",
+    "bytes": 913,
+    "sha256": "bb32fa38f8626aa1bfc2f6846a9ab1553e536a1fa06917aa11ef9077cf6274ae"
+  },
+  {
+    "file": "打开预览.html",
+    "bytes": 2959,
+    "sha256": "0a1494e65ab026cc85e08eeeeb756a01d547df911d4b3511588869a25aa736ab"
+  }
+]

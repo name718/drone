@@ -1,0 +1,35 @@
+{
+  "parts": 21,
+  "expected_solids": 44,
+  "valid_parts": true,
+  "structure_roundtrips": [
+    {
+      "name": "FrameFront",
+      "relative_volume_error": 4.791880106848747e-13
+    },
+    {
+      "name": "FrameRear",
+      "relative_volume_error": 1.733084256215615e-13
+    },
+    {
+      "name": "Stand",
+      "relative_volume_error": 5.797634403428034e-12
+    },
+    {
+      "name": "RearButton0",
+      "relative_volume_error": 3.652548433703012e-13
+    },
+    {
+      "name": "RearButton1",
+      "relative_volume_error": 3.652548433703012e-13
+    }
+  ],
+  "collisions": [],
+  "tested_pairs": 26,
+  "reimported_solids": 44,
+  "dimensions_mm": [
+    76.0,
+    60.513553848716,
+    126.76690893040458
+  ]
+}

@@ -1,0 +1,8 @@
+.venv/
+data/
+.env
+.deploy_known_hosts
+__pycache__/
+*.tar.gz
+*.zip
+*.log

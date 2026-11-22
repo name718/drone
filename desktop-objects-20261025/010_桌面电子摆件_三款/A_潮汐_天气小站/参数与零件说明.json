@@ -1,0 +1,589 @@
+{
+  "id": "tide-station",
+  "name": "潮汐 · 天气小站",
+  "subtitle": "拱形小屏幕、实体按钮与侧边温湿度通风口。",
+  "features": [
+    "时间显示",
+    "室内温湿度",
+    "按键切换页面"
+  ],
+  "sensors": [
+    "SHT40 温湿度（候选）"
+  ],
+  "power": "5V USB，暂不放电池",
+  "notes": "联网天气可后续扩展；当前只完成屏幕、按键和传感器的结构空间布局。",
+  "parts": [
+    {
+      "name": "FrontShell",
+      "cn": "拱形前壳与螺柱",
+      "mat": "cream",
+      "color": [
+        0.92,
+        0.9,
+        0.83
+      ],
+      "kind": "structure",
+      "group": "case",
+      "exterior": true,
+      "explode": [
+        0,
+        -30,
+        0
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 21106.600387987706
+    },
+    {
+      "name": "RearShell",
+      "cn": "后壳与通风孔",
+      "mat": "sage",
+      "color": [
+        0.4,
+        0.6,
+        0.52
+      ],
+      "kind": "structure",
+      "group": "case",
+      "exterior": true,
+      "explode": [
+        0,
+        34,
+        0
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 26952.398655558092
+    },
+    {
+      "name": "Plinth",
+      "cn": "低重心底座",
+      "mat": "clay",
+      "color": [
+        0.74,
+        0.43,
+        0.32
+      ],
+      "kind": "structure",
+      "group": "base",
+      "exterior": true,
+      "explode": [
+        0,
+        0,
+        -17
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 45699.15905434851
+    },
+    {
+      "name": "Pad0",
+      "cn": "底部防滑垫",
+      "mat": "rubber",
+      "color": [
+        0.07,
+        0.09,
+        0.09
+      ],
+      "kind": "envelope",
+      "group": "base",
+      "exterior": true,
+      "explode": [
+        -6.800000000000001,
+        -2.8000000000000003,
+        -5
+      ],
+      "note": "防滑垫为 8×1 mm 候选预算，需按实际胶垫确认",
+      "solids": 1,
+      "volume_mm3": 50.26548245743669
+    },
+    {
+      "name": "Pad1",
+      "cn": "底部防滑垫",
+      "mat": "rubber",
+      "color": [
+        0.07,
+        0.09,
+        0.09
+      ],
+      "kind": "envelope",
+      "group": "base",
+      "exterior": true,
+      "explode": [
+        -6.800000000000001,
+        2.8000000000000003,
+        -5
+      ],
+      "note": "防滑垫为 8×1 mm 候选预算，需按实际胶垫确认",
+      "solids": 1,
+      "volume_mm3": 50.26548245743669
+    },
+    {
+      "name": "Pad2",
+      "cn": "底部防滑垫",
+      "mat": "rubber",
+      "color": [
+        0.07,
+        0.09,
+        0.09
+      ],
+      "kind": "envelope",
+      "group": "base",
+      "exterior": true,
+      "explode": [
+        6.800000000000001,
+        -2.8000000000000003,
+        -5
+      ],
+      "note": "防滑垫为 8×1 mm 候选预算，需按实际胶垫确认",
+      "solids": 1,
+      "volume_mm3": 50.26548245743669
+    },
+    {
+      "name": "Pad3",
+      "cn": "底部防滑垫",
+      "mat": "rubber",
+      "color": [
+        0.07,
+        0.09,
+        0.09
+      ],
+      "kind": "envelope",
+      "group": "base",
+      "exterior": true,
+      "explode": [
+        6.800000000000001,
+        2.8000000000000003,
+        -5
+      ],
+      "note": "防滑垫为 8×1 mm 候选预算，需按实际胶垫确认",
+      "solids": 1,
+      "volume_mm3": 50.26548245743669
+    },
+    {
+      "name": "DisplayBezel",
+      "cn": "屏幕面框",
+      "mat": "dark",
+      "color": [
+        0.08,
+        0.12,
+        0.13
+      ],
+      "kind": "structure",
+      "group": "case",
+      "exterior": true,
+      "explode": [
+        0,
+        -28,
+        0
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 1585.7425185755849
+    },
+    {
+      "name": "TFTGlass",
+      "cn": "LCD 玻璃空间",
+      "mat": "glass",
+      "color": [
+        0.035,
+        0.07,
+        0.08
+      ],
+      "kind": "envelope",
+      "group": "display",
+      "exterior": false,
+      "explode": [
+        0,
+        -14,
+        0
+      ],
+      "note": "按显示区适配的玻璃包络，用户模块板框与厚度仍待测",
+      "solids": 1,
+      "volume_mm3": 824.7701946710588
+    },
+    {
+      "name": "TFTStack",
+      "cn": "LCD 背光层空间",
+      "mat": "dark",
+      "color": [
+        0.08,
+        0.12,
+        0.13
+      ],
+      "kind": "envelope",
+      "group": "display",
+      "exterior": false,
+      "explode": [
+        0,
+        -10,
+        0
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 3583.134725394818
+    },
+    {
+      "name": "TFTPCB",
+      "cn": "1.8寸 TFT 载板空间",
+      "mat": "pcb",
+      "color": [
+        0.04,
+        0.36,
+        0.25
+      ],
+      "kind": "envelope",
+      "group": "display",
+      "exterior": false,
+      "explode": [
+        0,
+        8,
+        0
+      ],
+      "note": "显示区 35.04×28.03 mm 为官方参考；45×38 mm 载板是预算，未套用用户实测孔位",
+      "solids": 1,
+      "volume_mm3": 2736.000000000001
+    },
+    {
+      "name": "ActiveDisplay",
+      "cn": "35.04×28.03 有效显示区",
+      "mat": "black",
+      "color": [
+        0.025,
+        0.035,
+        0.035
+      ],
+      "kind": "visual",
+      "group": "display",
+      "exterior": false,
+      "explode": [
+        0,
+        0,
+        0
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 19.64342399999986
+    },
+    {
+      "name": "DisplayText12",
+      "cn": "10:25（显示示意）",
+      "mat": "paper",
+      "color": [
+        0.94,
+        0.94,
+        0.86
+      ],
+      "kind": "visual",
+      "group": "display",
+      "exterior": false,
+      "explode": [
+        0,
+        -25,
+        0
+      ],
+      "note": "屏幕显示内容示意，不是打印零件，也不表示固件已完成",
+      "solids": 6,
+      "volume_mm3": 0.6975713893135416
+    },
+    {
+      "name": "DisplayText13",
+      "cn": "24C（显示示意）",
+      "mat": "warm",
+      "color": [
+        1.0,
+        0.81,
+        0.47
+      ],
+      "kind": "visual",
+      "group": "display",
+      "exterior": false,
+      "explode": [
+        0,
+        -25,
+        0
+      ],
+      "note": "屏幕显示内容示意，不是打印零件，也不表示固件已完成",
+      "solids": 3,
+      "volume_mm3": 0.13836080420911331
+    },
+    {
+      "name": "DisplayText14",
+      "cn": "55%（显示示意）",
+      "mat": "sage",
+      "color": [
+        0.4,
+        0.6,
+        0.52
+      ],
+      "kind": "visual",
+      "group": "display",
+      "exterior": false,
+      "explode": [
+        0,
+        -25,
+        0
+      ],
+      "note": "屏幕显示内容示意，不是打印零件，也不表示固件已完成",
+      "solids": 5,
+      "volume_mm3": 0.1552976206819216
+    },
+    {
+      "name": "SunMark",
+      "cn": "顶部太阳装饰",
+      "mat": "gold",
+      "color": [
+        0.85,
+        0.63,
+        0.32
+      ],
+      "kind": "visual",
+      "group": "case",
+      "exterior": true,
+      "explode": [
+        0,
+        0,
+        0
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 2.179008664529886
+    },
+    {
+      "name": "Button0",
+      "cn": "前面切换按钮",
+      "mat": "sage",
+      "color": [
+        0.4,
+        0.6,
+        0.52
+      ],
+      "kind": "structure",
+      "group": "controls",
+      "exterior": true,
+      "explode": [
+        -5.3999999999999995,
+        -20,
+        0
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 143.35087278330226
+    },
+    {
+      "name": "SwitchPCB0",
+      "cn": "按键小板空间",
+      "mat": "pcb",
+      "color": [
+        0.04,
+        0.36,
+        0.25
+      ],
+      "kind": "envelope",
+      "group": "controls",
+      "exterior": false,
+      "explode": [
+        0,
+        0,
+        0
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 43.19999999999999
+    },
+    {
+      "name": "Switch0",
+      "cn": "轻触开关空间",
+      "mat": "chip",
+      "color": [
+        0.16,
+        0.19,
+        0.18
+      ],
+      "kind": "envelope",
+      "group": "controls",
+      "exterior": false,
+      "explode": [
+        0,
+        0,
+        0
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 40.43199999999995
+    },
+    {
+      "name": "Button1",
+      "cn": "前面切换按钮",
+      "mat": "sage",
+      "color": [
+        0.4,
+        0.6,
+        0.52
+      ],
+      "kind": "structure",
+      "group": "controls",
+      "exterior": true,
+      "explode": [
+        5.3999999999999995,
+        -20,
+        0
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 143.35087278330226
+    },
+    {
+      "name": "SwitchPCB1",
+      "cn": "按键小板空间",
+      "mat": "pcb",
+      "color": [
+        0.04,
+        0.36,
+        0.25
+      ],
+      "kind": "envelope",
+      "group": "controls",
+      "exterior": false,
+      "explode": [
+        0,
+        0,
+        0
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 43.19999999999999
+    },
+    {
+      "name": "Switch1",
+      "cn": "轻触开关空间",
+      "mat": "chip",
+      "color": [
+        0.16,
+        0.19,
+        0.18
+      ],
+      "kind": "envelope",
+      "group": "controls",
+      "exterior": false,
+      "explode": [
+        0,
+        0,
+        0
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 40.43199999999995
+    },
+    {
+      "name": "MainPCB",
+      "cn": "控制板空间",
+      "mat": "pcb",
+      "color": [
+        0.04,
+        0.36,
+        0.25
+      ],
+      "kind": "envelope",
+      "group": "electronics",
+      "exterior": false,
+      "explode": [
+        0,
+        0,
+        13
+      ],
+      "note": "控制/供电板预算，尚未设计电路",
+      "solids": 1,
+      "volume_mm3": 1584.0000000000014
+    },
+    {
+      "name": "MCU",
+      "cn": "无线主控空间",
+      "mat": "metal",
+      "color": [
+        0.68,
+        0.71,
+        0.7
+      ],
+      "kind": "envelope",
+      "group": "electronics",
+      "exterior": false,
+      "explode": [
+        0,
+        0,
+        0
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 734.3999999999996
+    },
+    {
+      "name": "SensorPCB",
+      "cn": "温湿度小板空间",
+      "mat": "pcb",
+      "color": [
+        0.04,
+        0.36,
+        0.25
+      ],
+      "kind": "envelope",
+      "group": "electronics",
+      "exterior": false,
+      "explode": [
+        0,
+        0,
+        0
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 102.39999999999964
+    },
+    {
+      "name": "SHT40",
+      "cn": "温湿度芯片空间",
+      "mat": "metal",
+      "color": [
+        0.68,
+        0.71,
+        0.7
+      ],
+      "kind": "envelope",
+      "group": "electronics",
+      "exterior": false,
+      "explode": [
+        0,
+        0,
+        0
+      ],
+      "note": "SHT40 为温湿度候选；小板尺寸、温升隔离与开孔需实测",
+      "solids": 1,
+      "volume_mm3": 1.7999999999999932
+    },
+    {
+      "name": "USB_C",
+      "cn": "USB-C 插座空间",
+      "mat": "metal",
+      "color": [
+        0.68,
+        0.71,
+        0.7
+      ],
+      "kind": "envelope",
+      "group": "electronics",
+      "exterior": false,
+      "explode": [
+        0,
+        18,
+        0
+      ],
+      "note": "接口仅为安装空间预算，型号与板边位置尚未定型",
+      "solids": 1,
+      "volume_mm3": 116.98211458621373
+    }
+  ],
+  "dimensions_mm": [
+    96.0,
+    44.0,
+    99.0
+  ]
+}

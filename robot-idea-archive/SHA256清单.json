@@ -1,0 +1,382 @@
+[
+  {
+    "file": ".gitignore",
+    "bytes": 72,
+    "sha256": "c6937702ff26836f774ddc7681d1ec55e1e1c7c04be85ca364678d8a8e8f8629"
+  },
+  {
+    "file": "00_打开网站预览.html",
+    "bytes": 5347,
+    "sha256": "539ce379725196d4d9b334fa1557c82a3bea5b76aab13aec1234a0c16d1a51ed"
+  },
+  {
+    "file": "README.txt",
+    "bytes": 5394,
+    "sha256": "2987b6176dec41ae46250606cbd54b59cd7de5490a9c7aa2cf999ab98146a524"
+  },
+  {
+    "file": "app.py",
+    "bytes": 17970,
+    "sha256": "37d3c368d0b3bda5c4cbb345b6380ce9380781058f9407b3c4b3b741e3559b7f"
+  },
+  {
+    "file": "deploy/backup.py",
+    "bytes": 1127,
+    "sha256": "666855227bbc15db5311223947dd945dee58b06afc9b28a4c70074ab0bb77a6b"
+  },
+  {
+    "file": "deploy/install.sh",
+    "bytes": 2466,
+    "sha256": "511dc6537024bba0215d8547039cb2f922d3dd675145da89fdd211278ca3823a"
+  },
+  {
+    "file": "deploy/robot-idea-archive.service",
+    "bytes": 628,
+    "sha256": "df1816211b468ef076dc56a757ee2705ad60f22161c5daeccad01d367295d565"
+  },
+  {
+    "file": "manage.py",
+    "bytes": 866,
+    "sha256": "51eaba4d4b76038ccab8b18168d462bd7662a3397907de2e4d7343277a6c4ba5"
+  },
+  {
+    "file": "prepare_delivery.py",
+    "bytes": 2208,
+    "sha256": "849e401e1343e1987714f81f01d83a9bcf48c798dd35708ed582dfe303c5c46a"
+  },
+  {
+    "file": "prepare_seed.py",
+    "bytes": 10802,
+    "sha256": "69f6c17820cd00c04a1c5e3c202f8201d8b4fb00973ba4d2f81c9fcb56f492e6"
+  },
+  {
+    "file": "preview-data.js",
+    "bytes": 36801,
+    "sha256": "1b6cb2f75ec1237afeaf7379be7e44bc993c6953e3cb5c75df695fe480ddb27b"
+  },
+  {
+    "file": "requirements.txt",
+    "bytes": 45,
+    "sha256": "2f33ee7b7da6efcaf29144e9ec4421d5efb73963d7d3af71f1baca0748d3ae82"
+  },
+  {
+    "file": "seed.json",
+    "bytes": 36773,
+    "sha256": "2375cab9eba2b0a1edb0c8ab8271af32eeafc9330adc3b5d8e10957997fdba7b"
+  },
+  {
+    "file": "seed.py",
+    "bytes": 1488,
+    "sha256": "eb5f3aa82c5709fa999468d544e27eff171a494a2d6b193d13122fa49f9f96a0"
+  },
+  {
+    "file": "seed_assets/baobao-00.jpg",
+    "bytes": 80053,
+    "sha256": "38afa9b89255902b84636c3cd671bd9c3b58a01249fade9d9579cb442bbd1158"
+  },
+  {
+    "file": "seed_assets/box-companion-00.jpg",
+    "bytes": 70598,
+    "sha256": "7b2e027e2718b69ad81c369d97a46591bc47f3d44c151d69b478bf06f9754def"
+  },
+  {
+    "file": "seed_assets/box-companion-01.jpg",
+    "bytes": 102087,
+    "sha256": "32529b544922681d96b2554ad2950258f37d985fcc0e74cbeb6fbd37da24fbe6"
+  },
+  {
+    "file": "seed_assets/box-companion-02.jpg",
+    "bytes": 32595,
+    "sha256": "066487bcd007b1563700ef7d40809a780eb20c8a88bd16e947a42706b407d541"
+  },
+  {
+    "file": "seed_assets/box-companion-03.jpg",
+    "bytes": 80173,
+    "sha256": "34b75792e09cad0c7955cb08b3b87bf074117ed551df6f9fbd4c308ec6ca24f5"
+  },
+  {
+    "file": "seed_assets/cruiser-00.jpg",
+    "bytes": 98234,
+    "sha256": "33f590b540061b335c6a9a236594a01016b7312c36ffa39f0c816e04d40df801"
+  },
+  {
+    "file": "seed_assets/cruiser-01.jpg",
+    "bytes": 92496,
+    "sha256": "7675b0ce2cb53b752e49636317662942c1dd24504393d460ac2985548b45286d"
+  },
+  {
+    "file": "seed_assets/diandian-00.jpg",
+    "bytes": 82161,
+    "sha256": "164f635df5d845efc47f9f337be343352e1f81f20b49d62b7fae9ba46c82fa37"
+  },
+  {
+    "file": "seed_assets/diandian-01.jpg",
+    "bytes": 88421,
+    "sha256": "62ffe47db81e3b14994662b894e80f75b0157e14cbc8b7992326043188709b23"
+  },
+  {
+    "file": "seed_assets/doudou-00.jpg",
+    "bytes": 64330,
+    "sha256": "cbc3e71113a3b3d87ebe12be7746ff4f60d7e3edc69ca3244d2ca70cb126d646"
+  },
+  {
+    "file": "seed_assets/kedu-00.jpg",
+    "bytes": 76711,
+    "sha256": "d38364f21c77d5990990bbf0da67fe5fbe8395df31ad911858cf1525d92ebac3"
+  },
+  {
+    "file": "seed_assets/n20-base-00.jpg",
+    "bytes": 74055,
+    "sha256": "da782dc7d674faaa123fa3cfc18171e5c0680886056ffc6a4d7432b43026b1d1"
+  },
+  {
+    "file": "seed_assets/n20-base-01.jpg",
+    "bytes": 70219,
+    "sha256": "ed14766702109c8fc195ac9ca3589b9b40d40a973632bec6a369704bc5ae9522"
+  },
+  {
+    "file": "seed_assets/note-frame-00.jpg",
+    "bytes": 72639,
+    "sha256": "ae24b1f2e9fe8888882c4361a9a3ed18d393d118dbb52850f6339674a4c02791"
+  },
+  {
+    "file": "seed_assets/note-frame-01.jpg",
+    "bytes": 59771,
+    "sha256": "b3b829a5562278cd9b7586f212df91cd713b6bf77498e295fcdf4a56192bc944"
+  },
+  {
+    "file": "seed_assets/note-frame-02.jpg",
+    "bytes": 31670,
+    "sha256": "2fbb1e8ef40a3e444aa501867dd66e244100ef69ba2c1f535a919fbf6591ae7a"
+  },
+  {
+    "file": "seed_assets/note-frame-03.jpg",
+    "bytes": 77962,
+    "sha256": "17f50d09da3327e9b8415458e8c58752d9460d431ef7ca79e4297e04bfbb72d5"
+  },
+  {
+    "file": "seed_assets/orbit-light-00.jpg",
+    "bytes": 92958,
+    "sha256": "2b5f33b956ec5c97e0f3caccf4d91d49a77c665995b9a869b6ae5f0436115bda"
+  },
+  {
+    "file": "seed_assets/orbit-light-01.jpg",
+    "bytes": 77898,
+    "sha256": "281fae492f80ad172b46eded22130f32be4234d6b3cc28a72bf6a5d940dd4a13"
+  },
+  {
+    "file": "seed_assets/orbit-light-02.jpg",
+    "bytes": 61872,
+    "sha256": "a2032d94aa434935fda9dab49fe050f43f907346fb6627923cea9baad8a129d6"
+  },
+  {
+    "file": "seed_assets/orbit-light-03.jpg",
+    "bytes": 108575,
+    "sha256": "62f1befe885e4393e378be022b2c7cfd1305063ec42b22b6ebf7f3abbf382a0f"
+  },
+  {
+    "file": "seed_assets/round-ear-00.jpg",
+    "bytes": 92650,
+    "sha256": "61ac908ab7581a1f139f31868d47363c0270b995870d07f499b7c2ada8086527"
+  },
+  {
+    "file": "seed_assets/round-ear-01.jpg",
+    "bytes": 120144,
+    "sha256": "152160d48b1fea35e09b653ecc927c2a346ac9a5075dd2900251718e8e9f257e"
+  },
+  {
+    "file": "seed_assets/round-ear-02.jpg",
+    "bytes": 124494,
+    "sha256": "3234f8f8622ebaed9b41a9232d2de716dbba6a1607192c3e623ea15e07703f38"
+  },
+  {
+    "file": "seed_assets/round-ear-03.jpg",
+    "bytes": 81358,
+    "sha256": "ce86315a7a4af7c2d6c3054278b2e46f037d9cdca3384396d9d986fd9cb49bcd"
+  },
+  {
+    "file": "seed_assets/round-ear-04.jpg",
+    "bytes": 69418,
+    "sha256": "8a8d51a3598a229171d64fdbf1620aa7dbce87d113b6466ae800d527b9920a1c"
+  },
+  {
+    "file": "seed_assets/round-ear-05.jpg",
+    "bytes": 84091,
+    "sha256": "c58797f8bdc057957065ef24aac5e72e1aa261d674eee687b01df772f0734e38"
+  },
+  {
+    "file": "seed_assets/round-ear-06.jpg",
+    "bytes": 82997,
+    "sha256": "b3e1ff7b025ba1eee201202201629a79d07ff557de456ca7bb65207ccd269467"
+  },
+  {
+    "file": "seed_assets/round-ear-07.gif",
+    "bytes": 2384343,
+    "sha256": "ff27950d9bf7b761aecb357bbcf3402a47d369147138018b3222bdeebe66b152"
+  },
+  {
+    "file": "seed_assets/tide-station-00.jpg",
+    "bytes": 74484,
+    "sha256": "930f4d3060bab9f6cc2c04cd83459aef4f4336af75d0a9bddf9aa504e5fd0416"
+  },
+  {
+    "file": "seed_assets/tide-station-01.jpg",
+    "bytes": 54662,
+    "sha256": "f1b7dbd24f981e839ab35179c9fcea59cfe752f6883bbcdbf649df508860e440"
+  },
+  {
+    "file": "seed_assets/tide-station-02.jpg",
+    "bytes": 41770,
+    "sha256": "3e1e994b1b2a08075a41d438f3cf19dfa8000e252ff49012130c8343471184ce"
+  },
+  {
+    "file": "seed_assets/tide-station-03.jpg",
+    "bytes": 75736,
+    "sha256": "c092bd5809a191152ec8ec6f19c1bc245d2406eb03ff8345d7f63077f79d5363"
+  },
+  {
+    "file": "seed_assets/tuanzi-00.jpg",
+    "bytes": 74358,
+    "sha256": "a1df954e4a8b90349fa2616da78eacc6befd092d5407ac8d49fae48acb3b7c0b"
+  },
+  {
+    "file": "seed_assets/tuanzi-01.jpg",
+    "bytes": 89521,
+    "sha256": "ac0707f6b32d9568b18810374e391f7455ad0cb763e859f6b91e59c11b2ab503"
+  },
+  {
+    "file": "seed_assets/yaya-00.jpg",
+    "bytes": 48147,
+    "sha256": "5be69e841ef8fc66dbfef1531acc5382c65662d2e579ad3e9c4ce7bf5a0a0026"
+  },
+  {
+    "file": "seed_files/note-frame-color.glb",
+    "bytes": 809900,
+    "sha256": "29afeab1f2956039c7eb21e355557fa7638ea47972906c85a2d9eb7e25345f90"
+  },
+  {
+    "file": "seed_files/note-frame-full.step",
+    "bytes": 3252106,
+    "sha256": "d949b4c77911a04e24eb03c4f35ae3b34413697e3c6f4e359f29689e9549fb93"
+  },
+  {
+    "file": "seed_files/note-frame-structure.step",
+    "bytes": 591289,
+    "sha256": "68d79e28f6a85f234502b54c9b9e3b67d4032fd507d63b8c77df62933c4d9e53"
+  },
+  {
+    "file": "seed_files/orbit-light-color.glb",
+    "bytes": 561040,
+    "sha256": "e2c57ba510cb122609bed93f75ac0090c25bb9738a9d2d9fc2ef92146d3ea65a"
+  },
+  {
+    "file": "seed_files/orbit-light-full.step",
+    "bytes": 891602,
+    "sha256": "d7126b183b836728a99a1266ae1e5166610691563585ab6aeb00837ccce15b68"
+  },
+  {
+    "file": "seed_files/orbit-light-structure.step",
+    "bytes": 428028,
+    "sha256": "834e8e6e35f4cb92161ef0b1cec3126903ed0e4ca7bbeeaa73aa9d6dd122335b"
+  },
+  {
+    "file": "seed_files/tide-station-color.glb",
+    "bytes": 592536,
+    "sha256": "d36412b75212c01ae2e4799f871dd58d8e3768e4961b45607fdbd32f442ef7a9"
+  },
+  {
+    "file": "seed_files/tide-station-full.step",
+    "bytes": 1746843,
+    "sha256": "7cf29738a95f34bc0d2d0a634f1bfe8424f09f79d078992c3ddec8a28b339246"
+  },
+  {
+    "file": "seed_files/tide-station-structure.step",
+    "bytes": 393159,
+    "sha256": "d31db82acde7bbc084033a323b7e2cc8ce59a651e664452b316b83ed0defc300"
+  },
+  {
+    "file": "static/app.js",
+    "bytes": 27384,
+    "sha256": "330c40681a96267aef214387522bd2e62e6f37710e995df1dc5fa4bce20b104a"
+  },
+  {
+    "file": "static/favicon.svg",
+    "bytes": 399,
+    "sha256": "8924a82efc7de0800ff536ab7c7f5dc44d5d314604d6a4f144b941d0624e4fd4"
+  },
+  {
+    "file": "static/index.html",
+    "bytes": 5311,
+    "sha256": "cd3e2821aed646461fde231236d52f57305e7b91d03d9df62f156b965272d26d"
+  },
+  {
+    "file": "static/style.css",
+    "bytes": 29402,
+    "sha256": "2b7b3b847d953484f19879fffcf4ca1c47f6d7c5ffadcb69056fa15e6074a455"
+  },
+  {
+    "file": "sync_desktop_objects.py",
+    "bytes": 4956,
+    "sha256": "534d40e82a0525ba0593c6cb1bd946cd1b75c6c29517bc3f80ce0bf077309518"
+  },
+  {
+    "file": "test_app.py",
+    "bytes": 7029,
+    "sha256": "96946d3bbf755fab6bab5cec19b18c84a74072c2b0e6a691ee4a32d4e81853e7"
+  },
+  {
+    "file": "启动档案.command",
+    "bytes": 606,
+    "sha256": "c5074c4f683d60bb6dad38780fd329e0d39cc4dd03c8edb1482dd5b5fd895cbd"
+  },
+  {
+    "file": "服务器开机失败_工单草稿.txt",
+    "bytes": 1113,
+    "sha256": "ff1623aef05f0da562dd457e33a131d660184242124f5e09191ca8b5d69cb025"
+  },
+  {
+    "file": "运维记录/2026-10-25_工单629715已提交.txt",
+    "bytes": 621,
+    "sha256": "7a92cfe7771143cd68fa3fe205570ca5707e773132da98e9b8cf21f3f0879d56"
+  },
+  {
+    "file": "运维记录/2026-10-25_工单629715提交截图.jpg",
+    "bytes": 297952,
+    "sha256": "09f0d9e0088d9782547fdc59f6e2c3a0591f00f4942c2479ac57b97d8dfe9773"
+  },
+  {
+    "file": "验收截图/01_桌面首页.jpg",
+    "bytes": 163791,
+    "sha256": "225c0e15ba94eb7141aeb929a840507cd08d7db467f3b95b34ac36c50ce83b77"
+  },
+  {
+    "file": "验收截图/02_手机首页.jpg",
+    "bytes": 33525,
+    "sha256": "bd94da9a3ebe19a967e34e3ff66f0c050887e77893d06026e7751ac713b8fa94"
+  },
+  {
+    "file": "验收截图/03_圆耳机器人功能.jpg",
+    "bytes": 135157,
+    "sha256": "ad11e56262dbc1febd7969d93a113175f57c01404fa457dec8ce9278ac5a37b4"
+  },
+  {
+    "file": "验收截图/04_版本时间线.jpg",
+    "bytes": 120354,
+    "sha256": "252e56976ebd3e7c1cc43503cfd285f61e81746bd9498dd8b8aa8055ea6ec311"
+  },
+  {
+    "file": "验收截图/05_新增三款摆件.jpg",
+    "bytes": 121049,
+    "sha256": "dd9df420dbb1b2fb11aec60554527a55dd3e63ce16be384b721235f0dd757a15"
+  },
+  {
+    "file": "验收截图/06_新摆件模型下载.jpg",
+    "bytes": 117242,
+    "sha256": "2252fae925a144e1520f035dff54b26900db92b9e9c9b698f0121deef6ab5b8c"
+  },
+  {
+    "file": "验收记录.txt",
+    "bytes": 1752,
+    "sha256": "0db7c17f49a884066fff6d4ab198b9eeb4ee9455672dcf6f38a21e262c0de3fc"
+  }
+]

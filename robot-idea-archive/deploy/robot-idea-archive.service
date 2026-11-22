@@ -1,0 +1,24 @@
+[Unit]
+Description=Private Robot Idea Archive
+After=network.target
+
+[Service]
+Type=simple
+User=robotarchive
+Group=robotarchive
+WorkingDirectory=/opt/robot-idea-archive
+Environment=ARCHIVE_DATA=/var/lib/robot-idea-archive
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/robot-idea-archive/.venv/bin/gunicorn --bind 0.0.0.0:5187 --workers 2 --threads 2 --timeout 60 --access-logfile - --error-logfile - app:app
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/robot-idea-archive
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target

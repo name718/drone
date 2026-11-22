@@ -1,0 +1,39 @@
+{
+  "parts": 27,
+  "expected_solids": 38,
+  "valid_parts": true,
+  "structure_roundtrips": [
+    {
+      "name": "FrontShell",
+      "relative_volume_error": 5.446643618151188e-14
+    },
+    {
+      "name": "RearShell",
+      "relative_volume_error": 4.7917162884918035e-14
+    },
+    {
+      "name": "Plinth",
+      "relative_volume_error": 6.5277845009521335e-15
+    },
+    {
+      "name": "DisplayBezel",
+      "relative_volume_error": 1.5915873906736015e-14
+    },
+    {
+      "name": "Button0",
+      "relative_volume_error": 7.930669378865369e-16
+    },
+    {
+      "name": "Button1",
+      "relative_volume_error": 5.948002034149028e-16
+    }
+  ],
+  "collisions": [],
+  "tested_pairs": 20,
+  "reimported_solids": 38,
+  "dimensions_mm": [
+    96.0,
+    44.0,
+    99.0
+  ]
+}

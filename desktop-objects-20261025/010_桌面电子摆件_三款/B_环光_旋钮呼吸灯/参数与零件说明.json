@@ -1,0 +1,694 @@
+{
+  "id": "orbit-light",
+  "name": "环光 · 旋钮呼吸灯",
+  "subtitle": "悬起一圈暖光，用一只旋钮控制明暗与呼吸节奏。",
+  "features": [
+    "旋钮调光",
+    "按压开关",
+    "呼吸灯模式"
+  ],
+  "sensors": [
+    "旋转编码器 / 按压开关（候选）"
+  ],
+  "power": "5V USB；限流、功耗与温升需后续验证",
+  "notes": "16 颗 LED 和环形板是空间预算；不承诺已实现光学均匀性或灯具性能。",
+  "parts": [
+    {
+      "name": "BaseLower",
+      "cn": "底座下壳与螺柱",
+      "mat": "sage",
+      "color": [
+        0.4,
+        0.6,
+        0.52
+      ],
+      "kind": "structure",
+      "group": "base",
+      "exterior": true,
+      "explode": [
+        0,
+        0,
+        -17
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 23243.415234474338
+    },
+    {
+      "name": "RingFrame",
+      "cn": "灯环骨架与中空支撑",
+      "mat": "cream",
+      "color": [
+        0.92,
+        0.9,
+        0.83
+      ],
+      "kind": "structure",
+      "group": "case",
+      "exterior": true,
+      "explode": [
+        0,
+        0,
+        22
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 38921.74118936616
+    },
+    {
+      "name": "Diffuser",
+      "cn": "前置暖光扩散环",
+      "mat": "warm",
+      "color": [
+        1.0,
+        0.81,
+        0.47
+      ],
+      "kind": "structure",
+      "group": "case",
+      "exterior": true,
+      "explode": [
+        0,
+        -22,
+        23
+      ],
+      "note": "半透明扩散件概念，透光均匀度和材料尚未测试",
+      "solids": 1,
+      "volume_mm3": 2738.369236501542
+    },
+    {
+      "name": "RingRear",
+      "cn": "灯环后盖",
+      "mat": "clay",
+      "color": [
+        0.74,
+        0.43,
+        0.32
+      ],
+      "kind": "structure",
+      "group": "case",
+      "exterior": true,
+      "explode": [
+        0,
+        24,
+        23
+      ],
+      "note": "后盖底部为中空支撑柱让位，留名义边隙；最终固定方式待试装",
+      "solids": 1,
+      "volume_mm3": 4008.675530513695
+    },
+    {
+      "name": "LEDPCB",
+      "cn": "环形 LED 板空间",
+      "mat": "pcb",
+      "color": [
+        0.04,
+        0.36,
+        0.25
+      ],
+      "kind": "envelope",
+      "group": "led",
+      "exterior": false,
+      "explode": [
+        0,
+        13,
+        22
+      ],
+      "note": "定制环形 PCB 布局预算，未指定可直接购买的同尺寸成品灯环",
+      "solids": 1,
+      "volume_mm3": 2284.3148502782087
+    },
+    {
+      "name": "LED0",
+      "cn": "暖光LED空间",
+      "mat": "white",
+      "color": [
+        0.92,
+        0.95,
+        0.91
+      ],
+      "kind": "envelope",
+      "group": "led",
+      "exterior": false,
+      "explode": [
+        0,
+        -5,
+        22
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 13.5
+    },
+    {
+      "name": "LED1",
+      "cn": "暖光LED空间",
+      "mat": "white",
+      "color": [
+        0.92,
+        0.95,
+        0.91
+      ],
+      "kind": "envelope",
+      "group": "led",
+      "exterior": false,
+      "explode": [
+        0,
+        -5,
+        22
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 13.5
+    },
+    {
+      "name": "LED2",
+      "cn": "暖光LED空间",
+      "mat": "white",
+      "color": [
+        0.92,
+        0.95,
+        0.91
+      ],
+      "kind": "envelope",
+      "group": "led",
+      "exterior": false,
+      "explode": [
+        0,
+        -5,
+        22
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 13.5
+    },
+    {
+      "name": "LED3",
+      "cn": "暖光LED空间",
+      "mat": "white",
+      "color": [
+        0.92,
+        0.95,
+        0.91
+      ],
+      "kind": "envelope",
+      "group": "led",
+      "exterior": false,
+      "explode": [
+        0,
+        -5,
+        22
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 13.5
+    },
+    {
+      "name": "LED4",
+      "cn": "暖光LED空间",
+      "mat": "white",
+      "color": [
+        0.92,
+        0.95,
+        0.91
+      ],
+      "kind": "envelope",
+      "group": "led",
+      "exterior": false,
+      "explode": [
+        0,
+        -5,
+        22
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 13.5
+    },
+    {
+      "name": "LED5",
+      "cn": "暖光LED空间",
+      "mat": "white",
+      "color": [
+        0.92,
+        0.95,
+        0.91
+      ],
+      "kind": "envelope",
+      "group": "led",
+      "exterior": false,
+      "explode": [
+        0,
+        -5,
+        22
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 13.5
+    },
+    {
+      "name": "LED6",
+      "cn": "暖光LED空间",
+      "mat": "white",
+      "color": [
+        0.92,
+        0.95,
+        0.91
+      ],
+      "kind": "envelope",
+      "group": "led",
+      "exterior": false,
+      "explode": [
+        0,
+        -5,
+        22
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 13.5
+    },
+    {
+      "name": "LED7",
+      "cn": "暖光LED空间",
+      "mat": "white",
+      "color": [
+        0.92,
+        0.95,
+        0.91
+      ],
+      "kind": "envelope",
+      "group": "led",
+      "exterior": false,
+      "explode": [
+        0,
+        -5,
+        22
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 13.5
+    },
+    {
+      "name": "LED8",
+      "cn": "暖光LED空间",
+      "mat": "white",
+      "color": [
+        0.92,
+        0.95,
+        0.91
+      ],
+      "kind": "envelope",
+      "group": "led",
+      "exterior": false,
+      "explode": [
+        0,
+        -5,
+        22
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 13.5
+    },
+    {
+      "name": "LED9",
+      "cn": "暖光LED空间",
+      "mat": "white",
+      "color": [
+        0.92,
+        0.95,
+        0.91
+      ],
+      "kind": "envelope",
+      "group": "led",
+      "exterior": false,
+      "explode": [
+        0,
+        -5,
+        22
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 13.5
+    },
+    {
+      "name": "LED10",
+      "cn": "暖光LED空间",
+      "mat": "white",
+      "color": [
+        0.92,
+        0.95,
+        0.91
+      ],
+      "kind": "envelope",
+      "group": "led",
+      "exterior": false,
+      "explode": [
+        0,
+        -5,
+        22
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 13.5
+    },
+    {
+      "name": "LED11",
+      "cn": "暖光LED空间",
+      "mat": "white",
+      "color": [
+        0.92,
+        0.95,
+        0.91
+      ],
+      "kind": "envelope",
+      "group": "led",
+      "exterior": false,
+      "explode": [
+        0,
+        -5,
+        22
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 13.5
+    },
+    {
+      "name": "LED12",
+      "cn": "暖光LED空间",
+      "mat": "white",
+      "color": [
+        0.92,
+        0.95,
+        0.91
+      ],
+      "kind": "envelope",
+      "group": "led",
+      "exterior": false,
+      "explode": [
+        0,
+        -5,
+        22
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 13.5
+    },
+    {
+      "name": "LED13",
+      "cn": "暖光LED空间",
+      "mat": "white",
+      "color": [
+        0.92,
+        0.95,
+        0.91
+      ],
+      "kind": "envelope",
+      "group": "led",
+      "exterior": false,
+      "explode": [
+        0,
+        -5,
+        22
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 13.5
+    },
+    {
+      "name": "LED14",
+      "cn": "暖光LED空间",
+      "mat": "white",
+      "color": [
+        0.92,
+        0.95,
+        0.91
+      ],
+      "kind": "envelope",
+      "group": "led",
+      "exterior": false,
+      "explode": [
+        0,
+        -5,
+        22
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 13.5
+    },
+    {
+      "name": "LED15",
+      "cn": "暖光LED空间",
+      "mat": "white",
+      "color": [
+        0.92,
+        0.95,
+        0.91
+      ],
+      "kind": "envelope",
+      "group": "led",
+      "exterior": false,
+      "explode": [
+        0,
+        -5,
+        22
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 13.5
+    },
+    {
+      "name": "ControlPCB",
+      "cn": "控制与限流板空间",
+      "mat": "pcb",
+      "color": [
+        0.04,
+        0.36,
+        0.25
+      ],
+      "kind": "envelope",
+      "group": "electronics",
+      "exterior": false,
+      "explode": [
+        0,
+        0,
+        7
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 2319.999999999999
+    },
+    {
+      "name": "ControlMCU",
+      "cn": "主控与电源空间",
+      "mat": "metal",
+      "color": [
+        0.68,
+        0.71,
+        0.7
+      ],
+      "kind": "envelope",
+      "group": "electronics",
+      "exterior": false,
+      "explode": [
+        0,
+        0,
+        0
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 1215.9999999999998
+    },
+    {
+      "name": "Encoder",
+      "cn": "旋钮编码器空间",
+      "mat": "metal",
+      "color": [
+        0.68,
+        0.71,
+        0.7
+      ],
+      "kind": "envelope",
+      "group": "controls",
+      "exterior": false,
+      "explode": [
+        0,
+        0,
+        0
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 1238.3999999999996
+    },
+    {
+      "name": "EncoderShaft",
+      "cn": "旋钮轴空间",
+      "mat": "metal",
+      "color": [
+        0.68,
+        0.71,
+        0.7
+      ],
+      "kind": "envelope",
+      "group": "controls",
+      "exterior": false,
+      "explode": [
+        0,
+        0,
+        0
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 226.19467105846508
+    },
+    {
+      "name": "Knob",
+      "cn": "顶部调光旋钮",
+      "mat": "clay",
+      "color": [
+        0.74,
+        0.43,
+        0.32
+      ],
+      "kind": "structure",
+      "group": "controls",
+      "exterior": true,
+      "explode": [
+        0,
+        0,
+        15
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 2616.469158356952
+    },
+    {
+      "name": "KnobMark",
+      "cn": "旋钮标记",
+      "mat": "cream",
+      "color": [
+        0.92,
+        0.9,
+        0.83
+      ],
+      "kind": "visual",
+      "group": "controls",
+      "exterior": true,
+      "explode": [
+        0,
+        0,
+        0
+      ],
+      "note": "原创概念结构；固定、公差、线束与实物配合待验证",
+      "solids": 1,
+      "volume_mm3": 0.12799999999999698
+    },
+    {
+      "name": "USB_C",
+      "cn": "USB-C 插座空间",
+      "mat": "metal",
+      "color": [
+        0.68,
+        0.71,
+        0.7
+      ],
+      "kind": "envelope",
+      "group": "electronics",
+      "exterior": false,
+      "explode": [
+        0,
+        18,
+        0
+      ],
+      "note": "接口仅为安装空间预算，型号与板边位置尚未定型",
+      "solids": 1,
+      "volume_mm3": 116.98211458621365
+    },
+    {
+      "name": "Pad0",
+      "cn": "底部防滑垫",
+      "mat": "rubber",
+      "color": [
+        0.07,
+        0.09,
+        0.09
+      ],
+      "kind": "envelope",
+      "group": "base",
+      "exterior": true,
+      "explode": [
+        -7.6000000000000005,
+        -3.4000000000000004,
+        -5
+      ],
+      "note": "防滑垫为 8×1 mm 候选预算，需按实际胶垫确认",
+      "solids": 1,
+      "volume_mm3": 50.26548245743669
+    },
+    {
+      "name": "Pad1",
+      "cn": "底部防滑垫",
+      "mat": "rubber",
+      "color": [
+        0.07,
+        0.09,
+        0.09
+      ],
+      "kind": "envelope",
+      "group": "base",
+      "exterior": true,
+      "explode": [
+        -7.6000000000000005,
+        3.4000000000000004,
+        -5
+      ],
+      "note": "防滑垫为 8×1 mm 候选预算，需按实际胶垫确认",
+      "solids": 1,
+      "volume_mm3": 50.26548245743669
+    },
+    {
+      "name": "Pad2",
+      "cn": "底部防滑垫",
+      "mat": "rubber",
+      "color": [
+        0.07,
+        0.09,
+        0.09
+      ],
+      "kind": "envelope",
+      "group": "base",
+      "exterior": true,
+      "explode": [
+        7.6000000000000005,
+        -3.4000000000000004,
+        -5
+      ],
+      "note": "防滑垫为 8×1 mm 候选预算，需按实际胶垫确认",
+      "solids": 1,
+      "volume_mm3": 50.26548245743669
+    },
+    {
+      "name": "Pad3",
+      "cn": "底部防滑垫",
+      "mat": "rubber",
+      "color": [
+        0.07,
+        0.09,
+        0.09
+      ],
+      "kind": "envelope",
+      "group": "base",
+      "exterior": true,
+      "explode": [
+        7.6000000000000005,
+        3.4000000000000004,
+        -5
+      ],
+      "note": "防滑垫为 8×1 mm 候选预算，需按实际胶垫确认",
+      "solids": 1,
+      "volume_mm3": 50.26548245743669
+    }
+  ],
+  "dimensions_mm": [
+    100.0000002,
+    56.9000001,
+    125.0000001
+  ]
+}
